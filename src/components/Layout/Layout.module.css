@@ -1,0 +1,373 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden; /* Ngăn chặn cuộn ngang tuyệt đối trên các trình duyệt mobile */
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  height: 70px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+}
+
+.navContainer {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  list-style: none;
+}
+
+.navLink {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: hsl(var(--text-secondary));
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.navLink:hover {
+  color: hsl(var(--text-primary));
+  background: hsl(var(--primary) / 0.08);
+}
+
+.activeNavLink {
+  color: hsl(var(--primary));
+  font-weight: 800;
+  background: hsl(var(--primary) / 0.1);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userName {
+  font-weight: 500;
+}
+
+.langToggleCircleBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid rgba(247, 148, 30, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  padding: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.langToggleCircleBtn:hover {
+  transform: scale(1.08) translateY(-1px);
+  border-color: #F7941E;
+  box-shadow: 0 4px 12px rgba(247, 148, 30, 0.22);
+}
+
+.langToggleCircleBtn:active {
+  transform: scale(0.96) translateY(0);
+}
+
+.flagSvg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Hamburger button styling */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: hsl(var(--text-primary));
+  cursor: pointer;
+  z-index: 110;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Mobile Drawer (Menu trượt bên phải) */
+.mobileDrawer {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  width: 280px;
+  height: calc(100vh - 70px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 105;
+  transition: transform var(--transition-normal), visibility var(--transition-normal);
+  padding: 2rem 1.5rem;
+  transform: translateX(100%); /* Bắt đầu ngoài màn hình bên phải */
+  visibility: hidden; /* Ẩn hoàn toàn để không gây tràn cuộn ngang trên điện thoại */
+}
+
+.mobileDrawerOpen {
+  transform: translateX(0); /* Trượt vào màn hình */
+  visibility: visible; /* Hiện menu */
+}
+
+.mobileNavLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.mobileNavLink {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: hsl(var(--text-secondary));
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+}
+
+.mobileNavLink:hover {
+  color: hsl(var(--text-primary));
+  background: hsl(var(--primary) / 0.1);
+}
+
+.activeMobileNavLink {
+  color: hsl(var(--primary));
+  font-weight: 800;
+  background: hsl(var(--primary) / 0.15);
+  border-left: 3px solid hsl(var(--primary));
+}
+
+.mobileUserSection {
+  border-top: 1px solid var(--glass-border);
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+.backdrop {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 102;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 70px;
+}
+
+.footer {
+  border-top: 1px solid var(--border-muted);
+  padding: 2.5rem 0;
+  background: hsl(224deg 39% 10%);
+  margin-top: auto;
+  --text-primary: 0deg 0% 100%;
+  --text-secondary: 215deg 20% 75%;
+  --text-muted: 215deg 15% 55%;
+}
+
+.footerContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  color: hsl(var(--text-secondary));
+  font-size: 0.9rem;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footerLink {
+  color: hsl(var(--text-primary));
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.footerLink:hover {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  background: hsl(var(--primary) / 0.1);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid hsl(var(--primary) / 0.2);
+}
+
+.logoutBtn {
+  background: none;
+  border: none;
+  color: hsl(var(--danger));
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0;
+  transition: var(--transition-fast);
+}
+
+.logoutBtn:hover {
+  text-decoration: underline;
+}
+
+/* Floating Contact Shortcut Widget */
+.floatingContactWidget {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 9999;
+}
+
+.contactShortcutBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  background-color: #ffffff;
+  text-decoration: none;
+  position: relative;
+}
+
+.contactShortcutBtn:hover {
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+}
+
+/* Tooltip on hover */
+.contactShortcutBtn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: 65px;
+  background-color: rgba(13, 37, 95, 0.95);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateX(10px);
+}
+
+.contactShortcutBtn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+/* Specific Buttons colors */
+.zaloBtn {
+  background-color: #0088FF;
+}
+
+.zaloBtn:hover {
+  background-color: #0077EE;
+}
+
+.messengerBtn {
+  background-color: #ffffff;
+}
+
+.gmailBtn {
+  background-color: #ea4335;
+}
+
+.gmailBtn:hover {
+  background-color: #d93025;
+}
+
+/* Media Query cho Mobile */
+@media (max-width: 768px) {
+  .navLinks,
+  .navActions {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+}
