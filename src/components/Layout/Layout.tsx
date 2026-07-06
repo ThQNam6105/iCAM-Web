@@ -22,13 +22,13 @@ export const Layout: React.FC = () => {
       <header className={styles.header}>
         <nav className={styles.navContainer}>
           {/* Logo */}
-          <a href="/" className={styles.logo} onClick={closeMenu}>
+          <NavLink to="/" className={styles.logo} onClick={closeMenu}>
             <img
               src={logoImg}
               alt="Logo iCAM"
               style={{ height: '64px', width: 'auto', display: 'block' }}
             />
-          </a>
+          </NavLink>
 
           {/* Desktop Navigation Links */}
           <ul className={styles.navLinks}>
