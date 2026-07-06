@@ -11,7 +11,8 @@ import { Contact } from '../pages/Contact/Contact';
 import { NotFound } from '../pages/NotFound/NotFound';
 
 export const AppRouter: React.FC = () => {
-  const basename = import.meta.env.DEV ? '/' : '/iCAM-Web';
+  const base = import.meta.env.BASE_URL;
+  const basename = base.endsWith('/') && base.length > 1 ? base.slice(0, -1) : base;
 
   return (
     <BrowserRouter basename={basename}>
