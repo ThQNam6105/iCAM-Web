@@ -23,28 +23,20 @@ export const Layout: React.FC = () => {
   const closeMenu = () => setIsMenuOpen(false);
 
   const base = import.meta.env.BASE_URL;
-  const basename = base.endsWith('/') && base.length > 1 ? base.slice(0, -1) : base;
-
-  const handleLogoClick = () => {
-    closeMenu();
-    const isHome = pathname === '/' || pathname === basename || pathname === `${basename}/`;
-    if (isHome) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
+  const homepageUrl = base.endsWith('/') ? base : `${base}/`;
 
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
         <nav className={styles.navContainer}>
           {/* Logo */}
-          <NavLink to="/" className={styles.logo} onClick={handleLogoClick}>
+          <a href={homepageUrl} className={styles.logo} onClick={closeMenu}>
             <img
               src={logoImg}
               alt="Logo iCAM"
               style={{ height: '64px', width: 'auto', display: 'block' }}
             />
-          </NavLink>
+          </a>
 
           {/* Desktop Navigation Links */}
           <ul className={styles.navLinks}>
