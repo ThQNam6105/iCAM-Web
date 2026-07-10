@@ -1,6 +1,6 @@
 import logoImg from '../../assets/ican.png'; // Thay thế đuôi file tương ứng (.svg, .png)
 import React, { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { User, LogOut, Menu, X } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import styles from './Layout.module.css';
@@ -9,6 +9,11 @@ export const Layout: React.FC = () => {
   const { user, logout } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lang, setLang] = useState<'VI' | 'EN'>('VI');
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   const toggleLanguage = () => {
     setLang((prev) => (prev === 'VI' ? 'EN' : 'VI'));
@@ -17,12 +22,19 @@ export const Layout: React.FC = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
+  const handleLogoClick = () => {
+    closeMenu();
+    if (pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
         <nav className={styles.navContainer}>
           {/* Logo */}
-          <NavLink to="/" className={styles.logo} onClick={closeMenu}>
+          <NavLink to="/" className={styles.logo} onClick={handleLogoClick}>
             <img
               src={logoImg}
               alt="Logo iCAM"
