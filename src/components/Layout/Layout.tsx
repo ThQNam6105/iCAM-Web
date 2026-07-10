@@ -281,7 +281,16 @@ export const Layout: React.FC = () => {
             </NavLink>
           </div>
           <p style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            THIEUNAM iCAM © {new Date().getFullYear()}
+            <a
+              href="https://github.com/ThQNam6105"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseOver={(e) => (e.currentTarget.style.color = 'hsl(var(--primary))')}
+              onMouseOut={(e) => (e.currentTarget.style.color = 'inherit')}
+            >
+              THIEUNAM iCAM © {new Date().getFullYear()}
+            </a>
           </p>
         </div>
       </footer>
