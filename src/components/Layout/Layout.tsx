@@ -22,9 +22,13 @@ export const Layout: React.FC = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
+  const base = import.meta.env.BASE_URL;
+  const basename = base.endsWith('/') && base.length > 1 ? base.slice(0, -1) : base;
+
   const handleLogoClick = () => {
     closeMenu();
-    if (pathname === '/') {
+    const isHome = pathname === '/' || pathname === basename || pathname === `${basename}/`;
+    if (isHome) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
