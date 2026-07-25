@@ -70,6 +70,7 @@
   line-height: 1.2;
   letter-spacing: -0.02em;
   margin-bottom: 1rem;
+  color: #ffffff !important;
 }
 
 .heroTagline {
@@ -833,11 +834,12 @@
   font-size: clamp(1.8rem, 3.5vw, 2.6rem);
   font-weight: 800;
   margin-bottom: 1rem;
+  color: #ffffff !important;
 }
 
 .ctaCard p {
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff !important;
   max-width: 680px;
   margin: 0 auto 2.5rem auto;
   line-height: 1.6;
