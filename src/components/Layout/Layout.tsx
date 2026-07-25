@@ -312,7 +312,7 @@ export const Layout: React.FC = () => {
 
         {/* Messenger Shortcut */}
         <a
-          href="https://m.me/icam"
+          href="https://m.me/tqnam6105"
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.messengerBtn}`}
