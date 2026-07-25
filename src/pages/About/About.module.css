@@ -1,60 +1,922 @@
+/* ANH NGỮ CAM — About Us Modern UI/UX Stylesheet */
+
+.aboutWrapper {
+  width: 100%;
+  overflow-x: hidden;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+}
+
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  padding: 2rem 0;
-  max-width: 800px;
+  max-width: 1280px;
   margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-.title {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+.orangeHighlight,
+.orangeText {
+  color: #F58220;
 }
 
-.description {
-  font-size: 1.1rem;
-  color: hsl(var(--text-secondary));
-  line-height: 1.7;
-}
-
-.section {
+/* ==========================================
+   SECTION 1: HERO BANNER
+   ========================================== */
+.heroSection {
+  position: relative;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #091a36 0%, #0d2752 50%, #153c7a 100%);
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 2rem;
-  border-radius: var(--radius-lg);
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.5rem 5rem 1.5rem;
+  overflow: hidden;
 }
 
-.techGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 30%, rgba(245, 130, 32, 0.15) 0%, transparent 60%);
+  pointer-events: none;
 }
 
-.techItem {
-  background: hsl(var(--bg-tertiary) / 0.5);
-  border: 1px solid var(--glass-border);
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
+.heroContainer {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
   text-align: center;
-  transition: var(--transition-fast);
+  color: #ffffff;
 }
 
-.techItem:hover {
-  border-color: hsl(var(--primary) / 0.4);
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(245, 130, 32, 0.15);
+  border: 1px solid rgba(245, 130, 32, 0.4);
+  color: #F58220;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.heroTagline {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
+.heroDescription {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #94a3b8;
+  max-width: 760px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.primaryHeroBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #F58220;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(245, 130, 32, 0.35);
+  transition: all 0.3s ease;
+}
+
+.primaryHeroBtn:hover {
+  background: #e07112;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(245, 130, 32, 0.45);
+}
+
+.secondaryHeroBtn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.secondaryHeroBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
-.techName {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: hsl(var(--text-primary));
-  margin-bottom: 0.25rem;
+.locationPills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.techDetail {
+.locationPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+/* ==========================================
+   SECTION HEADERS
+   ========================================== */
+.sectionHeader {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3.5rem auto;
+}
+
+.sectionTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(245, 130, 32, 0.1);
+  color: #F58220;
+  font-weight: 700;
   font-size: 0.85rem;
-  color: hsl(var(--text-muted));
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.sectionTagLight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+}
+
+.sectionSubtitle {
+  font-size: 1.05rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   SECTION 2: MISSION & DECLARATIONS
+   ========================================== */
+.missionSection {
+  padding: 6rem 0;
+  background-color: #FFF9F2;
+}
+
+.declarationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.declarationCard {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(245, 130, 32, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.declarationCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(245, 130, 32, 0.12);
+  border-color: #F58220;
+}
+
+.highlightCard {
+  background: linear-gradient(145deg, #ffffff 0%, #fff6ed 100%);
+  border-color: rgba(245, 130, 32, 0.4);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.quoteBadge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #F58220;
+  color: #ffffff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.cardIcon {
+  color: #F58220;
+}
+
+.declarationQuote {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.35rem;
+  line-height: 1.3;
+}
+
+.declarationSub {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #F58220;
+  margin-bottom: 1rem;
+}
+
+.declarationDesc {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   SECTION 3: CORE VALUES
+   ========================================== */
+.valuesSection {
+  padding: 6rem 0;
+  background: #ffffff;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.75rem;
+}
+
+.valueCard {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.valueCard:hover {
+  background: #ffffff;
+  border-color: #F58220;
+  box-shadow: 0 15px 35px rgba(245, 130, 32, 0.1);
+  transform: translateY(-5px);
+}
+
+.valueIconBox {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(245, 130, 32, 0.1);
+  color: #F58220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.valueCard h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.6rem;
+}
+
+.valueCard p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   SECTION 4: WHY CHOOSE US (COMPARISON)
+   ========================================== */
+.whyUsSection {
+  padding: 6rem 0;
+  background: #f8fafc;
+}
+
+.toggleContainer {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.toggleBtn {
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.activeToggle {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.activeToggleOrange {
+  background: #F58220;
+  color: #ffffff;
+  border-color: #F58220;
+  box-shadow: 0 6px 20px rgba(245, 130, 32, 0.3);
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.comparisonCard {
+  border-radius: 20px;
+  padding: 2.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.traditionalSide {
+  opacity: 0.85;
+}
+
+.camSide {
+  border-color: rgba(245, 130, 32, 0.4);
+  box-shadow: 0 10px 30px rgba(245, 130, 32, 0.08);
+}
+
+.highlightedSide {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.comparisonHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.comparisonHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.badgeDanger {
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+}
+
+.badgeSuccess {
+  background: #f0fdf4;
+  color: #16a34a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+}
+
+.comparisonList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.comparisonList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.crossIcon {
+  color: #ef4444;
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.checkIcon {
+  color: #16a34a;
+}
+
+/* ==========================================
+   SECTION 5: TEACHING METHOD (4Ls + LETI)
+   ========================================== */
+.methodSection {
+  padding: 6rem 0;
+  background: #ffffff;
+}
+
+.methodTabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.methodTab {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 2rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.activeTab {
+  background: #F58220;
+  color: #ffffff;
+  border-color: #F58220;
+  box-shadow: 0 8px 24px rgba(245, 130, 32, 0.3);
+}
+
+.tabContentFade {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fourLsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.75rem;
+}
+
+.lsCard {
+  background: #FFF9F2;
+  border-radius: 18px;
+  padding: 2rem;
+  border: 1px solid rgba(245, 130, 32, 0.2);
+  transition: all 0.3s ease;
+}
+
+.lsCard:hover {
+  transform: translateY(-5px);
+  border-color: #F58220;
+  box-shadow: 0 12px 30px rgba(245, 130, 32, 0.12);
+}
+
+.lsIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: #F58220;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.lsCard h4 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.lsCard p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.letiBanner {
+  background: linear-gradient(135deg, #091a36 0%, #0d2752 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.letiBanner h3 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #F58220;
+  margin-bottom: 0.5rem;
+}
+
+.letiBanner p {
+  font-size: 1.05rem;
+  color: #cbd5e1;
+}
+
+.letiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.letiCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.letiCard:hover {
+  border-color: #F58220;
+  box-shadow: 0 10px 25px rgba(245, 130, 32, 0.08);
+}
+
+.letiIcon {
+  color: #F58220;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.letiCard h5 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.3rem;
+}
+
+.letiCard p {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   SECTION 6: 21ST CENTURY CLASSROOM
+   ========================================== */
+.classroomSection {
+  padding: 6rem 0;
+  background: #f8fafc;
+}
+
+.classroomGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 2rem;
+}
+
+.classroomCard {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.25rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.classroomCard:hover {
+  transform: translateY(-6px);
+  border-color: #F58220;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+}
+
+.classIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(245, 130, 32, 0.1);
+  color: #F58220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.classroomCard h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+}
+
+.classroomCard p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   SECTION 7: STUDENT JOURNEY
+   ========================================== */
+.journeySection {
+  padding: 6rem 0;
+  background: #ffffff;
+}
+
+.journeySteps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stepCard {
+  flex: 1;
+  min-width: 220px;
+  background: #FFF9F2;
+  border-radius: 18px;
+  padding: 2rem 1.5rem;
+  border: 1px solid rgba(245, 130, 32, 0.2);
+  position: relative;
+}
+
+.stepNumber {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #F58220;
+  margin-bottom: 0.75rem;
+}
+
+.stepCard h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.stepCard p {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.stepConnector {
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+}
+
+/* ==========================================
+   SECTION 8: STUDENT OUTCOMES
+   ========================================== */
+.outcomesSection {
+  padding: 6rem 0;
+  background: #f8fafc;
+}
+
+.outcomesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+.outcomeItem {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.outcomeItem:hover {
+  border-color: #F58220;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(245, 130, 32, 0.08);
+}
+
+.outcomeItem h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.3rem;
+}
+
+.outcomeItem p {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   SECTION 9: INNOVATION STORY
+   ========================================== */
+.storySection {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.storyBox {
+  background: linear-gradient(135deg, #091a36 0%, #0d2752 100%);
+  border-radius: 24px;
+  padding: 3.5rem 3rem;
+  color: #ffffff;
+}
+
+.storyContent {
+  max-width: 850px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.storyContent h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+}
+
+.storyContent p {
+  font-size: 1.05rem;
+  color: #cbd5e1;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+/* ==========================================
+   SECTION 10: CALL TO ACTION (CTA)
+   ========================================== */
+.ctaSection {
+  padding: 6rem 0;
+  background: #FFF9F2;
+}
+
+.ctaCard {
+  background: linear-gradient(135deg, #F58220 0%, #e07112 100%);
+  border-radius: 24px;
+  padding: 4rem 2.5rem;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 20px 50px rgba(245, 130, 32, 0.3);
+}
+
+.ctaCard h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.ctaCard p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 680px;
+  margin: 0 auto 2.5rem auto;
+  line-height: 1.6;
+}
+
+.ctaButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.primaryCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem 2.25rem;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.primaryCtaBtn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+}
+
+.secondaryCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem 2.25rem;
+  border-radius: 14px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.secondaryCtaBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES
+   ========================================== */
+@media (max-width: 768px) {
+  .heroSection {
+    min-height: auto;
+    padding: 4rem 1rem 3rem 1rem;
+  }
+
+  .stepConnector {
+    display: none;
+  }
+
+  .journeySteps {
+    flex-direction: column;
+  }
+
+  .stepCard {
+    width: 100%;
+  }
+
+  .storyBox {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .ctaCard {
+    padding: 3rem 1.5rem;
+  }
 }
