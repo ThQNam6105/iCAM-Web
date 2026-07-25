@@ -332,7 +332,7 @@ export const Layout: React.FC = () => {
 
         {/* Gmail Shortcut */}
         <a
-          href="mailto:info@icam.edu.vn"
+          href="mailto:thieunam2005@gmail.com"
           className={`${styles.contactShortcutBtn} ${styles.gmailBtn}`}
           data-tooltip="Gửi Email"
         >

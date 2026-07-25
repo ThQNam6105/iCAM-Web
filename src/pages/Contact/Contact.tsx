@@ -124,7 +124,11 @@ export const Contact: React.FC = () => {
                     <Mail size={18} className={styles.icon} />
                     <div>
                       <strong>Email hỗ trợ:</strong>
-                      <p>tuyensinh@icam.edu.vn</p>
+                      <p>
+                        <a href="mailto:thieunam2005@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
+                          thieunam2005@gmail.com
+                        </a>
+                      </p>
                     </div>
                   </div>
 

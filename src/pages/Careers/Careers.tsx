@@ -301,7 +301,7 @@ export const Careers: React.FC = () => {
               Đừng ngần ngại gửi hồ sơ ứng tuyển tự do (Talent Pool) cho ANH NGỮ CAM. Chúng tôi luôn mở rộng cửa chào đón các nhân tố tài năng đồng hành lâu dài!
             </p>
             <div className={styles.ctaButtons}>
-              <a href="mailto:tuyendung@icam.edu.vn" className={styles.primaryCtaBtn}>
+              <a href="mailto:thieunam2005@gmail.com" className={styles.primaryCtaBtn}>
                 Gửi CV Ứng Tuyển Tự Do <Send size={16} />
               </a>
             </div>
