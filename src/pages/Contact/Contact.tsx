@@ -11,7 +11,9 @@ import {
   PhoneCall,
   GraduationCap,
   Building2,
-  ShieldCheck
+  ShieldCheck,
+  ExternalLink,
+  Navigation
 } from 'lucide-react';
 import styles from './Contact.module.css';
 
@@ -20,7 +22,7 @@ export const Contact: React.FC = () => {
     name: '',
     phone: '',
     email: '',
-    branch: 'hocmon',
+    branch: 'trungmytay',
     course: 'ielts',
     message: '',
   });
@@ -29,7 +31,7 @@ export const Contact: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    setFormData({ name: '', phone: '', email: '', branch: 'hocmon', course: 'ielts', message: '' });
+    setFormData({ name: '', phone: '', email: '', branch: 'trungmytay', course: 'ielts', message: '' });
     setTimeout(() => setSubmitted(false), 5000);
   };
 
@@ -38,6 +40,9 @@ export const Contact: React.FC = () => {
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const googleMapsUrl = 'https://maps.app.goo.gl/AhLJBp14TZsQwmuq5';
+  const fullAddress = '344 A Tổ 13 KP 1, Trung Mỹ Tây, Hồ Chí Minh, Việt Nam';
 
   return (
     <div className={styles.contactWrapper}>
@@ -64,10 +69,17 @@ export const Contact: React.FC = () => {
               <PhoneCall size={16} color="#F58220" />
               <span>Hotline: 0909 123 456</span>
             </div>
-            <div className={styles.quickBadge}>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.quickBadgeLink}
+              title="Xem bản đồ chỉ đường"
+            >
               <MapPin size={16} color="#F58220" />
-              <span>Cơ sở Hóc Môn & Quận 12, TP.HCM</span>
-            </div>
+              <span>{fullAddress}</span>
+              <ExternalLink size={14} />
+            </a>
             <div className={styles.quickBadge}>
               <Clock size={16} color="#F58220" />
               <span>T2 - CN: 08:00 - 21:30</span>
@@ -82,47 +94,49 @@ export const Contact: React.FC = () => {
           <div className={styles.splitLayout}>
             {/* LEFT COLUMN: CAMPUSES & CONTACT INFO */}
             <div className={styles.infoColumn}>
-              {/* Campus 1: Hoc Mon */}
+              {/* Main Campus Card */}
               <div className={styles.campusCard}>
                 <div className={styles.campusHeader}>
                   <Building2 size={22} color="#F58220" />
-                  <h3>Cơ Sở Hóc Môn</h3>
+                  <div>
+                    <h3>Trụ Sở ANH NGỮ CAM</h3>
+                    <span className={styles.subTag}>Hóc Môn & Quận 12</span>
+                  </div>
                 </div>
                 <div className={styles.campusBody}>
                   <div className={styles.infoRow}>
-                    <MapPin size={18} className={styles.icon} />
-                    <span>Khu vực Trung tâm Hóc Môn, TP. Hồ Chí Minh</span>
+                    <MapPin size={20} className={styles.icon} />
+                    <div>
+                      <strong>Địa chỉ chính thức:</strong>
+                      <p className={styles.addressText}>{fullAddress}</p>
+                    </div>
                   </div>
-                  <div className={styles.infoRow}>
-                    <Phone size={18} className={styles.icon} />
-                    <span>Hotline: 0909 123 456</span>
-                  </div>
-                  <div className={styles.infoRow}>
-                    <Mail size={18} className={styles.icon} />
-                    <span>Email: hocmon@icam.edu.vn</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Campus 2: District 12 */}
-              <div className={styles.campusCard}>
-                <div className={styles.campusHeader}>
-                  <Building2 size={22} color="#F58220" />
-                  <h3>Cơ Sở Quận 12</h3>
-                </div>
-                <div className={styles.campusBody}>
-                  <div className={styles.infoRow}>
-                    <MapPin size={18} className={styles.icon} />
-                    <span>Khu vực Trung tâm Quận 12, TP. Hồ Chí Minh</span>
-                  </div>
                   <div className={styles.infoRow}>
                     <Phone size={18} className={styles.icon} />
-                    <span>Hotline: 0909 789 012</span>
+                    <div>
+                      <strong>Hotline tuyển sinh & tư vấn:</strong>
+                      <p>0909 123 456 - 0909 789 012</p>
+                    </div>
                   </div>
+
                   <div className={styles.infoRow}>
                     <Mail size={18} className={styles.icon} />
-                    <span>Email: quan12@icam.edu.vn</span>
+                    <div>
+                      <strong>Email hỗ trợ:</strong>
+                      <p>tuyensinh@icam.edu.vn</p>
+                    </div>
                   </div>
+
+                  {/* Google Maps Button */}
+                  <a
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.mapsDirectionBtn}
+                  >
+                    <Navigation size={18} /> Định Vị Trên Google Maps <ExternalLink size={15} />
+                  </a>
                 </div>
               </div>
 
@@ -217,15 +231,15 @@ export const Contact: React.FC = () => {
 
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label htmlFor="branch">Cơ sở thuận tiện *</label>
+                      <label htmlFor="branch">Cơ sở đăng ký *</label>
                       <select
                         id="branch"
                         name="branch"
                         value={formData.branch}
                         onChange={handleChange}
                       >
-                        <option value="hocmon">Cơ sở Hóc Môn</option>
-                        <option value="quan12">Cơ sở Quận 12</option>
+                        <option value="trungmytay">Cơ sở Trung Mỹ Tây (344 A Tổ 13 KP 1, HCM)</option>
+                        <option value="hocmon">Cơ sở Hóc Môn & Quận 12</option>
                       </select>
                     </div>
 
@@ -269,13 +283,42 @@ export const Contact: React.FC = () => {
         </div>
       </section>
 
-      {/* LOCATION MAP PLACEHOLDER SECTION */}
+      {/* LOCATION MAP EMBEDDED SECTION */}
       <section className={styles.mapSection}>
         <div className={styles.container}>
           <div className={styles.mapCard}>
-            <MapPin size={36} color="#F58220" />
-            <h3>Hệ Thống Cơ Sở ANH NGỮ CAM Tại Hóc Môn & Quận 12</h3>
-            <p>Phụ huynh và học viên có thể đến trực tiếp cơ sở để tham quan phòng học thông minh Smartboard và tư vấn 1-1.</p>
+            <div className={styles.mapHeaderInfo}>
+              <MapPin size={32} color="#F58220" />
+              <div>
+                <h3>Vị Trí Bản Đồ Trung Tâm ANH NGỮ CAM</h3>
+                <p className={styles.mapAddress}>{fullAddress}</p>
+              </div>
+            </div>
+
+            {/* Embedded Google Maps iFrame */}
+            <div className={styles.mapFrameWrapper}>
+              <iframe
+                title="Bản đồ ANH NGỮ CAM Trung Mỹ Tây"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.4725356950293!2d106.61750031533446!3d10.851624892270634!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752a16d5555555%3A0x1!2zMzQ0IEEgVOG7lSAxMyBLUCAxLCBUcnVuZyBN4bu5IFTDonksIEjhu5MgQ2jDrSBNaW5o!5e0!3m2!1svi!2s!4v1700000000000!5m2!1svi!2s"
+                width="100%"
+                height="380"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+
+            <div className={styles.mapFooter}>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.openMapsBtn}
+              >
+                <Navigation size={18} /> Mở Ứng Dụng Google Maps Chỉ Đường <ExternalLink size={16} />
+              </a>
+            </div>
           </div>
         </div>
       </section>
