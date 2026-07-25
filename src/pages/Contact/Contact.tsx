@@ -161,7 +161,7 @@ export const Contact: React.FC = () => {
 
               {/* Fast Shortcut Actions */}
               <div className={styles.shortcutGrid}>
-                <a href="https://zalo.me" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>
+                <a href="http://zaloapp.com/qr/p/1eek3rblfox15" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>
                   <MessageCircle size={18} color="#0088FF" /> Chat qua Zalo
                 </a>
                 <a href="https://m.me" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>

@@ -299,7 +299,7 @@ export const Layout: React.FC = () => {
       <div className={styles.floatingContactWidget}>
         {/* Zalo Shortcut */}
         <a
-          href="https://zalo.me/0909090909"
+          href="http://zaloapp.com/qr/p/1eek3rblfox15"
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.zaloBtn}`}
