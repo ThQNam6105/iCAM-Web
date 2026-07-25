@@ -5,7 +5,7 @@
   overflow-x: hidden;
   background-color: #ffffff;
   color: #1e293b;
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 .container {
@@ -152,14 +152,16 @@
 }
 
 .badge {
-  background: rgba(245, 130, 32, 0.1);
-  color: #F58220;
+  background: #F58220;
+  color: #ffffff !important;
+  font-family: 'Be Vietnam Pro', sans-serif;
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
   font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(245, 130, 32, 0.2);
 }
 
 .ageBadge {
