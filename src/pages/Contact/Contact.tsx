@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, Map } from 'lucide-react';
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Send,
+  Sparkles,
+  MessageCircle,
+  CheckCircle2,
+  PhoneCall,
+  GraduationCap,
+  Building2,
+  ShieldCheck
+} from 'lucide-react';
 import styles from './Contact.module.css';
 
 export const Contact: React.FC = () => {
@@ -7,6 +20,7 @@ export const Contact: React.FC = () => {
     name: '',
     phone: '',
     email: '',
+    branch: 'hocmon',
     course: 'ielts',
     message: '',
   });
@@ -14,9 +28,8 @@ export const Contact: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Giả lập gửi thông tin thành công
     setSubmitted(true);
-    setFormData({ name: '', phone: '', email: '', course: 'ielts', message: '' });
+    setFormData({ name: '', phone: '', email: '', branch: 'hocmon', course: 'ielts', message: '' });
     setTimeout(() => setSubmitted(false), 5000);
   };
 
@@ -27,197 +40,247 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <div className="page-container">
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={`${styles.title} gradient-text`}>Liên Hệ Với Chúng Tôi</h1>
-          <p className={styles.subtitle}>
-            Đừng ngần ngại liên hệ để nhận tư vấn lộ trình học miễn phí hoặc gửi câu hỏi góp ý về cho
-            iCAM.
+    <div className={styles.contactWrapper}>
+      {/* HERO SECTION */}
+      <section className={styles.heroSection}>
+        <div className={styles.heroOverlay} />
+        <div className={styles.heroContainer}>
+          <div className={styles.heroBadge}>
+            <Sparkles size={16} />
+            <span>ANH NGỮ CAM — HÓC MÔN & QUẬN 12</span>
+          </div>
+
+          <h1 className={styles.heroTitle}>
+            Liên Hệ & <span className={styles.orangeHighlight}>Đăng Ký Tư Vấn</span>
+          </h1>
+
+          <p className={styles.heroSubtitle}>
+            Đừng ngần ngại liên hệ để nhận tư vấn lộ trình học cá nhân hóa và đăng ký kiểm tra trình độ 4 kỹ năng hoàn toàn miễn phí cùng đội ngũ chuyên gia ANH NGỮ CAM.
           </p>
+
+          {/* Quick Contact Badges */}
+          <div className={styles.quickContactRow}>
+            <div className={styles.quickBadge}>
+              <PhoneCall size={16} color="#F58220" />
+              <span>Hotline: 0909 123 456</span>
+            </div>
+            <div className={styles.quickBadge}>
+              <MapPin size={16} color="#F58220" />
+              <span>Cơ sở Hóc Môn & Quận 12, TP.HCM</span>
+            </div>
+            <div className={styles.quickBadge}>
+              <Clock size={16} color="#F58220" />
+              <span>T2 - CN: 08:00 - 21:30</span>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className={styles.splitLayout}>
-          {/* Contact Info Column */}
-          <div className={styles.infoColumn}>
-            <div className={`${styles.infoCard} glass`}>
-              <div className={styles.infoItem}>
-                <div className={styles.iconWrapper}>
-                  <MapPin size={20} />
+      {/* MAIN SPLIT LAYOUT SECTION */}
+      <section className={styles.mainSection}>
+        <div className={styles.container}>
+          <div className={styles.splitLayout}>
+            {/* LEFT COLUMN: CAMPUSES & CONTACT INFO */}
+            <div className={styles.infoColumn}>
+              {/* Campus 1: Hoc Mon */}
+              <div className={styles.campusCard}>
+                <div className={styles.campusHeader}>
+                  <Building2 size={22} color="#F58220" />
+                  <h3>Cơ Sở Hóc Môn</h3>
                 </div>
-                <div className={styles.infoText}>
-                  <span className={styles.infoLabel}>Địa chỉ</span>
-                  <span className={styles.infoValue}>
-                    Tòa nhà iCAM, số 12 Chùa Bộc, Đống Đa, Hà Nội
-                  </span>
+                <div className={styles.campusBody}>
+                  <div className={styles.infoRow}>
+                    <MapPin size={18} className={styles.icon} />
+                    <span>Khu vực Trung tâm Hóc Môn, TP. Hồ Chí Minh</span>
+                  </div>
+                  <div className={styles.infoRow}>
+                    <Phone size={18} className={styles.icon} />
+                    <span>Hotline: 0909 123 456</span>
+                  </div>
+                  <div className={styles.infoRow}>
+                    <Mail size={18} className={styles.icon} />
+                    <span>Email: hocmon@icam.edu.vn</span>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.infoItem}>
-                <div className={styles.iconWrapper}>
-                  <Phone size={20} />
+              {/* Campus 2: District 12 */}
+              <div className={styles.campusCard}>
+                <div className={styles.campusHeader}>
+                  <Building2 size={22} color="#F58220" />
+                  <h3>Cơ Sở Quận 12</h3>
                 </div>
-                <div className={styles.infoText}>
-                  <span className={styles.infoLabel}>Hotline tuyển sinh</span>
-                  <span className={styles.infoValue}>0987.654.321 – 1900.1234</span>
+                <div className={styles.campusBody}>
+                  <div className={styles.infoRow}>
+                    <MapPin size={18} className={styles.icon} />
+                    <span>Khu vực Trung tâm Quận 12, TP. Hồ Chí Minh</span>
+                  </div>
+                  <div className={styles.infoRow}>
+                    <Phone size={18} className={styles.icon} />
+                    <span>Hotline: 0909 789 012</span>
+                  </div>
+                  <div className={styles.infoRow}>
+                    <Mail size={18} className={styles.icon} />
+                    <span>Email: quan12@icam.edu.vn</span>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.infoItem}>
-                <div className={styles.iconWrapper}>
-                  <Mail size={20} />
+              {/* Working Hours & Commitments */}
+              <div className={styles.workingCard}>
+                <div className={styles.workingItem}>
+                  <Clock size={20} color="#F58220" />
+                  <div>
+                    <h4>Giờ Làm Việc Trung Tâm</h4>
+                    <p>Thứ 2 – Chủ Nhật | 08:00 – 21:30 (Mở cửa tất cả các ngày trong tuần)</p>
+                  </div>
                 </div>
-                <div className={styles.infoText}>
-                  <span className={styles.infoLabel}>Email</span>
-                  <span className={styles.infoValue}>tuyensinh@icam.edu.vn</span>
+
+                <div className={styles.workingItem}>
+                  <ShieldCheck size={20} color="#F58220" />
+                  <div>
+                    <h4>Cam Kết Tư Vấn</h4>
+                    <p>Tư vấn viên liên hệ hỗ trợ trong vòng 24h & Test trình độ miễn phí 100%.</p>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.infoItem}>
-                <div className={styles.iconWrapper}>
-                  <Clock size={20} />
-                </div>
-                <div className={styles.infoText}>
-                  <span className={styles.infoLabel}>Giờ làm việc</span>
-                  <span className={styles.infoValue}>Thứ 2 – Chủ nhật | 08:00 – 21:30</span>
-                </div>
+              {/* Fast Shortcut Actions */}
+              <div className={styles.shortcutGrid}>
+                <a href="https://zalo.me" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>
+                  <MessageCircle size={18} color="#0088FF" /> Chat qua Zalo
+                </a>
+                <a href="https://m.me" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>
+                  <Send size={18} color="#A033FF" /> Chat Messenger
+                </a>
               </div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className={styles.mapPlaceholder}>
-              <Map size={36} color="hsl(var(--primary))" />
-              <span style={{ fontWeight: 600 }}>Bản đồ chỉ đường</span>
-              <span style={{ fontSize: '0.85rem' }}>(Google Maps sẽ được nhúng hiển thị ở đây)</span>
+            {/* RIGHT COLUMN: CONSULTATION FORM */}
+            <div className={styles.formColumn}>
+              <div className={styles.formCard}>
+                <div className={styles.formCardHeader}>
+                  <GraduationCap size={28} color="#F58220" />
+                  <div>
+                    <h2>Đăng Ký Tư Vấn & Test Trình Độ</h2>
+                    <p>Học viên được kiểm tra trình độ 4 kỹ năng miễn phí và nhận lộ trình học cá nhân hóa.</p>
+                  </div>
+                </div>
+
+                {submitted && (
+                  <div className={styles.successAlert}>
+                    <CheckCircle2 size={20} />
+                    <span>Gửi thông tin thành công! Bộ phận tư vấn ANH NGỮ CAM sẽ liên hệ lại với bạn trong vòng 24h làm việc.</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className={styles.contactForm}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="name">Họ và tên *</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Nhập họ và tên của bạn..."
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="phone">Số điện thoại *</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="Nhập số điện thoại liên hệ..."
+                        required
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label htmlFor="email">Địa chỉ Email</label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="email@example.com..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="branch">Cơ sở thuận tiện *</label>
+                      <select
+                        id="branch"
+                        name="branch"
+                        value={formData.branch}
+                        onChange={handleChange}
+                      >
+                        <option value="hocmon">Cơ sở Hóc Môn</option>
+                        <option value="quan12">Cơ sở Quận 12</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label htmlFor="course">Khóa học quan tâm *</label>
+                      <select
+                        id="course"
+                        name="course"
+                        value={formData.course}
+                        onChange={handleChange}
+                      >
+                        <option value="kids">CAM Kids Starter (4-6 tuổi)</option>
+                        <option value="juniors">CAM Juniors (7-11 tuổi)</option>
+                        <option value="teens">CAM Teens Master (12-15 tuổi)</option>
+                        <option value="ielts">Lộ trình IELTS Bứt Tốc (4.5 - 7.5+)</option>
+                        <option value="communication">Tiếng Anh Giao Tiếp Thực Chiến</option>
+                        <option value="online">iCAM Online Đa Trải Nghiệm</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="message">Lời nhắn / Yêu cầu thêm</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Ví dụ: Thời gian rảnh của học viên, trình độ hiện tại hoặc mong muốn cụ thể..."
+                      rows={4}
+                    />
+                  </div>
+
+                  <button type="submit" className={styles.submitBtn}>
+                    <Send size={18} /> Gửi Yêu Cầu Tư Vấn Ngay
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Contact Form Column */}
-          <div className={`${styles.formCard} glass`}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Đăng Ký Nhận Tư Vấn</h2>
-            <p
-              style={{
-                color: 'hsl(var(--text-secondary))',
-                fontSize: '0.9rem',
-                marginBottom: '0.5rem',
-              }}
-            >
-              Học viên sẽ được kiểm tra trình độ đầu vào hoàn toàn miễn phí cùng giảng viên bản xứ.
-            </p>
-
-            {submitted && (
-              <div
-                style={{
-                  background: 'rgba(74, 222, 128, 0.1)',
-                  border: '1px solid rgb(74, 222, 128)',
-                  color: 'rgb(22, 101, 52)',
-                  padding: '1rem',
-                  borderRadius: '8px',
-                  fontSize: '0.95rem',
-                  fontWeight: 500,
-                }}
-              >
-                ✓ Gửi thông tin thành công! Tư vấn viên của iCAM sẽ liên hệ lại với bạn trong vòng 24h
-                làm việc.
-              </div>
-            )}
-
-            <form
-              onSubmit={handleSubmit}
-              style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
-            >
-              <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="name">
-                  Họ và tên *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={styles.input}
-                  placeholder="Nhập họ và tên của bạn..."
-                  required
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="phone">
-                  Số điện thoại *
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className={styles.input}
-                  placeholder="Nhập số điện thoại liên hệ..."
-                  required
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="email">
-                  Địa chỉ Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={styles.input}
-                  placeholder="ví dụ: email@cua-ban.com..."
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="course">
-                  Khóa học quan tâm
-                </label>
-                <select
-                  id="course"
-                  name="course"
-                  value={formData.course}
-                  onChange={handleChange}
-                  className={styles.input}
-                  style={{ background: 'hsl(var(--bg-secondary))' }}
-                >
-                  <option value="ielts">Lộ trình IELTS Cam kết đầu ra</option>
-                  <option value="communication">Tiếng Anh Giao Tiếp Thực Chiến</option>
-                  <option value="kids">Tiếng Anh Trẻ Em Phát Triển Toàn Diện</option>
-                  <option value="other">Tư vấn khóa học khác</option>
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label className={styles.label} htmlFor="message">
-                  Lời nhắn / Yêu cầu thêm
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  className={styles.textarea}
-                  placeholder="Ví dụ: Lịch rảnh rỗi của bạn, trình độ hiện tại..."
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="btn-primary"
-                style={{ justifyContent: 'center', padding: '14px' }}
-              >
-                <Send size={18} /> Gửi yêu cầu tư vấn
-              </button>
-            </form>
+      {/* LOCATION MAP PLACEHOLDER SECTION */}
+      <section className={styles.mapSection}>
+        <div className={styles.container}>
+          <div className={styles.mapCard}>
+            <MapPin size={36} color="#F58220" />
+            <h3>Hệ Thống Cơ Sở ANH NGỮ CAM Tại Hóc Môn & Quận 12</h3>
+            <p>Phụ huynh và học viên có thể đến trực tiếp cơ sở để tham quan phòng học thông minh Smartboard và tư vấn 1-1.</p>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
+
 export default Contact;
