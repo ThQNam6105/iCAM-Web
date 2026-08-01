@@ -1,4 +1,4 @@
-/* ANH NGỮ CAM — Contact Page Modern Stylesheet */
+/* ICANCAM — Contact Page Modern Stylesheet */
 
 .contactWrapper {
   width: 100%;
@@ -9,9 +9,11 @@
 }
 
 .container {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 
 .orangeHighlight {
@@ -508,3 +510,4 @@
     padding: 1.5rem;
   }
 }
+

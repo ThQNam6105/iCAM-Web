@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import styles from './NotFound.module.css';
@@ -19,3 +19,4 @@ export const NotFound: React.FC = () => {
     </div>
   );
 };
+

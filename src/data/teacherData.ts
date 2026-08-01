@@ -1,4 +1,4 @@
-import teacherJames from '../assets/teacher_james.png';
+﻿import teacherJames from '../assets/teacher_james.png';
 import teacherDavid from '../assets/teacher_david.png';
 import teacherSarah from '../assets/teacher_sarah.png';
 import teacherOliver from '../assets/teacher_oliver.png';
@@ -15,6 +15,7 @@ export interface Teacher {
   id: string;
   name: string;
   role: string;
+  roleEn?: string;
   image: string;
   mainHighlight: string;
   highlights: TeacherHighlight[];
@@ -94,3 +95,4 @@ export const teachersData: Teacher[] = [
     ]
   }
 ];
+

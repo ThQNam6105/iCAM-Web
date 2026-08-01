@@ -1,0 +1,52 @@
+.transitionWrapper {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.transitionSvg {
+  display: block;
+  width: 100%;
+  height: 60px;
+}
+
+@media (min-width: 768px) {
+  .transitionSvg {
+    height: 75px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .transitionSvg {
+    height: 85px;
+  }
+}
+
+.navyToWhite {
+  background-color: #ffffff;
+}
+
+.whiteToSoftOrange {
+  background-color: #FFF8F0;
+}
+
+.softOrangeToWhite {
+  background-color: #ffffff;
+}
+
+.whiteToNavy {
+  background-color: #ffffff;
+}
+
+.softOrangeToNavy {
+  background-color: #FFF8F0;
+}
+
+.navyToSoftOrange {
+  background-color: #FFF8F0;
+}

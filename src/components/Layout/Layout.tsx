@@ -1,23 +1,30 @@
-import logoImg from '../../assets/ican.png'; // Thay thế đuôi file tương ứng (.svg, .png)
+import logoImg from '../../assets/ican.png';
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { User, LogOut, Menu, X } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 import styles from './Layout.module.css';
 
 export const Layout: React.FC = () => {
   const { user, logout } = useAppStore();
+  const { language, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [lang, setLang] = useState<'VI' | 'EN'>('VI');
   const { pathname } = useLocation();
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 
-  const toggleLanguage = () => {
-    setLang((prev) => (prev === 'VI' ? 'EN' : 'VI'));
-  };
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -47,7 +54,7 @@ export const Layout: React.FC = () => {
                   isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink
                 }
               >
-                GIỚI THIỆU
+                {t.nav.about}
               </NavLink>
             </li>
             <li>
@@ -57,7 +64,7 @@ export const Layout: React.FC = () => {
                   isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink
                 }
               >
-                CHƯƠNG TRÌNH HỌC
+                {t.nav.curriculum}
               </NavLink>
             </li>
             <li>
@@ -67,7 +74,7 @@ export const Layout: React.FC = () => {
                   isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink
                 }
               >
-                TIN TỨC - SỰ KIỆN
+                {t.nav.news}
               </NavLink>
             </li>
             <li>
@@ -77,7 +84,7 @@ export const Layout: React.FC = () => {
                   isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink
                 }
               >
-                HỎI ĐÁP
+                {t.nav.faq}
               </NavLink>
             </li>
             <li>
@@ -87,7 +94,7 @@ export const Layout: React.FC = () => {
                   isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink
                 }
               >
-                TUYỂN DỤNG
+                {t.nav.careers}
               </NavLink>
             </li>
             <li>
@@ -97,7 +104,7 @@ export const Layout: React.FC = () => {
                   isActive ? `${styles.navLink} ${styles.activeNavLink}` : styles.navLink
                 }
               >
-                LIÊN HỆ
+                {t.nav.contact}
               </NavLink>
             </li>
           </ul>
@@ -109,21 +116,22 @@ export const Layout: React.FC = () => {
               {user && (
                 <div className={styles.userBadge}>
                   <User size={14} />
-                  <span className={styles.userName}>Chào, {user.name}</span>
-                  <button onClick={logout} className={styles.logoutBtn} title="Đăng xuất">
+                  <span className={styles.userName}>{t.nav.welcome}, {user.name}</span>
+                  <button onClick={logout} className={styles.logoutBtn} title={t.nav.logout}>
                     <LogOut size={14} />
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Language Toggle Button */}
+            {/* Language Toggle Button with Flag Icons */}
             <button
               onClick={toggleLanguage}
               className={styles.langToggleCircleBtn}
-              title={lang === 'VI' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+              title={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+              aria-label={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
             >
-              {lang === 'VI' ? (
+              {language === 'vi' ? (
                 /* Vietnam Flag */
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" className={styles.flagSvg} preserveAspectRatio="xMidYMid slice">
                   <rect width="30" height="20" fill="#da251d"/>
@@ -162,7 +170,7 @@ export const Layout: React.FC = () => {
               }
               onClick={closeMenu}
             >
-              GIỚI THIỆU
+              {t.nav.about}
             </NavLink>
           </li>
           <li>
@@ -175,7 +183,7 @@ export const Layout: React.FC = () => {
               }
               onClick={closeMenu}
             >
-              CHƯƠNG TRÌNH HỌC
+              {t.nav.curriculum}
             </NavLink>
           </li>
           <li>
@@ -188,7 +196,7 @@ export const Layout: React.FC = () => {
               }
               onClick={closeMenu}
             >
-              TIN TỨC - SỰ KIỆN
+              {t.nav.news}
             </NavLink>
           </li>
           <li>
@@ -201,7 +209,7 @@ export const Layout: React.FC = () => {
               }
               onClick={closeMenu}
             >
-              HỎI ĐÁP
+              {t.nav.faq}
             </NavLink>
           </li>
           <li>
@@ -214,7 +222,7 @@ export const Layout: React.FC = () => {
               }
               onClick={closeMenu}
             >
-              TUYỂN DỤNG
+              {t.nav.careers}
             </NavLink>
           </li>
           <li>
@@ -227,14 +235,14 @@ export const Layout: React.FC = () => {
               }
               onClick={closeMenu}
             >
-              LIÊN HỆ
+              {t.nav.contact}
             </NavLink>
           </li>
           {user && (
             <li className={styles.mobileUserSection}>
               <div className={styles.userBadge}>
                 <User size={14} />
-                <span>Chào, {user.name}</span>
+                <span>{t.nav.welcome}, {user.name}</span>
               </div>
               <button
                 onClick={() => {
@@ -244,7 +252,7 @@ export const Layout: React.FC = () => {
                 className="btn-secondary"
                 style={{ width: '100%', marginTop: '1rem', justifyContent: 'center' }}
               >
-                <LogOut size={14} /> Đăng xuất
+                <LogOut size={14} /> {t.nav.logout}
               </button>
             </li>
           )}
@@ -262,22 +270,22 @@ export const Layout: React.FC = () => {
         <div className={styles.footerContent}>
           <div className={styles.footerLinks}>
             <NavLink to="/about" className={styles.footerLink} onClick={closeMenu}>
-              GIỚI THIỆU
+              {t.nav.about}
             </NavLink>
             <NavLink to="/curriculum" className={styles.footerLink} onClick={closeMenu}>
-              CHƯƠNG TRÌNH HỌC
+              {t.nav.curriculum}
             </NavLink>
             <NavLink to="/news" className={styles.footerLink} onClick={closeMenu}>
-              TIN TỨC - SỰ KIỆN
+              {t.nav.news}
             </NavLink>
             <NavLink to="/faq" className={styles.footerLink} onClick={closeMenu}>
-              HỎI ĐÁP
+              {t.nav.faq}
             </NavLink>
             <NavLink to="/careers" className={styles.footerLink} onClick={closeMenu}>
-              TUYỂN DỤNG
+              {t.nav.careers}
             </NavLink>
             <NavLink to="/contact" className={styles.footerLink} onClick={closeMenu}>
-              LIÊN HỆ
+              {t.nav.contact}
             </NavLink>
           </div>
           <p style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -289,7 +297,7 @@ export const Layout: React.FC = () => {
               onMouseOver={(e) => (e.currentTarget.style.color = 'hsl(var(--primary))')}
               onMouseOut={(e) => (e.currentTarget.style.color = 'inherit')}
             >
-              THIEUNAM iCAM © {new Date().getFullYear()}
+              {t.footer.copyright} {new Date().getFullYear()}
             </a>
           </p>
         </div>
@@ -303,7 +311,7 @@ export const Layout: React.FC = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.zaloBtn}`}
-          data-tooltip="Chat Zalo"
+          data-tooltip={t.shortcuts.zalo}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="36" height="36">
             <text x="50" y="62" fontFamily="'Plus Jakarta Sans', Arial, sans-serif" fontWeight="900" fontSize="28" fill="#FFFFFF" textAnchor="middle">Zalo</text>
@@ -316,7 +324,7 @@ export const Layout: React.FC = () => {
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.messengerBtn}`}
-          data-tooltip="Chat Messenger"
+          data-tooltip={t.shortcuts.messenger}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30">
             <defs>
@@ -334,7 +342,7 @@ export const Layout: React.FC = () => {
         <a
           href="mailto:thieunam2005@gmail.com"
           className={`${styles.contactShortcutBtn} ${styles.gmailBtn}`}
-          data-tooltip="Gửi Email"
+          data-tooltip={t.shortcuts.email}
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#ffffff" fill="none" strokeWidth="2" />
@@ -353,3 +361,6 @@ export const Layout: React.FC = () => {
     </div>
   );
 };
+
+export default Layout;
+

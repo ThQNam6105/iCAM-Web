@@ -16,8 +16,11 @@ import {
   Navigation
 } from 'lucide-react';
 import styles from './Contact.module.css';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 export const Contact: React.FC = () => {
+  const { language } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -42,7 +45,9 @@ export const Contact: React.FC = () => {
   };
 
   const googleMapsUrl = 'https://maps.app.goo.gl/AhLJBp14TZsQwmuq5';
-  const fullAddress = '344 A Tổ 13 KP 1, Trung Mỹ Tây, Hồ Chí Minh, Việt Nam';
+  const fullAddress = language === 'en'
+    ? '344 A To 13 KP 1, Trung My Tay, Ho Chi Minh City, Vietnam'
+    : '344 A Tổ 13 KP 1, Trung Mỹ Tây, Hồ Chí Minh, Việt Nam';
 
   return (
     <div className={styles.contactWrapper}>
@@ -52,7 +57,7 @@ export const Contact: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>ANH NGỮ CAM — HÓC MÔN & QUẬN 12</span>
+            <span>ICANCAM — HÓC MÔN & QUẬN 12</span>
           </div>
 
           <h1 className={styles.heroTitle}>
@@ -60,7 +65,7 @@ export const Contact: React.FC = () => {
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Đừng ngần ngại liên hệ để nhận tư vấn lộ trình học cá nhân hóa và đăng ký kiểm tra trình độ 4 kỹ năng hoàn toàn miễn phí cùng đội ngũ chuyên gia ANH NGỮ CAM.
+            Đừng ngần ngại liên hệ để nhận tư vấn lộ trình học cá nhân hóa và đăng ký kiểm tra trình độ 4 kỹ năng hoàn toàn miễn phí cùng đội ngũ chuyên gia ICANCAM.
           </p>
 
           {/* Quick Contact Badges */}
@@ -88,6 +93,9 @@ export const Contact: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Hero (Navy) -> Main Split Section (Soft Orange) */}
+      <SectionTransition variant="navy-to-soft-orange" />
+
       {/* MAIN SPLIT LAYOUT SECTION */}
       <section className={styles.mainSection}>
         <div className={styles.container}>
@@ -99,7 +107,7 @@ export const Contact: React.FC = () => {
                 <div className={styles.campusHeader}>
                   <Building2 size={22} color="#F58220" />
                   <div>
-                    <h3>Trụ Sở ANH NGỮ CAM</h3>
+                    <h3>Trụ Sở ICANCAM</h3>
                     <span className={styles.subTag}>Hóc Môn & Quận 12</span>
                   </div>
                 </div>
@@ -166,7 +174,7 @@ export const Contact: React.FC = () => {
               {/* Fast Shortcut Actions */}
               <div className={styles.shortcutGrid}>
                 <a href="http://zaloapp.com/qr/p/1eek3rblfox15" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>
-                  <MessageCircle size={18} color="#0088FF" /> Chat qua Zalo
+                  <MessageCircle size={18} color="#0088FF" /> Chat Zalo
                 </a>
                 <a href="https://m.me/tqnam6105" target="_blank" rel="noreferrer" className={styles.shortcutBtn}>
                   <Send size={18} color="#A033FF" /> Chat Messenger
@@ -188,7 +196,7 @@ export const Contact: React.FC = () => {
                 {submitted && (
                   <div className={styles.successAlert}>
                     <CheckCircle2 size={20} />
-                    <span>Gửi thông tin thành công! Bộ phận tư vấn ANH NGỮ CAM sẽ liên hệ lại với bạn trong vòng 24h làm việc.</span>
+                    <span>Gửi thông tin thành công! Bộ phận tư vấn ICANCAM sẽ liên hệ lại với bạn trong vòng 24h làm việc.</span>
                   </div>
                 )}
 
@@ -201,7 +209,7 @@ export const Contact: React.FC = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Nhập họ và tên của bạn..."
+                      placeholder="Nhập họ và tên..."
                       required
                     />
                   </div>
@@ -215,7 +223,7 @@ export const Contact: React.FC = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="Nhập số điện thoại liên hệ..."
+                        placeholder="Nhập số điện thoại..."
                         required
                       />
                     </div>
@@ -255,12 +263,12 @@ export const Contact: React.FC = () => {
                         value={formData.course}
                         onChange={handleChange}
                       >
-                        <option value="kids">CAM Kids Starter (4-6 tuổi)</option>
-                        <option value="juniors">CAM Juniors (7-11 tuổi)</option>
-                        <option value="teens">CAM Teens Master (12-15 tuổi)</option>
-                        <option value="ielts">Lộ trình IELTS Bứt Tốc (4.5 - 7.5+)</option>
-                        <option value="communication">Tiếng Anh Giao Tiếp Thực Chiến</option>
-                        <option value="online">iCAM Online Đa Trải Nghiệm</option>
+                        <option value="kids">CAM Kids Starter (4-6)</option>
+                        <option value="juniors">CAM Juniors (7-11)</option>
+                        <option value="teens">CAM Teens Master (12-15)</option>
+                        <option value="ielts">IELTS Acceleration (4.5 - 7.5+)</option>
+                        <option value="communication">Practical Communication</option>
+                        <option value="online">iCAM Online 21st</option>
                       </select>
                     </div>
                   </div>
@@ -272,7 +280,7 @@ export const Contact: React.FC = () => {
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      placeholder="Ví dụ: Thời gian rảnh của học viên, trình độ hiện tại hoặc mong muốn cụ thể..."
+                      placeholder="Ghi chú thêm nhu cầu của bạn..."
                       rows={4}
                     />
                   </div>
@@ -287,6 +295,9 @@ export const Contact: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Main Split Section (Soft Orange) -> Map Section (Navy) */}
+      <SectionTransition variant="soft-orange-to-navy" />
+
       {/* LOCATION MAP EMBEDDED SECTION */}
       <section className={styles.mapSection}>
         <div className={styles.container}>
@@ -294,7 +305,7 @@ export const Contact: React.FC = () => {
             <div className={styles.mapHeaderInfo}>
               <MapPin size={32} color="#F58220" />
               <div>
-                <h3>Vị Trí Bản Đồ Trung Tâm ANH NGỮ CAM</h3>
+                <h3>Vị Trí Bản Đồ Trung Tâm ICANCAM</h3>
                 <p className={styles.mapAddress}>{fullAddress}</p>
               </div>
             </div>
@@ -302,7 +313,7 @@ export const Contact: React.FC = () => {
             {/* Embedded Google Maps iFrame */}
             <div className={styles.mapFrameWrapper}>
               <iframe
-                title="Bản đồ ANH NGỮ CAM Trung Mỹ Tây"
+                title="Google Maps ICANCAM"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.4725356950293!2d106.61750031533446!3d10.851624892270634!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752a16d5555555%3A0x1!2zMzQ0IEEgVOG7lSAxMyBLUCAxLCBUcnVuZyBN4bu5IFTDonksIEjhu5MgQ2jDrSBNaW5o!5e0!3m2!1svi!2s!4v1700000000000!5m2!1svi!2s"
                 width="100%"
                 height="380"

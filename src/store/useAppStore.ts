@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 
 interface AppState {
   counter: number;
@@ -17,3 +17,4 @@ export const useAppStore = create<AppState>((set) => ({
   login: (name) => set({ user: { name, isLoggedIn: true } }),
   logout: () => set({ user: null }),
 }));
+

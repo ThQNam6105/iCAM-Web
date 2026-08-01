@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { articlesData } from '../../data/newsData';
 import { teachersData } from '../../data/teacherData';
@@ -8,10 +8,13 @@ import { studentsData } from '../../data/studentData';
 import { parentsData } from '../../data/parentData';
 import bannerBg from '../../assets/banner-bg.jpg';
 import bannerBgMobile from '../../assets/banner-bg-mobile.jpg';
+import enBannerBg from '../../assets/en_banner-bg.jpg';
+import enBannerBgMobile from '../../assets/en_banner-bg-mobile.jpg';
 import studentHologram from '../../assets/student_hologram.png';
 import achievementTeacher from '../../assets/achievement_teacher.png';
 import achievementSmartboard from '../../assets/achievement_smartboard.png';
 import achievementSchool from '../../assets/achievement_school.png';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const renderHighlightIcon = (type: 'ielts' | 'degree' | 'medal') => {
   switch (type) {
@@ -41,11 +44,22 @@ const renderHighlightIcon = (type: 'ielts' | 'degree' | 'medal') => {
 };
 
 export const Home: React.FC = () => {
+  const { language, t } = useLanguage();
+  const navigate = useNavigate();
+
   // State for News Overview
   const [currentIndex, setCurrentIndex] = useState(0);
   const [disableTransition, setDisableTransition] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [cardsToShow, setCardsToShow] = useState(3);
+
+  // Mouse & Touch Drag State for News Slider
+  const [isDraggingNews, setIsDraggingNews] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const dragMovedRef = React.useRef(false);
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
+  const [showCursorTooltip, setShowCursorTooltip] = useState(false);
 
   // State for Teachers Slider
   const [teacherIndex, setTeacherIndex] = useState(0);
@@ -70,6 +84,13 @@ export const Home: React.FC = () => {
   const [currentBanner, setCurrentBanner] = useState(bannerBg);
   const [activeAchievementIdx, setActiveAchievementIdx] = useState(0);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveAchievementIdx((prev) => (prev + 1) % 4);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Form State for registration section
   const [formData, setFormData] = useState({
     fullName: '',
@@ -81,69 +102,61 @@ export const Home: React.FC = () => {
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Đăng ký tư vấn thành công! Đội ngũ iCAM sẽ liên hệ Quý phụ huynh trong thời gian sớm nhất.');
-    setFormData({
-      fullName: '',
-      phone: '',
-      email: '',
-      childAge: '',
-      city: '',
-    });
+    alert(language === 'en' ? 'Thank you! ICANCAM team will contact you soon.' : 'Cảm ơn bạn đã đăng ký! ICANCAM sẽ liên hệ tư vấn sớm nhất.');
+    setFormData({ fullName: '', phone: '', email: '', childAge: '', city: '' });
   };
 
-  // Cập nhật số thẻ hiển thị và ảnh banner dựa theo chiều rộng màn hình (để đồng bộ với CSS)
+  // Check screen width for responsiveness & banner image switching (Bilingual support)
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth <= 768) {
+      const width = window.innerWidth;
+      const isMobile = width <= 768;
+
+      if (language === 'en') {
+        setCurrentBanner(isMobile ? enBannerBgMobile : enBannerBg);
+      } else {
+        setCurrentBanner(isMobile ? bannerBgMobile : bannerBg);
+      }
+
+      if (width < 640) {
         setCardsToShow(1);
         setTeachersToShow(1);
         setStudentsToShow(1);
         setParentsToShow(1);
-        setCurrentBanner(bannerBgMobile);
-      } else if (window.innerWidth <= 1024) {
+      } else if (width < 1024) {
         setCardsToShow(2);
         setTeachersToShow(2);
         setStudentsToShow(2);
         setParentsToShow(2);
-        setCurrentBanner(bannerBg);
       } else {
         setCardsToShow(3);
         setTeachersToShow(4);
         setStudentsToShow(3);
         setParentsToShow(3);
-        setCurrentBanner(bannerBg);
       }
     };
 
-    handleResize(); // Chạy lần đầu
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [language]);
 
-  // Theo dõi trạng thái hoạt động của Tab trình duyệt (tránh lỗi khi chuyển Tab)
+  // Page visibility check for auto-play sliders
   useEffect(() => {
     const handleVisibilityChange = () => {
       setIsTabActive(!document.hidden);
     };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Achievement image auto rotation timer
-  useEffect(() => {
-    if (!isTabActive) return;
-    const timer = setInterval(() => {
-      setActiveAchievementIdx((prev) => (prev + 1) % 4);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [isTabActive]);
-
   // ==========================================================================
-  // Slider News - Nhân bản các phần tử đầu/cuối để làm vòng lặp vô hạn
+  // Slider News - Infinite loop logic
   // ==========================================================================
-  const clonedBefore = articlesData.slice(-cardsToShow);
-  const clonedAfter = articlesData.slice(0, cardsToShow);
-  const extendedArticles = [...clonedBefore, ...articlesData, ...clonedAfter];
+  const clonedArticlesBefore = articlesData.slice(-cardsToShow);
+  const clonedArticlesAfter = articlesData.slice(0, cardsToShow);
+  const extendedArticles = [...clonedArticlesBefore, ...articlesData, ...clonedArticlesAfter];
 
   const nextSlide = () => {
     if (disableTransition) return;
@@ -153,6 +166,80 @@ export const Home: React.FC = () => {
   const prevSlide = () => {
     if (disableTransition) return;
     setCurrentIndex((prev) => prev - 1);
+  };
+
+  const handleMouseDownNews = (e: React.MouseEvent) => {
+    // Chỉ kích hoạt khi nhấn giữ CHUỘT TRÁI (e.button === 0)
+    if (e.button !== 0) return;
+    e.preventDefault();
+    setIsDraggingNews(true);
+    setDragStartX(e.clientX);
+    setDragOffset(0);
+    dragMovedRef.current = false;
+    setIsPaused(true);
+  };
+
+  useEffect(() => {
+    if (!isDraggingNews) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - dragStartX;
+      if (Math.abs(deltaX) > 5) {
+        dragMovedRef.current = true;
+      }
+      setDragOffset(deltaX);
+    };
+
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (e.button === 0 || e.buttons === 0) {
+        setIsDraggingNews(false);
+        setIsPaused(false);
+        setDragOffset((currentOffset) => {
+          if (currentOffset < -40) {
+            if (!disableTransition) setCurrentIndex((prev) => prev + 1);
+          } else if (currentOffset > 40) {
+            if (!disableTransition) setCurrentIndex((prev) => prev - 1);
+          }
+          return 0;
+        });
+      }
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDraggingNews, dragStartX, disableTransition]);
+
+  const handleTouchStartNews = (e: React.TouchEvent) => {
+    setIsDraggingNews(true);
+    setDragStartX(e.touches[0].clientX);
+    setDragOffset(0);
+    dragMovedRef.current = false;
+    setIsPaused(true);
+  };
+
+  const handleTouchMoveNews = (e: React.TouchEvent) => {
+    if (!isDraggingNews) return;
+    const deltaX = e.touches[0].clientX - dragStartX;
+    if (Math.abs(deltaX) > 5) {
+      dragMovedRef.current = true;
+    }
+    setDragOffset(deltaX);
+  };
+
+  const handleTouchEndNews = () => {
+    if (!isDraggingNews) return;
+    setIsDraggingNews(false);
+    setIsPaused(false);
+    if (dragOffset < -40) {
+      nextSlide();
+    } else if (dragOffset > 40) {
+      prevSlide();
+    }
+    setDragOffset(0);
   };
 
   useEffect(() => {
@@ -199,7 +286,7 @@ export const Home: React.FC = () => {
   }, [disableTransition]);
 
   // ==========================================================================
-  // Slider Teachers - Nhân bản các phần tử đầu/cuối để làm vòng lặp vô hạn
+  // Slider Teachers - Infinite loop logic
   // ==========================================================================
   const clonedTeachersBefore = teachersData.slice(-teachersToShow);
   const clonedTeachersAfter = teachersData.slice(0, teachersToShow);
@@ -259,7 +346,7 @@ export const Home: React.FC = () => {
   }, [disableTeacherTransition]);
 
   // ==========================================================================
-  // Slider Students - Nhân bản các phần tử đầu/cuối để làm vòng lặp vô hạn
+  // Slider Students - Infinite loop logic
   // ==========================================================================
   const clonedStudentsBefore = studentsData.slice(-studentsToShow);
   const clonedStudentsAfter = studentsData.slice(0, studentsToShow);
@@ -319,7 +406,7 @@ export const Home: React.FC = () => {
   }, [disableStudentTransition]);
 
   // ==========================================================================
-  // Slider Parents - Nhân bản các phần tử đầu/cuối để làm vòng lặp vô hạn
+  // Slider Parents - Infinite loop logic
   // ==========================================================================
   const clonedParentsBefore = parentsData.slice(-parentsToShow);
   const clonedParentsAfter = parentsData.slice(0, parentsToShow);
@@ -382,13 +469,13 @@ export const Home: React.FC = () => {
     <div style={{ width: '100%' }}>
       {/* Banner Section */}
       <section className={styles.banner} style={{ backgroundImage: `url(${currentBanner})` }}>
-        {/* Background image overlay (subtle bottom shadow to make button stand out) */}
+        {/* Background image overlay */}
         <div className={styles.overlay} />
 
         {/* Register button at bottom center */}
         <div className={styles.buttonContainer}>
           <Link to="/contact" className={`btn-primary ${styles.registerBtn}`}>
-            ĐĂNG KÝ NGAY
+            {t.home.registerNow}
           </Link>
         </div>
       </section>
@@ -399,29 +486,51 @@ export const Home: React.FC = () => {
           {/* Top Label */}
           <div className={styles.newsTopLabelContainer}>
             <div className={styles.newsTopLabel}>
-              <span>TỔNG QUAN TIN TỨC & SỰ KIỆN</span>
+              <span>{t.home.newsOverviewLabel}</span>
             </div>
           </div>
 
-          {/* Slider Row Wrapper */}
+          {/* Slider Row Wrapper with Drag to Scroll & Floating Tooltip */}
           <div
-            className={styles.newsSliderWrapper}
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+            className={`${styles.newsSliderWrapper} ${isDraggingNews ? styles.isDragging : ''}`}
+            onMouseEnter={() => {
+              setIsPaused(true);
+              setShowCursorTooltip(true);
+            }}
+            onMouseLeave={() => {
+              setIsPaused(false);
+              setShowCursorTooltip(false);
+            }}
+            onMouseMove={(e) => {
+              setCursorPos({ x: e.clientX, y: e.clientY });
+            }}
+            onMouseDown={handleMouseDownNews}
+            onTouchStart={handleTouchStartNews}
+            onTouchMove={handleTouchMoveNews}
+            onTouchEnd={handleTouchEndNews}
           >
-            {/* Navigation Left Button */}
-            <button onClick={prevSlide} className={styles.navBtn} aria-label="Previous News">
-              <ChevronLeft size={36} />
-            </button>
-
+            {/* Floating Mouse Cursor Drag Tooltip */}
+            {showCursorTooltip && cursorPos && (
+              <div
+                className={`${styles.cursorDragBadge} ${isDraggingNews ? styles.isDraggingBadge : ''}`}
+                style={{
+                  left: `${cursorPos.x + 14}px`,
+                  top: `${cursorPos.y + 18}px`,
+                }}
+              >
+                {isDraggingNews
+                  ? (language === 'en' ? 'Dragging...' : 'Đang kéo...')
+                  : (language === 'en' ? 'Hold & Drag' : 'Giữ và kéo')}
+              </div>
+            )}
             {/* Slider viewport */}
             <div className={styles.sliderContainer}>
               <div
                 className={styles.sliderTrack}
                 onTransitionEnd={handleTransitionEnd}
                 style={{
-                  transform: `translate3d(-${(currentIndex + cardsToShow) * (100 / cardsToShow)}%, 0px, 0px)`,
-                  transition: disableTransition ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+                  transform: `translate3d(calc(-${(currentIndex + cardsToShow) * (100 / cardsToShow)}% + ${dragOffset}px), 0px, 0px)`,
+                  transition: disableTransition || isDraggingNews ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
                 }}
               >
                 {extendedArticles.map((article, index) => (
@@ -430,21 +539,31 @@ export const Home: React.FC = () => {
                     className={styles.cardWrapper}
                     style={{ width: `${100 / cardsToShow}%` }}
                   >
-                    <Link to="/news" className={styles.newsCard}>
+                    <div
+                      className={styles.newsCard}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!dragMovedRef.current) {
+                          navigate('/news');
+                        }
+                      }}
+                    >
                       <div className={styles.imageWrapper}>
-                        <img src={article.image} alt={article.title} className={styles.newsImg} />
+                        <img
+                          src={article.image}
+                          alt={language === 'en' ? (article.titleEn || article.title) : article.title}
+                          className={styles.newsImg}
+                          draggable={false}
+                        />
                       </div>
-                      <h4 className={styles.newsTitle}>{article.title}</h4>
-                    </Link>
+                      <h4 className={styles.newsTitle}>
+                        {language === 'en' ? (article.titleEn || article.title) : article.title}
+                      </h4>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Navigation Right Button */}
-            <button onClick={nextSlide} className={styles.navBtn} aria-label="Next News">
-              <ChevronRight size={36} />
-            </button>
           </div>
         </div>
       </section>
@@ -455,7 +574,7 @@ export const Home: React.FC = () => {
           {/* Top Label */}
           <div className={styles.numberTalkTopLabelContainer}>
             <div className={styles.numberTalkTopLabel}>
-              <span>THÀNH TỰU NỔI BẬT CỦA ICAM</span>
+              <span>{t.home.achievementsLabel}</span>
             </div>
           </div>
 
@@ -491,10 +610,10 @@ export const Home: React.FC = () => {
                 {/* Item 1 */}
                 <div className={styles.numberTalkItem}>
                   <h3 className={styles.numberTalkItemTitle}>
-                    10 <span className={styles.numberTalkItemSup}>năm</span>
+                    10 <span className={styles.numberTalkItemSup}>{language === 'en' ? 'years' : 'năm'}</span>
                   </h3>
                   <div className={styles.numberTalkItemText}>
-                    kinh nghiệm đào tạo tiếng Anh
+                    {t.home.yearsExpDesc}
                   </div>
                 </div>
 
@@ -504,7 +623,7 @@ export const Home: React.FC = () => {
                     4Ls & L.E.T.I
                   </h3>
                   <div className={styles.numberTalkItemText}>
-                    ứng dụng phương pháp học tiếng Anh ứng dụng và tương tác
+                    {language === 'en' ? 'interactive learning methods applied' : 'ứng dụng phương pháp học tiếng Anh ứng dụng và tương tác'}
                   </div>
                 </div>
 
@@ -514,17 +633,17 @@ export const Home: React.FC = () => {
                     100 <span className={styles.numberTalkItemSup}>%</span>
                   </h3>
                   <div className={styles.numberTalkItemText}>
-                    lớp học thông minh với bảng tương tác hiện đại
+                    {t.home.teachersCountDesc}
                   </div>
                 </div>
 
                 {/* Item 4 */}
                 <div className={styles.numberTalkItem}>
                   <h3 className={styles.numberTalkItemTitle}>
-                    Hơn 20 <span className={styles.numberTalkItemSup}>trường</span>
+                    {language === 'en' ? 'Over 20' : 'Hơn 20'} <span className={styles.numberTalkItemSup}>{language === 'en' ? 'schools' : 'trường'}</span>
                   </h3>
                   <div className={styles.numberTalkItemText}>
-                    đang liên kết giảng dạy trên địa bàn quận 12 và tỉnh Bình Dương
+                    {language === 'en' ? 'partner schools across Hoc Mon & District 12' : 'đang liên kết giảng dạy trên địa bàn quận 12 và tỉnh Bình Dương'}
                   </div>
                 </div>
               </div>
@@ -539,7 +658,7 @@ export const Home: React.FC = () => {
           {/* Top Label */}
           <div className={styles.teachersTopLabelContainer}>
             <div className={styles.teachersTopLabel}>
-              <span>GIÁO VIÊN ICAM TIÊU BIỂU</span>
+              <span>{t.home.teachersLabel}</span>
             </div>
           </div>
 
@@ -618,7 +737,9 @@ export const Home: React.FC = () => {
                             </svg>
                           </span>
                         </div>
-                        <p className={styles.teacherRole}>{teacher.role}</p>
+                        <p className={styles.teacherRole}>
+                          {language === 'en' ? (teacher.roleEn || teacher.role) : teacher.role}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -631,7 +752,6 @@ export const Home: React.FC = () => {
               <ChevronRight size={36} />
             </button>
           </div>
-
         </div>
       </section>
 
@@ -641,7 +761,7 @@ export const Home: React.FC = () => {
           {/* Top Label */}
           <div className={styles.studentsTopLabelContainer}>
             <div className={styles.studentsTopLabel}>
-              <span>HỌC VIÊN XUẤT SẮC ĐANG THEO HỌC TẠI ICAM</span>
+              <span>{t.home.studentsLabel}</span>
             </div>
           </div>
 
@@ -732,8 +852,6 @@ export const Home: React.FC = () => {
               <ChevronRight size={36} />
             </button>
           </div>
-
-
         </div>
       </section>
 
@@ -743,7 +861,7 @@ export const Home: React.FC = () => {
           {/* Top Label */}
           <div className={styles.parentsTopLabelContainer}>
             <div className={styles.parentsTopLabel}>
-              <span>Nhận xét từ phụ huynh</span>
+              <span>{t.home.parentsLabel}</span>
             </div>
           </div>
 
@@ -782,16 +900,18 @@ export const Home: React.FC = () => {
                         {/* Companion Badge */}
                         <div className={styles.parentBadge}>
                           <span className={styles.parentBadgeNumber}>+{parent.years}</span>
-                          <span className={styles.parentBadgeText}>năm đồng hành</span>
+                          <span className={styles.parentBadgeText}>{language === 'en' ? 'years with us' : 'năm đồng hành'}</span>
                         </div>
                       </div>
 
                       {/* Info & Feedback */}
                       <div className={styles.parentInfo}>
-                        <span className={styles.parentLabel}>Phụ huynh</span>
+                        <span className={styles.parentLabel}>{language === 'en' ? 'Parent' : 'Phụ huynh'}</span>
                         <h4 className={styles.parentChildName}>{parent.childName}</h4>
                         <div className={styles.parentDivider}></div>
-                        <p className={styles.parentFeedback}>"{parent.feedback}"</p>
+                        <p className={styles.parentFeedback}>
+                          "{language === 'en' ? (parent.feedbackEn || parent.feedback) : parent.feedback}"
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -820,7 +940,9 @@ export const Home: React.FC = () => {
           {/* Heading */}
           <div className={styles.registerHeading}>
             <h2 className={styles.registerTitleSolo}>
-              Trở thành học viên của <span className={styles.registerHighlight}>iCAM</span> ngay bây giờ
+              {language === 'en' ? 'Become an ' : 'Trở thành học viên của '}
+              <span className={styles.registerHighlight}>iCAM</span>
+              {language === 'en' ? ' student today' : ' ngay bây giờ'}
             </h2>
           </div>
 
@@ -830,36 +952,40 @@ export const Home: React.FC = () => {
             <div className={styles.registerLeftCards}>
               {/* Card 1 */}
               <div className={styles.promoCard}>
-                <h3 className={styles.promoTitle}>GIẢM 30% HỌC PHÍ</h3>
+                <h3 className={styles.promoTitle}>
+                  {language === 'en' ? '30% TUITION DISCOUNT' : 'GIẢM 30% HỌC PHÍ'}
+                </h3>
                 <p className={styles.promoText}>
-                  Cho học viên lần đầu đăng ký trở thành học viên iCAM
+                  {language === 'en' ? 'For new students enrolling at iCAM for the first time' : 'Cho học viên lần đầu đăng ký trở thành học viên iCAM'}
                 </p>
                 <Link to="/contact" className={styles.promoBtn}>
-                  NHẬN NGAY
+                  {language === 'en' ? 'CLAIM NOW' : 'NHẬN NGAY'}
                 </Link>
               </div>
 
               {/* Card 2 */}
               <div className={styles.promoCard}>
                 <h3 className={styles.promoTitle}>
-                  ĐÁNH GIÁ NĂNG LỰC TIẾNG ANH CHUẨN QUỐC TẾ MIỄN PHÍ
+                  {language === 'en' ? 'FREE INTERNATIONAL ENGLISH ASSESSMENT' : 'ĐÁNH GIÁ NĂNG LỰC TIẾNG ANH CHUẨN QUỐC TẾ MIỄN PHÍ'}
                 </h3>
                 <Link to="/contact" className={styles.promoBtn}>
-                  ĐĂNG KÝ NGAY
+                  {t.home.registerNow}
                 </Link>
               </div>
             </div>
 
             {/* Right Column: Registration Form Card */}
             <div className={styles.formCard}>
-              <h3 className={styles.formTitle}>ĐĂNG KÝ TƯ VẤN</h3>
+              <h3 className={styles.formTitle}>
+                {language === 'en' ? 'BOOK CONSULTATION' : 'ĐÁNH GIÁ & TƯ VẤN'}
+              </h3>
               <form onSubmit={handleRegisterSubmit} className={styles.registerForm}>
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <input
                       type="text"
                       required
-                      placeholder="*Họ và tên"
+                      placeholder={t.home.regNamePlaceholder}
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                       className={styles.formInput}
@@ -869,7 +995,7 @@ export const Home: React.FC = () => {
                     <input
                       type="tel"
                       required
-                      placeholder="*Điện thoại"
+                      placeholder={t.home.regPhonePlaceholder}
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className={styles.formInput}
@@ -882,7 +1008,7 @@ export const Home: React.FC = () => {
                     <input
                       type="email"
                       required
-                      placeholder="*Email"
+                      placeholder={t.home.regEmailPlaceholder}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className={styles.formInput}
@@ -892,7 +1018,7 @@ export const Home: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder="*Tuổi của bé"
+                      placeholder={t.home.regAgePlaceholder}
                       value={formData.childAge}
                       onChange={(e) => setFormData({ ...formData, childAge: e.target.value })}
                       className={styles.formInput}
@@ -907,7 +1033,7 @@ export const Home: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className={styles.formSelect}
                   >
-                    <option value="">Tỉnh / Thành phố*</option>
+                    <option value="">{language === 'en' ? 'City / Province*' : 'Tỉnh / Thành phố*'}</option>
                     <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
                     <option value="TP. Hà Nội">TP. Hà Nội</option>
                     <option value="Tỉnh Bình Dương">Tỉnh Bình Dương</option>
@@ -918,13 +1044,13 @@ export const Home: React.FC = () => {
                     <option value="Tỉnh Bến Tre">Tỉnh Bến Tre</option>
                     <option value="Tỉnh Tây Ninh">Tỉnh Tây Ninh</option>
                     <option value="TP. Cần Thơ">TP. Cần Thơ</option>
-                    <option value="Khác">Tỉnh / Thành phố khác</option>
+                    <option value="Khác">{language === 'en' ? 'Other Region' : 'Tỉnh / Thành phố khác'}</option>
                   </select>
                 </div>
 
                 <div className={styles.formSubmitContainer}>
                   <button type="submit" className={styles.formSubmitBtn}>
-                    ĐĂNG KÝ
+                    {t.home.registerNow}
                   </button>
                 </div>
               </form>
@@ -937,3 +1063,4 @@ export const Home: React.FC = () => {
 };
 
 export default Home;
+

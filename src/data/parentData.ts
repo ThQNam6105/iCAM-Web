@@ -1,4 +1,4 @@
-import parent1 from '../assets/parent_1.png';
+﻿import parent1 from '../assets/parent_1.png';
 import parent2 from '../assets/parent_2.png';
 import parent3 from '../assets/parent_3.png';
 import parent4 from '../assets/parent_4.png';
@@ -8,6 +8,7 @@ export interface ParentTestimonial {
   childName: string;
   image: string;
   feedback: string;
+  feedbackEn?: string;
   years: number;
 }
 
@@ -62,3 +63,4 @@ export const parentsData: ParentTestimonial[] = [
     years: 10
   }
 ];
+

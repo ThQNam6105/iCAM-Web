@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  HelpCircle,
   Sparkles,
   Search,
   ChevronDown,
@@ -9,106 +8,148 @@ import {
   PhoneCall,
   Send,
   Zap,
-  Compass,
-  Award
+  Award,
+  X
 } from 'lucide-react';
 import styles from './FAQ.module.css';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 interface FAQItem {
   id: number;
   category: 'method' | 'curriculum' | 'tuition' | 'location';
-  categoryLabel: string;
-  question: string;
-  answer: string;
+  categoryLabelVi: string;
+  categoryLabelEn: string;
+  questionVi: string;
+  questionEn: string;
+  answerVi: string;
+  answerEn: string;
 }
 
 const faqData: FAQItem[] = [
   {
     id: 1,
     category: 'method',
-    categoryLabel: 'PHƯƠNG PHÁP & LỚP HỌC',
-    question: 'Phương pháp 4Ls + LETI tại ANH NGỮ CAM là gì?',
-    answer: '4Ls đại diện cho 4 kỹ năng cốt lõi: Listening (Nghe), Speaking (Nói), Reading (Đọc), Writing (Viết). LETI (Learning English Through Interactions) là phương pháp giúp học viên học qua tương tác hai chiều, thảo luận nhóm, bài tập tình huống và trải nghiệm thực tế thay vì học thuộc lòng thụ động.'
+    categoryLabelVi: 'PHƯƠNG PHÁP & LỚP HỌC',
+    categoryLabelEn: 'METHOD & CLASSROOMS',
+    questionVi: 'Phương pháp 4Ls + LETI tại ICANCAM là gì?',
+    questionEn: 'What is the 4Ls + LETI methodology at ICANCAM?',
+    answerVi: '4Ls đại diện cho 4 kỹ năng cốt lõi: Listening (Nghe), Speaking (Nói), Reading (Đọc), Writing (Viết). LETI (Learning English Through Interactions) là phương pháp giúp học viên học qua tương tác hai chiều, thảo luận nhóm, bài tập tình huống và trải nghiệm thực tế thay vì học thuộc lòng thụ động.',
+    answerEn: '4Ls represents 4 core skills: Listening, Speaking, Reading, Writing. LETI (Learning English Through Interactions) is a method enabling students to learn through two-way interactions, group discussions, scenario tasks, and practical experiences rather than passive memorization.'
   },
   {
     id: 2,
     category: 'method',
-    categoryLabel: 'PHƯƠNG PHÁP & LỚP HỌC',
-    question: 'Lớp học 21st tại ANH NGỮ CAM có điểm gì khác biệt?',
-    answer: '100% phòng học được trang bị Bảng tương tác thông minh (Smartboard), sử dụng giáo trình và phần mềm Anh Quốc kết hợp đa phương tiện multimedia. Học viên được nhúng trong môi trường 100% tiếng Anh giúp kích hoạt phản xạ giao tiếp tự nhiên.'
+    categoryLabelVi: 'PHƯƠNG PHÁP & LỚP HỌC',
+    categoryLabelEn: 'METHOD & CLASSROOMS',
+    questionVi: 'Lớp học 21st tại ICANCAM có điểm gì khác biệt?',
+    questionEn: 'What makes the 21st Smart Classroom at ICANCAM unique?',
+    answerVi: '100% phòng học được trang bị Bảng tương tác thông minh (Smartboard), sử dụng giáo trình và phần mềm Anh Quốc kết hợp đa phương tiện multimedia. Học viên được nhúng trong môi trường 100% tiếng Anh giúp kích hoạt phản xạ giao tiếp tự nhiên.',
+    answerEn: '100% of classrooms are equipped with interactive touchscreens (Smartboards), using British curriculum software and multimedia. Students are immersed in a 100% English environment triggering natural speech reflexes.'
   },
   {
     id: 3,
     category: 'curriculum',
-    categoryLabel: 'LỘ TRÌNH & CAM KẾT',
-    question: 'ANH NGỮ CAM có cam kết đầu ra bằng văn bản không?',
-    answer: 'Có. Tất cả học viên đăng ký lộ trình học tại ANH NGỮ CAM đều được ký hợp đồng cam kết đầu ra bằng văn bản pháp lý. Nếu học viên tham gia đầy đủ lịch học và làm bài tập theo quy định nhưng chưa đạt target, trung tâm sẽ tài trợ 100% học phí học lại.'
+    categoryLabelVi: 'LỘ TRÌNH & CAM KẾT',
+    categoryLabelEn: 'PATHWAY & GUARANTEES',
+    questionVi: 'ICANCAM có cam kết đầu ra bằng văn bản không?',
+    questionEn: 'Does ICANCAM provide written outcome guarantees?',
+    answerVi: 'Có. Tất cả học viên đăng ký lộ trình học tại ICANCAM đều được ký hợp đồng cam kết đầu ra bằng văn bản pháp lý. Nếu học viên tham gia đầy đủ lịch học và làm bài tập theo quy định nhưng chưa đạt target, trung tâm sẽ tài trợ 100% học phí học lại.',
+    answerEn: 'Yes. All students enrolling in ICANCAM pathways receive a legal written output contract. If a student attends required sessions and completes assignments but falls short of targets, the center sponsors 100% tuition for re-taking.'
   },
   {
     id: 4,
     category: 'curriculum',
-    categoryLabel: 'LỘ TRÌNH & CAM KẾT',
-    question: 'Trung tâm có các khóa học dành cho những độ tuổi nào?',
-    answer: 'ANH NGỮ CAM cung cấp các chương trình đào tạo đa dạng: CAM Kids Starter (4-6 tuổi), CAM Juniors (7-11 tuổi), CAM Teens Master (12-15 tuổi), Lộ trình IELTS Bứt Tốc (4.5 – 7.5+) và Tiếng Anh Giao Tiếp Thực Chiến cho sinh viên & người đi làm.'
+    categoryLabelVi: 'LỘ TRÌNH & CAM KẾT',
+    categoryLabelEn: 'PATHWAY & GUARANTEES',
+    questionVi: 'Trung tâm có các khóa học dành cho những độ tuổi nào?',
+    questionEn: 'Which age groups do ICANCAM courses cater to?',
+    answerVi: 'ICANCAM cung cấp các chương trình đào tạo đa dạng: CAM Kids Starter (4-6 tuổi), CAM Juniors (7-11 tuổi), CAM Teens Master (12-15 tuổi), Lộ trình IELTS Bứt Tốc (4.5 – 7.5+) và Tiếng Anh Giao Tiếp Thực Chiến cho sinh viên & người đi làm.',
+    answerEn: 'ICANCAM provides diverse programs: CAM Kids Starter (ages 4-6), CAM Juniors (ages 7-11), CAM Teens Master (ages 12-15), IELTS Acceleration (4.5–7.5+), and Practical Communication for students and working professionals.'
   },
   {
     id: 5,
     category: 'curriculum',
-    categoryLabel: 'LỘ TRÌNH & CAM KẾT',
-    question: 'Làm thế nào để biết con tôi phù hợp với khóa học nào?',
-    answer: 'Trước khi nhập học, học viên sẽ được tham gia bài kiểm tra đánh giá năng lực 4 kỹ năng hoàn toàn miễn phí để xác định chính xác trình độ và nhận tư vấn lộ trình cá nhân hóa.'
+    categoryLabelVi: 'LỘ TRÌNH & CAM KẾT',
+    categoryLabelEn: 'PATHWAY & GUARANTEES',
+    questionVi: 'Làm thế nào để biết con tôi phù hợp với khóa học nào?',
+    questionEn: 'How can I know which course is right for my child?',
+    answerVi: 'Trước khi nhập học, học viên sẽ được tham gia bài kiểm tra đánh giá năng lực 4 kỹ năng hoàn toàn miễn phí để xác định chính xác trình độ và nhận tư vấn lộ trình cá nhân hóa.',
+    answerEn: 'Before enrollment, students take a 100% free 4-skill proficiency assessment to accurately identify levels and receive a personalized learning roadmap.'
   },
   {
     id: 6,
     category: 'tuition',
-    categoryLabel: 'HỌC PHÍ & ƯU ĐÃI',
-    question: 'Học phí tại ANH NGỮ CAM có chính sách hỗ trợ trả góp không?',
-    answer: 'Trung tâm hỗ trợ các phương thức thanh toán linh hoạt, bao gồm trả góp 0% lãi suất qua thẻ tín dụng hoặc chia nhỏ học phí theo từng đợt đóng để tạo điều kiện thuận lợi nhất cho phụ huynh.'
+    categoryLabelVi: 'HỌC PHÍ & ƯU ĐÃI',
+    categoryLabelEn: 'TUITION & DISCOUNTS',
+    questionVi: 'Học phí tại ICANCAM có chính sách hỗ trợ trả góp không?',
+    questionEn: 'Does ICANCAM offer tuition installment support?',
+    answerVi: 'Trung tâm hỗ trợ các phương thức thanh toán linh hoạt, bao gồm trả góp 0% lãi suất qua thẻ tín dụng hoặc chia nhỏ học phí theo từng đợt đóng để tạo điều kiện thuận lợi nhất cho phụ huynh.',
+    answerEn: 'We support flexible payment options including 0% interest credit card installments or split payments to create the best convenience for parents.'
   },
   {
     id: 7,
     category: 'tuition',
-    categoryLabel: 'HỌC PHÍ & ƯU ĐÃI',
-    question: 'Khi đăng ký nhóm hoặc học nhiều khóa có được ưu đãi không?',
-    answer: 'ANH NGỮ CAM áp dụng các chương trình ưu đãi dành riêng cho học viên đăng ký theo nhóm gia đình, anh chị em cùng học hoặc đăng ký trọn gói lộ trình dài hạn.'
+    categoryLabelVi: 'HỌC PHÍ & ƯU ĐÃI',
+    categoryLabelEn: 'TUITION & DISCOUNTS',
+    questionVi: 'Khi đăng ký nhóm hoặc học nhiều khóa có được ưu đãi không?',
+    questionEn: 'Are there discounts for group enrollments or multi-course signups?',
+    answerVi: 'ICANCAM áp dụng các chương trình ưu đãi dành riêng cho học viên đăng ký theo nhóm gia đình, anh chị em cùng học hoặc đăng ký trọn gói lộ trình dài hạn.',
+    answerEn: 'ICANCAM applies dedicated discounts for family group signups, siblings studying together, or full long-term pathway packages.'
   },
   {
     id: 8,
     category: 'location',
-    categoryLabel: 'CƠ SỞ & LỊCH HỌC',
-    question: 'Địa điểm các cơ sở của ANH NGỮ CAM ở đâu?',
-    answer: 'ANH NGỮ CAM hiện có các cơ sở đào tạo hiện đại tại khu vực Hóc Môn và Quận 12, TP. Hồ Chí Minh với hệ thống phòng học chuẩn 21st.'
+    categoryLabelVi: 'CƠ SỞ & LỊCH HỌC',
+    categoryLabelEn: 'CAMPUSES & SCHEDULE',
+    questionVi: 'Địa điểm các cơ sở của ICANCAM ở đâu?',
+    questionEn: 'Where are ICANCAM campuses located?',
+    answerVi: 'ICANCAM hiện có các cơ sở đào tạo hiện đại tại khu vực Hóc Môn và Quận 12, TP. Hồ Chí Minh với hệ thống phòng học chuẩn 21st (344 A Tổ 13 KP 1, Trung Mỹ Tây, HCM).',
+    answerEn: 'ICANCAM currently operates modern campuses in Hoc Mon & District 12, HCMC with 21st smart classrooms (344 A To 13 KP 1, Trung My Tay, HCMC).'
   },
   {
     id: 9,
     category: 'location',
-    categoryLabel: 'CƠ SỞ & LỊCH HỌC',
-    question: 'Lịch học tại trung tâm được sắp xếp như thế nào?',
-    answer: 'Lịch học linh hoạt từ Thứ 2 đến Chủ nhật với các ca sáng, chiều và tối (từ 17h30 - 19h00 hoặc 19h00 - 20h30). Học viên có thể linh hoạt sắp xếp học bù nếu bận đột xuất.'
+    categoryLabelVi: 'CƠ SỞ & LỊCH HỌC',
+    categoryLabelEn: 'CAMPUSES & SCHEDULE',
+    questionVi: 'Lịch học tại trung tâm được sắp xếp như thế nào?',
+    questionEn: 'How are class schedules arranged at the center?',
+    answerVi: 'Lịch học linh hoạt từ Thứ 2 đến Chủ nhật với các ca sáng, chiều và tối (từ 17h30 - 19h00 hoặc 19h00 - 20h30). Học viên có thể linh hoạt sắp xếp học bù nếu bận đột xuất.',
+    answerEn: 'Class schedules are flexible from Monday to Sunday with morning, afternoon, and evening shifts (17:30–19:00 or 19:00–20:30). Students can makeup missed classes easily.'
   },
   {
     id: 10,
     category: 'method',
-    categoryLabel: 'PHƯƠNG PHÁP & LỚP HỌC',
-    question: 'Trẻ mầm non 4-6 tuổi mới bắt đầu học tiếng Anh có theo kịp không?',
-    answer: 'Chương trình CAM Kids được thiết kế riêng qua phương pháp Phonics, trò chơi và âm nhạc giúp trẻ thẩm thấu ngôn ngữ hoàn toàn tự nhiên mà không cảm thấy áp lực.'
+    categoryLabelVi: 'PHƯƠNG PHÁP & LỚP HỌC',
+    categoryLabelEn: 'METHOD & CLASSROOMS',
+    questionVi: 'Trẻ mầm non 4-6 tuổi mới bắt đầu học tiếng Anh có theo kịp không?',
+    questionEn: 'Can kindergarten children aged 4-6 keep up when starting English?',
+    answerVi: 'Chương trình CAM Kids được thiết kế riêng qua phương pháp Phonics, trò chơi và âm nhạc giúp trẻ thẩm thấu ngôn ngữ hoàn toàn tự nhiên mà không cảm thấy áp lực.',
+    answerEn: 'The CAM Kids program is custom-tailored with Phonics, games, and music so young children acquire English naturally without stress.'
   }
 ];
 
 export const FAQ: React.FC = () => {
+  const { language } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [openId, setOpenId] = useState<number | null>(1); // Mặc định mở câu đầu tiên
+  const [openIds, setOpenIds] = useState<number[]>([]);
 
   const toggleAccordion = (id: number) => {
-    setOpenId(openId === id ? null : id);
+    if (openIds.includes(id)) {
+      setOpenIds(openIds.filter(item => item !== id));
+    } else {
+      setOpenIds([...openIds, id]);
+    }
   };
 
-  const filteredFaqs = faqData.filter((faq) => {
-    const matchesCategory = activeCategory === 'all' || faq.category === activeCategory;
-    const matchesSearch =
-      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredFaqs = faqData.filter(item => {
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    const qText = language === 'en' ? item.questionEn : item.questionVi;
+    const aText = language === 'en' ? item.answerEn : item.answerVi;
+    const matchesSearch = searchQuery.trim() === '' ||
+      qText.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      aText.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -120,30 +161,34 @@ export const FAQ: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>HỎI ĐÁP & THẮC MẮC THƯỜNG GẶP</span>
+            <span>TƯ VẤN & GIẢI ĐÁP ICANCAM</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Giải Đáp Thắc Mắc <span className={styles.orangeHighlight}>ANH NGỮ CAM</span>
+            Giải Đáp Thắc Mắc <span className={styles.orangeHighlight}>ICANCAM</span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Tổng hợp câu hỏi thường gặp nhất từ Quý phụ huynh và học viên về phương pháp 4Ls + LETI, lộ trình học, cam kết đầu ra và học phí tại Hóc Môn & Quận 12.
+            Tổng hợp câu hỏi thường gặp về phương pháp 4Ls + LETI, lộ trình cam kết đầu ra, học phí cùng thông tin tuyển sinh tại Hóc Môn & Quận 12.
           </p>
 
-          {/* Interactive Search Box */}
-          <div className={styles.searchBox}>
+          {/* Search Box */}
+          <div className={styles.searchBoxWrapper}>
             <Search size={20} className={styles.searchIcon} />
             <input
               type="text"
-              placeholder="Nhập từ khóa tìm kiếm (ví dụ: học phí, cam kết, 4Ls, lịch học...)"
+              placeholder="Nhập từ khóa tìm kiếm (ví dụ: IELTS, cam kết, học phí...)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={styles.searchInput}
             />
             {searchQuery && (
-              <button className={styles.clearSearchBtn} onClick={() => setSearchQuery('')}>
-                Xóa
+              <button
+                className={styles.clearSearchBtn}
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+              >
+                <X size={16} />
               </button>
             )}
           </div>
@@ -154,7 +199,7 @@ export const FAQ: React.FC = () => {
               className={`${styles.filterBtn} ${activeCategory === 'all' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('all')}
             >
-              Tất Cả Thắc Mắc
+              Tất Cả Câu Hỏi
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'method' ? styles.activeFilter : ''}`}
@@ -184,91 +229,97 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      {/* ACCORDION FAQ LIST SECTION */}
-      <section className={styles.faqListSection}>
+      {/* Transition: Hero (Navy) -> Accordion List (Soft Orange) */}
+      <SectionTransition variant="navy-to-soft-orange" />
+
+      {/* ACCORDION FAQ SECTION */}
+      <section className={styles.accordionSection}>
         <div className={styles.container}>
-          {filteredFaqs.length > 0 ? (
-            <div className={styles.faqAccordionList}>
-              {filteredFaqs.map((faq) => {
-                const isOpen = openId === faq.id;
+          {filteredFaqs.length === 0 ? (
+            <div className={styles.noResultsCard}>
+              <h3>Không tìm thấy câu hỏi phù hợp</h3>
+              <p>Thử tìm kiếm với từ khóa khác hoặc gửi câu hỏi trực tiếp cho đội ngũ tư vấn ICANCAM.</p>
+            </div>
+          ) : (
+            <div className={styles.accordionList}>
+              {filteredFaqs.map(item => {
+                const isOpen = openIds.includes(item.id);
                 return (
-                  <div
-                    key={faq.id}
-                    className={`${styles.faqCard} ${isOpen ? styles.activeCard : ''}`}
-                  >
+                  <div key={item.id} className={`${styles.accordionItem} ${isOpen ? styles.itemOpen : ''}`}>
                     <button
-                      className={styles.questionButton}
-                      onClick={() => toggleAccordion(faq.id)}
+                      className={styles.accordionHeader}
+                      onClick={() => toggleAccordion(item.id)}
+                      aria-expanded={isOpen}
                     >
-                      <div className={styles.questionTitleGroup}>
-                        <span className={styles.categoryBadge}>{faq.categoryLabel}</span>
-                        <h3 className={styles.questionText}>{faq.question}</h3>
+                      <div className={styles.questionMeta}>
+                        <span className={styles.badgeCategory}>
+                          {language === 'en' ? item.categoryLabelEn : item.categoryLabelVi}
+                        </span>
+                        <span className={styles.questionText}>
+                          {language === 'en' ? item.questionEn : item.questionVi}
+                        </span>
                       </div>
-                      <div className={styles.toggleIcon}>
-                        {isOpen ? <ChevronUp size={22} color="#F58220" /> : <ChevronDown size={22} />}
+                      <div className={styles.toggleIconWrap}>
+                        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                       </div>
                     </button>
 
                     {isOpen && (
-                      <div className={styles.answerBody}>
-                        <div className={styles.answerContent}>
-                          <p>{faq.answer}</p>
-                        </div>
+                      <div className={styles.accordionBody}>
+                        <p>{language === 'en' ? item.answerEn : item.answerVi}</p>
                       </div>
                     )}
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <div className={styles.noResultsBox}>
-              <HelpCircle size={48} color="#cbd5e1" />
-              <h3>Không tìm thấy câu hỏi phù hợp</h3>
-              <p>Thử tìm kiếm với từ khóa khác hoặc gửi câu hỏi trực tiếp cho đội ngũ tư vấn ANH NGỮ CAM.</p>
-            </div>
           )}
         </div>
       </section>
 
-      {/* FAQ HIGHLIGHT PILLARS */}
+      {/* Transition: Accordion List (Soft Orange) -> Support Pillars (White) */}
+      <SectionTransition variant="soft-orange-to-white" />
+
+      {/* SUPPORT PILLARS */}
       <section className={styles.pillarsSection}>
         <div className={styles.container}>
           <div className={styles.pillarsGrid}>
             <div className={styles.pillarCard}>
-              <div className={styles.pillarIcon}><Zap size={28} /></div>
-              <h4>Hỏi Đáp Trực Tiếp</h4>
-              <p>Tư vấn viên sẵn sàng hỗ trợ giải đáp chi tiết mọi thắc mắc qua Hotline & Zalo 24/7.</p>
+              <PhoneCall size={32} color="#F58220" />
+              <h3>Tư Vấn Trực Tiếp 24/7</h3>
+              <p>Chuyên viên giáo dục sẵn sàng giải đáp thắc mắc lộ trình học qua Hotline & Zalo.</p>
             </div>
 
             <div className={styles.pillarCard}>
-              <div className={styles.pillarIcon}><Award size={28} /></div>
-              <h4>Cam Kết Bằng Văn Bản</h4>
-              <p>Mọi chính sách và đầu ra đào tạo đều được ký kết hợp đồng pháp lý minh bạch.</p>
+              <Award size={32} color="#F58220" />
+              <h3>Cam Kết Bằng Văn Bản</h3>
+              <p>100% học viên đăng ký lộ trình được ký hợp đồng cam kết chất lượng đầu ra.</p>
             </div>
 
             <div className={styles.pillarCard}>
-              <div className={styles.pillarIcon}><Compass size={28} /></div>
-              <h4>Test Trình Độ Miễn Phí</h4>
-              <p>Đánh giá năng lực 4 kỹ năng miễn phí trước khi tư vấn lộ trình học phù hợp nhất.</p>
+              <Zap size={32} color="#F58220" />
+              <h3>Học Độc Lập Bền Vững</h3>
+              <p>Rèn luyện tư duy tự nghiên cứu giúp học sinh làm chủ tiếng Anh suốt đời.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CONSULTATION CTA SECTION */}
+      {/* Transition: Support Pillars (White) -> CTA (Navy) */}
+      <SectionTransition variant="white-to-navy" />
+
+      {/* CONSULTATION CTA */}
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaCard}>
-            <h2>Bạn Vẫn Còn Thắc Mắc Cần Giải Đáp Trực Tiếp?</h2>
-            <p>
-              Đừng ngần ngại gửi câu hỏi cho ANH NGỮ CAM. Đội ngũ chuyên viên tư vấn tại Hóc Môn & Quận 12 sẽ liên hệ hỗ trợ bạn nhanh nhất.
-            </p>
+            <h2>Bạn Cần Thêm Thông Tin Từ ICANCAM?</h2>
+            <p>Đừng ngần ngại gửi câu hỏi cho ICANCAM. Đội ngũ chuyên viên tư vấn tại Hóc Môn & Quận 12 sẽ liên hệ hỗ trợ bạn nhanh nhất.</p>
             <div className={styles.ctaButtons}>
               <Link to="/contact" className={styles.primaryCtaBtn}>
-                Gửi Câu Hỏi Tư Vấn <Send size={16} />
+                <Send size={18} /> Đăng Ký Tư Vấn Miễn Phí
               </Link>
-              <a href="tel:0909090909" className={styles.secondaryCtaBtn}>
-                <PhoneCall size={16} /> Hotline Trực Tiếp
+              <a href="tel:0909123456" className={styles.secondaryCtaBtn}>
+                <PhoneCall size={18} /> Hotline: 0909 123 456
               </a>
             </div>
           </div>

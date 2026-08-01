@@ -1,4 +1,4 @@
-import newsArena from '../assets/news_arena.png';
+﻿import newsArena from '../assets/news_arena.png';
 import newsParenting from '../assets/news_parenting.png';
 import newsLimit from '../assets/news_limit.png';
 
@@ -6,11 +6,15 @@ export interface Article {
   id: number;
   category: 'events' | 'scholarship' | 'tips';
   categoryLabel: string;
+  categoryLabelEn?: string;
   date: string;
   title: string;
+  titleEn?: string;
   url: string;
   excerpt: string;
+  excerptEn?: string;
   content: string;
+  contentEn?: string;
   image: string;
 }
 
@@ -117,3 +121,4 @@ export const articlesData: Article[] = [
     image: placeholderImg,
   },
 ];
+

@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  GraduationCap,
-  Sparkles,
   BookOpen,
   CheckCircle2,
   Clock,
   Target,
   Award,
-  Users,
+  Sparkles,
   ArrowRight,
-  ChevronRight,
+  GraduationCap,
   Star,
+  X,
   Zap,
   Monitor,
   Lightbulb,
-  X
+  FileText
 } from 'lucide-react';
 import styles from './Curriculum.module.css';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 interface Course {
   id: string;
@@ -37,115 +38,115 @@ const coursesData: Course[] = [
   {
     id: 'kids-starter',
     category: 'kids',
-    title: 'CAM Kids Starter (4 – 6 tuổi)',
-    badge: 'KIDS ENGLISH',
-    age: '4 – 6 tuổi',
-    desc: 'Phương pháp Phonics chuẩn Anh Quốc giúp trẻ khơi gợi niềm yêu thích tiếng Anh, thẩm thấu ngữ âm tự nhiên và phát âm chuẩn bản xứ ngay từ nhỏ.',
-    duration: '24 buổi / khóa',
-    level: 'Mầm non (Mới bắt đầu)',
-    target: 'Phát âm chuẩn Phonics & Tự tin phản xạ đơn giản',
+    title: 'CAM Kids Starter',
+    badge: 'MẦM NON (4 - 6 TUỔI)',
+    age: '4 - 6 tuổi',
+    desc: 'Khơi dậy niềm đam mê tiếng Anh tự nhiên qua phương pháp Phonics, bài hát, trò chơi tương tác và hoạt động vận động.',
+    duration: '12 tháng / 3 khóa',
+    level: 'Pre-A1 Starters',
+    target: 'Phát âm chuẩn IPA, phản xạ tiếng Anh tự nhiên, tự tin giao tiếp từ câu đơn.',
     features: [
-      'Học qua trò chơi trí tuệ & bài hát tương tác',
-      'Môi trường 100% tiếng Anh thẩm thấu tự nhiên',
-      'Lớp học Smartboard trực quan sinh động'
+      'Phương pháp Phonics chuẩn Anh Quốc giúp đánh vần tiếng Anh như tiếng Việt',
+      'Lớp học Smartboard tương tác trực quan với 100% hình ảnh sinh động',
+      'Rèn luyện thói quen tự học và tự tin phát biểu trước đám đông'
     ],
     syllabus: [
-      'Module 1: Nhận diện bảng chữ cái & Ngữ âm Phonics chuẩn',
-      'Module 2: Từ vựng chủ đề gia đình, trường học & đồ chơi',
-      'Module 3: Phản xạ hội thoại chào hỏi & câu hỏi ngắn',
-      'Module 4: Tự tin biểu diễn bài hát & kể chuyện tiếng Anh'
+      'Module 1: Ngữ âm Phonics cơ bản & Nhận diện bảng chữ cái',
+      'Module 2: Từ vựng chủ đề GIA ĐÌNH, ĐỒ CHƠI, MÀU SẮC, ĐỘNG VẬT',
+      'Module 3: Giao tiếp câu đơn & Phản xạ nghe nói tự nhiên',
+      'Module 4: Thuyết trình dự án nhỏ & Thi lấy chứng chỉ CamKids'
     ]
   },
   {
-    id: 'juniors-cambridge',
+    id: 'juniors-master',
     category: 'kids',
-    title: 'CAM Juniors (7 – 11 tuổi)',
-    badge: 'CAMBRIDGE STARTERS / MOVERS / FLYERS',
-    age: '7 – 11 tuổi',
-    desc: 'Phát triển toàn diện 4 kỹ năng Nghe - Nói - Đọc - Viết qua phương pháp LETI tương tác, chuẩn bị nền tảng vững chắc cho chứng chỉ Cambridge.',
-    duration: '36 buổi / khóa',
-    level: 'Tiểu học (Starters - Flyers)',
-    target: 'Đạt khiên Cambridge tối đa & Tự tin giao tiếp',
+    title: 'CAM Juniors Master',
+    badge: 'TIEU HOC (7 - 11 TUOI)',
+    age: '7 - 11 tuổi',
+    desc: 'Phát triển toàn diện 4 kỹ năng Nghe - Nói - Đọc - Viết theo phương pháp 4Ls + LETI và chinh phục chứng chỉ Cambridge Starters, Movers, Flyers.',
+    duration: '24 tháng / 6 khóa',
+    level: 'A1 - A2 (Cambridge)',
+    target: 'Đạt 14-15 Khiên Cambridge, tự tin làm chủ 4Ls, rèn luyện tư duy tự học độc lập.',
     features: [
-      'Phương pháp LETI tương tác thảo luận nhóm',
-      'Rèn luyện tư duy phản biện & thuyết trình',
-      'Cam kết đầu ra chuẩn chứng chỉ Cambridge'
+      'Áp dụng mô hình 4Ls kết hợp LETI tương tác 2 chiều liên tục',
+      'Giáo trình Anh Quốc chuẩn hóa với ứng dụng phần mềm thông minh',
+      'Luyện thi Cambridge song song với nâng cao năng lực tiếng Anh thực tế'
     ],
     syllabus: [
-      'Module 1: Củng cố từ vựng & cấu trúc câu chuẩn Cambridge',
-      'Module 2: Luyện kỹ năng Đọc hiểu & Viết đoạn văn ngắn',
-      'Module 3: Phản xạ Nghe hiểu hội thoại tốc độ tự nhiên',
-      'Module 4: Kỹ năng thuyết trình đề tài cá nhân trước lớp'
+      'Module 1: Củng cố 4Ls & Ngữ pháp ứng dụng học thuật',
+      'Module 2: Đọc hiểu văn bản & Phát triển vốn từ phong phú',
+      'Module 3: Kỹ năng viết luận ngắn & Thuyết trình chủ đề',
+      'Module 4: Luyện đề thi Cambridge Starters / Movers / Flyers'
     ]
   },
   {
-    id: 'teens-master',
+    id: 'teens-academic',
     category: 'teens',
-    title: 'CAM Teens Master (12 – 15 tuổi)',
-    badge: 'TEENS ACADEMIC',
-    age: '12 – 15 tuổi',
-    desc: 'Nâng cao tư duy ngôn ngữ học thuật, làm chủ kỹ năng tự học độc lập và đặt nền tảng vững chắc cho các kỳ thi học sinh giỏi & IELTS.',
-    duration: '36 buổi / khóa',
-    level: 'THCS (A2 – B1)',
-    target: 'Tự học độc lập & Sẵn sàng lộ trình IELTS',
+    title: 'CAM Teens Academic',
+    badge: 'THIEU NIEN (12 - 15 TUOI)',
+    age: '12 - 15 tuổi',
+    desc: 'Bứt phá điểm số Tiếng Anh trên trường, xây dựng nền tảng ngữ pháp & từ vựng chuyên sâu và chuẩn bị hành trang chinh phục IELTS.',
+    duration: '18 tháng / 4 khóa',
+    level: 'A2 - B2 (KET / PET / IELTS 5.0+)',
+    target: 'Làm chủ kỹ năng tự học độc lập, tư duy phản biện, sẵn sàng bước vào lộ trình IELTS.',
     features: [
-      'Tập trung phát triển tư duy phản biện & luận điểm',
-      'Kỹ năng viết essay & thảo luận chuyên sâu',
-      'Mô hình 4Ls kết hợp công nghệ multimedia'
+      'Rèn luyện tư duy phản biện (Critical Thinking) & kỹ năng thuyết trình',
+      'Học qua dự án thực tế giúp ứng dụng kiến thức vào bài luận học thuật',
+      'Tài liệu giảng dạy kết hợp đề thi chuyên & thi THPT Quốc gia'
     ],
     syllabus: [
-      'Module 1: Từ vựng học thuật & Ngữ pháp nâng cao',
-      'Module 2: Kỹ năng đọc phân tích & tổng hợp thông tin',
-      'Module 3: Kỹ năng tranh luận (Debate) & phản biện',
-      'Module 4: Viết luận Academic Essay đúng tiêu chuẩn'
+      'Module 1: Ngữ pháp chuyên sâu & Viết đoạn văn nghị luận',
+      'Module 2: Kỹ năng đọc nhanh (Skimming & Scanning) văn bản dài',
+      'Module 3: Thảo luận nhóm & Thuyết trình chuyên đề bằng Tiếng Anh',
+      'Module 4: Chinh phục đề thi KET / PET & Tiền IELTS'
     ]
   },
   {
-    id: 'ielts-booster',
+    id: 'ielts-acceleration',
     category: 'ielts',
-    title: 'Lộ Trình IELTS Bứt Tốc (4.5 – 7.5+)',
-    badge: 'IELTS PREPARATION',
-    age: '14+ & Người lớn',
-    desc: 'Lộ trình cá nhân hóa tối ưu 4 kỹ năng Nghe-Nói-Đọc-Viết. Cam kết đầu ra bằng văn bản pháp lý, luyện đề thi thật liên tục với chuyên gia.',
-    duration: '48 buổi (4 tháng)',
-    level: 'Pre-IELTS trở lên',
-    target: 'Bứt tốc target 6.5 – 7.5+ IELTS',
+    title: 'Lộ Trình IELTS Bứt Tốc (4.5 - 7.5+)',
+    badge: 'IELTS ACCELERATION',
+    age: 'Từ 13 tuổi trở lên',
+    desc: 'Chương trình luyện thi IELTS cá nhân hóa với cam kết đầu ra bằng văn bản. Tập trung làm chủ chiến thuật 4 kỹ năng Nghe - Nói - Đọc - Viết.',
+    duration: '6 - 12 tháng',
+    level: 'IELTS Target 6.5 - 7.5+',
+    target: 'Đạt target IELTS cam kết, thành thạo tư duy học thuật và tự học nâng band điểm.',
     features: [
-      'Sửa bài chi tiết 1-1 cho Speaking & Writing',
-      'Chiến thuật giải đề IELTS sát thực tế 100%',
-      'Cam kết đầu ra bằng hợp đồng đào tạo'
+      'Chữa bài Speaking & Writing 1-1 chuyên sâu từ cựu giám khảo / Giáo viên 8.5+',
+      'Hệ thống kho đề thi thử IELTS 3D Smartboard cập nhật hàng tuần',
+      'Ký hợp đồng cam kết đầu ra bằng văn bản có giá trị pháp lý'
     ],
     syllabus: [
-      'Module 1: Xây dựng bộ tư duy & từ vựng IELTS Band 6.0+',
-      'Module 2: Chiến thuật Listening & Reading chọn lọc đáp án',
-      'Module 3: IELTS Speaking Part 1, 2, 3 chuyên sâu',
-      'Module 4: Writing Task 1 (Biểu đồ) & Task 2 (Nghị luận)'
+      'Module 1: IELTS Foundation - Củng cố nền tảng Ngữ âm & Từ vựng Band 5.0',
+      'Module 2: IELTS Skill Builder - Chiếm lĩnh phương pháp làm bài Task 1 & Task 2',
+      'Module 3: IELTS Intensive - Tăng tốc phản xạ Speaking & Listening nâng cao',
+      'Module 4: IELTS Master Mock Test - Luyện đề thực chiến dưới áp lực phòng thi'
     ]
   },
   {
     id: 'comm-practical',
     category: 'comm',
     title: 'Tiếng Anh Giao Tiếp Thực Chiến',
-    badge: 'COMMUNICATION',
+    badge: 'PRACTICAL COMMUNICATION',
     age: 'Sinh viên & Người đi làm',
-    desc: 'Phương pháp phản xạ nhanh, tập trung 80% thời lượng vào luyện nói tự nhiên và phát âm chuẩn bản xứ, giúp tự tin giao tiếp sau 3 tháng.',
-    duration: '36 buổi (3 tháng)',
-    level: 'Mọi cấp độ',
-    target: 'Phản xạ tự nhiên & Tự tin giao tiếp công việc',
+    desc: 'Phương pháp LETI tập trung phản xạ giao tiếp hai chiều, chuẩn hóa phát âm IPA và ứng dụng trực tiếp trong công việc & môi trường quốc tế.',
+    duration: '3 - 6 tháng',
+    level: 'Giao tiếp thành thạo',
+    target: 'Tự tin giao tiếp với người bản xứ, thuyết trình công việc và phỏng vấn tiếng Anh.',
     features: [
-      'Thực hành 80% thời lượng nghe nói thực tế',
-      'Xóa bỏ tâm lý e ngại, sợ sai khi giao tiếp',
-      'Ứng dụng ngay vào môi trường công sở & du lịch'
+      'Môi trường nhúng 100% tiếng Anh giúp kích hoạt phản xạ giao tiếp tự nhiên',
+      'Luyện phỏng vấn xin việc, viết Email công việc & đàm phán hợp đồng',
+      'Lịch học linh hoạt ca sáng/tối phù hợp cho người đi làm bận rộn'
     ],
     syllabus: [
-      'Module 1: Chuẩn hóa ngữ âm & phát âm IPA chuẩn',
-      'Module 2: Phản xạ hỏi đáp tự nhiên trong giao tiếp',
-      'Module 3: Tiếng Anh công sở (Họp, Email, Thuyết trình)',
-      'Module 4: Xử lý tình huống giao tiếp đời sống & du lịch'
+      'Module 1: Chuẩn hóa phát âm IPA & Phản xạ nghe nói căn bản',
+      'Module 2: Tiếng Anh công sở: Email, Cuộc họp & Tiếp đối tác',
+      'Module 3: Thuyết trình dự án & Phỏng vấn tuyển dụng quốc tế',
+      'Module 4: Giao tiếp thực chiến & Thảo luận tình huống thực tế'
     ]
   },
   {
-    id: 'online-experience',
+    id: 'online-21st',
     category: 'online',
     title: 'iCAM Online Đa Trải Nghiệm',
     badge: 'ONLINE MULTI-EXPERIENCE',
@@ -169,6 +170,7 @@ const coursesData: Course[] = [
 ];
 
 export const Curriculum: React.FC = () => {
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
@@ -184,15 +186,15 @@ export const Curriculum: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>LỘ TRÌNH ĐÀO TẠO CHUẨN QUỐC TẾ</span>
+            <span>{t.curriculum.heroBadge}</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Chương Trình Đào Tạo <span className={styles.orangeHighlight}>ANH NGỮ CAM</span>
+            {t.curriculum.heroTitle}
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Lộ trình học tối ưu kết hợp mô hình <strong>4Ls + LETI</strong> và công nghệ 21st, giúp học viên phát triển toàn diện 4 kỹ năng và khả năng tự học độc lập suốt đời.
+            {t.curriculum.heroSubtitle}
           </p>
 
           {/* Quick Category Filter Pills */}
@@ -201,41 +203,44 @@ export const Curriculum: React.FC = () => {
               className={`${styles.filterBtn} ${activeCategory === 'all' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('all')}
             >
-              Tất Cả Chương Trình
+              {t.curriculum.filterAll}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'kids' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('kids')}
             >
-              Trẻ Em & Mầm Non (4-11t)
+              {t.curriculum.filterKids}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'teens' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('teens')}
             >
-              Thiếu Niên (12-15t)
+              {t.curriculum.filterTeens}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'ielts' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('ielts')}
             >
-              Luyện Thi IELTS
+              {t.curriculum.filterIelts}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'comm' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('comm')}
             >
-              Giao Tiếp Thực Chiến
+              {t.curriculum.filterComm}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'online' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('online')}
             >
-              iCAM Online
+              {t.curriculum.filterOnline}
             </button>
           </div>
         </div>
       </section>
+
+      {/* Transition: Hero (Navy) -> Courses Grid (Soft Orange) */}
+      <SectionTransition variant="navy-to-soft-orange" />
 
       {/* MAIN COURSES GRID SECTION */}
       <section className={styles.coursesSection}>
@@ -251,7 +256,17 @@ export const Curriculum: React.FC = () => {
                 <h3 className={styles.courseTitle}>{course.title}</h3>
                 <p className={styles.courseDesc}>{course.desc}</p>
 
-                {/* Key Features List */}
+                <div className={styles.infoMeta}>
+                  <div className={styles.metaItem}>
+                    <Clock size={16} color="#F58220" />
+                    <span><strong>{t.curriculum.durationLabel}</strong> {course.duration}</span>
+                  </div>
+                  <div className={styles.metaItem}>
+                    <Target size={16} color="#F58220" />
+                    <span><strong>{t.curriculum.commitmentLabel}</strong> {course.target}</span>
+                  </div>
+                </div>
+
                 <div className={styles.featureList}>
                   {course.features.map((feat, idx) => (
                     <div key={idx} className={styles.featureItem}>
@@ -261,44 +276,15 @@ export const Curriculum: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Course Meta Info */}
-                <div className={styles.courseMeta}>
-                  <div className={styles.metaRow}>
-                    <div className={styles.metaLabel}>
-                      <Clock size={15} />
-                      <span>Thời lượng:</span>
-                    </div>
-                    <span className={styles.metaValue}>{course.duration}</span>
-                  </div>
-
-                  <div className={styles.metaRow}>
-                    <div className={styles.metaLabel}>
-                      <Users size={15} />
-                      <span>Đối tượng:</span>
-                    </div>
-                    <span className={styles.metaValue}>{course.level}</span>
-                  </div>
-
-                  <div className={styles.metaRow}>
-                    <div className={styles.metaLabel}>
-                      <Target size={15} />
-                      <span>Cam kết đầu ra:</span>
-                    </div>
-                    <span className={styles.targetValue}>{course.target}</span>
-                  </div>
-                </div>
-
-                {/* Card Actions */}
                 <div className={styles.cardActions}>
                   <button
-                    className={styles.detailBtn}
+                    className={styles.syllabusBtn}
                     onClick={() => setSelectedCourse(course)}
                   >
-                    Xem Chi Tiết Lộ Trình <ChevronRight size={16} />
+                    <FileText size={16} /> {t.curriculum.viewSyllabusBtn}
                   </button>
-
                   <Link to="/contact" className={styles.registerBtn}>
-                    <GraduationCap size={18} /> Đăng Ký Tư Vấn
+                    <GraduationCap size={18} /> {t.curriculum.registerBtn}
                   </Link>
                 </div>
               </div>
@@ -307,16 +293,19 @@ export const Curriculum: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Courses Grid (Soft Orange) -> Why Curriculum Works (White) */}
+      <SectionTransition variant="soft-orange-to-white" />
+
       {/* WHY OUR CURRICULUM WORKS */}
       <section className={styles.whyCurriculumSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Zap size={16} />
-              <span>ƯU ĐIỂM VƯỢT TRỘI</span>
+              <span>{t.curriculum.whyTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              Tại Sao Lộ Trình Đào Tạo Tại ANH NGỮ CAM Hiệu Quả?
+              {t.curriculum.whyTitle}
             </h2>
           </div>
 
@@ -356,20 +345,23 @@ export const Curriculum: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Why Curriculum Works (White) -> CTA (Navy) */}
+      <SectionTransition variant="white-to-navy" />
+
       {/* CTA SECTION */}
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaCard}>
-            <h2>Chưa Biết Khóa Học Nào Phù Hợp Với Con?</h2>
+            <h2>{t.curriculum.ctaTitle}</h2>
             <p>
-              Đăng ký kiểm tra trình độ Tiếng Anh miễn phí và nhận lộ trình học cá nhân hóa từ các chuyên gia ANH NGỮ CAM ngay hôm nay.
+              {t.curriculum.ctaDesc}
             </p>
             <div className={styles.ctaButtons}>
               <Link to="/contact" className={styles.primaryCtaBtn}>
-                Đăng Ký Test Trình Độ Miễn Phí <ArrowRight size={18} />
+                {t.curriculum.ctaPrimaryBtn} <ArrowRight size={18} />
               </Link>
-              <a href="tel:0909090909" className={styles.secondaryCtaBtn}>
-                Hotline Tư Vấn Trực Tiếp
+              <a href="tel:0909123456" className={styles.secondaryCtaBtn}>
+                {t.curriculum.ctaSecondaryBtn}
               </a>
             </div>
           </div>

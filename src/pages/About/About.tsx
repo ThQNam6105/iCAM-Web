@@ -25,6 +25,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import styles from './About.module.css';
+import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 export const About: React.FC = () => {
   const [activeMethodTab, setActiveMethodTab] = useState<'4ls' | 'leti'>('4ls');
@@ -38,7 +39,7 @@ export const About: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>ANH NGỮ CAM — HÓC MÔN & QUẬN 12</span>
+            <span>ICANCAM — HÓC MÔN & QUẬN 12</span>
           </div>
 
           <h1 className={styles.heroTitle}>
@@ -50,7 +51,7 @@ export const About: React.FC = () => {
           </p>
 
           <p className={styles.heroDescription}>
-            ANH NGỮ CAM tiên phong áp dụng mô hình giáo dục hiện đại, kết hợp phương pháp <strong>4Ls</strong> và <strong>LETI</strong> giúp học sinh không chỉ học tiếng Anh mà còn chủ động làm chủ và tự học suốt đời.
+            ICANCAM tiên phong áp dụng mô hình giáo dục hiện đại, kết hợp phương pháp <strong>4Ls</strong> và <strong>LETI</strong> giúp học sinh không chỉ học tiếng Anh mà còn chủ động làm chủ và tự học suốt đời.
           </p>
 
           <div className={styles.heroActions}>
@@ -61,20 +62,11 @@ export const About: React.FC = () => {
               Đăng Ký Tư Vấn
             </Link>
           </div>
-
-          {/* Quick Location Pills */}
-          <div className={styles.locationPills}>
-            <div className={styles.locationPill}>
-              <Compass size={16} color="#F58220" />
-              <span>Cơ sở Hóc Môn</span>
-            </div>
-            <div className={styles.locationPill}>
-              <Compass size={16} color="#F58220" />
-              <span>Cơ sở Quận 12</span>
-            </div>
-          </div>
         </div>
       </section>
+
+      {/* Transition: Hero (Navy) -> Mission (White) */}
+      <SectionTransition variant="navy-to-white" />
 
       {/* SECTION 2: MISSION & 3 CORE DECLARATIONS */}
       <section className={styles.missionSection}>
@@ -82,13 +74,13 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Target size={16} />
-              <span>SỨ MỆNH CỦA ANH NGỮ CAM</span>
+              <span>SỨ MỆNH CỦA ICANCAM</span>
             </div>
             <h2 className={styles.sectionTitle}>
               Khai Mở Năng Lực <span className={styles.orangeText}>Tự Học Độc Lập</span>
             </h2>
             <p className={styles.sectionSubtitle}>
-              Sứ mệnh của ANH NGỮ CAM không chỉ dừng lại ở việc truyền đạt kiến thức, mà là đồng hành biến học sinh thành người sử dụng tiếng Anh tự tin, độc lập và có khả năng tự phát triển tri thức suốt đời.
+              Sứ mệnh của ICANCAM không chỉ dừng lại ở việc truyền đạt kiến thức, mà là đồng hành biến học sinh thành người sử dụng tiếng Anh tự tin, độc lập và có khả năng tự phát triển tri thức suốt đời.
             </p>
           </div>
 
@@ -144,6 +136,9 @@ export const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Transition: Mission (White) -> Core Values (Soft Orange) */}
+      <SectionTransition variant="white-to-soft-orange" />
 
       {/* SECTION 3: CORE VALUES */}
       <section className={styles.valuesSection}>
@@ -202,6 +197,9 @@ export const About: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Core Values (Soft Orange) -> Comparison (White) */}
+      <SectionTransition variant="soft-orange-to-white" />
+
       {/* SECTION 4: WHY CHOOSE US (COMPARISON) */}
       <section className={styles.whyUsSection}>
         <div className={styles.container}>
@@ -214,7 +212,7 @@ export const About: React.FC = () => {
               Học Qua Tương Tác Thay Vì Ghi Nhớ Thụ Động
             </h2>
             <p className={styles.sectionSubtitle}>
-              ANH NGỮ CAM thay thế lối học vẹt rập khuôn bằng môi trường chủ động tương tác và ứng dụng thực tế.
+              ICANCAM thay thế lối học vẹt rập khuôn bằng môi trường chủ động tương tác và ứng dụng thực tế.
             </p>
           </div>
 
@@ -230,7 +228,7 @@ export const About: React.FC = () => {
               className={`${styles.toggleBtn} ${activeComparison === 'cam' ? styles.activeToggleOrange : ''}`}
               onClick={() => setActiveComparison('cam')}
             >
-              Mô Hình ANH NGỮ CAM ★
+              Mô Hình ICANCAM ★
             </button>
           </div>
 
@@ -263,7 +261,7 @@ export const About: React.FC = () => {
 
             <div className={`${styles.comparisonCard} ${styles.camSide} ${activeComparison === 'cam' ? styles.highlightedSide : ''}`}>
               <div className={styles.comparisonHeader}>
-                <h3>Phương Pháp ANH NGỮ CAM</h3>
+                <h3>Phương Pháp ICANCAM</h3>
                 <span className={styles.badgeSuccess}>4Ls + LETI Tương tác</span>
               </div>
               <ul className={styles.comparisonList}>
@@ -288,6 +286,9 @@ export const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Transition: Comparison (White) -> Teaching Method (Soft Orange) */}
+      <SectionTransition variant="white-to-soft-orange" />
 
       {/* SECTION 5: TEACHING METHOD (4Ls + LETI) */}
       <section id="methodology" className={styles.methodSection}>
@@ -416,6 +417,9 @@ export const About: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Teaching Method (Soft Orange) -> Smart Classrooms (Navy) */}
+      <SectionTransition variant="soft-orange-to-navy" />
+
       {/* SECTION 6: 21ST CENTURY CLASSROOM */}
       <section className={styles.classroomSection}>
         <div className={styles.container}>
@@ -459,6 +463,9 @@ export const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Transition: Smart Classrooms (Navy) -> Student Journey (White) */}
+      <SectionTransition variant="navy-to-white" />
 
       {/* SECTION 7: STUDENT JOURNEY */}
       <section className={styles.journeySection}>
@@ -506,6 +513,9 @@ export const About: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Transition: Student Journey (White) -> Student Outcomes (Soft Orange) */}
+      <SectionTransition variant="white-to-soft-orange" />
 
       {/* SECTION 8: STUDENT OUTCOMES */}
       <section className={styles.outcomesSection}>
@@ -572,6 +582,9 @@ export const About: React.FC = () => {
         </div>
       </section>
 
+      {/* Transition: Outcomes (Soft Orange) -> Story (Navy) */}
+      <SectionTransition variant="soft-orange-to-navy" />
+
       {/* SECTION 9: INNOVATION STORY */}
       <section className={styles.storySection}>
         <div className={styles.container}>
@@ -583,21 +596,24 @@ export const About: React.FC = () => {
               </div>
               <h2>Tiên Phong Giáo Dục Tại Hóc Môn & Quận 12</h2>
               <p>
-                Với kinh nghiệm tích lũy trong giảng dạy tiếng Anh, ANH NGỮ CAM không ngừng nghiên cứu và đổi mới nhằm mang mô hình giáo dục tiên phong thế kỷ 21 tới học sinh tại Hóc Môn và Quận 12.
+                Với kinh nghiệm tích lũy trong giảng dạy tiếng Anh, ICANCAM không ngừng nghiên cứu và đổi mới nhằm mang mô hình giáo dục tiên phong thế kỷ 21 tới học sinh tại Hóc Môn và Quận 12.
               </p>
               <p>
-                Chúng tôi tin rằng mỗi học sinh đều có tiềm năng lớn để trở thành một người sử dụng tiếng Anh thành thạo và tự lập. Bằng sự kết hợp giữa <strong>4Ls + LETI</strong> và công nghệ lớp học thông minh, ANH NGỮ CAM cam kết xây dựng môi trường học tập cảm hứng nhất.
+                Chúng tôi tin rằng mỗi học sinh đều có tiềm năng lớn để trở thành một người sử dụng tiếng Anh thành thạo và tự lập. Bằng sự kết hợp giữa <strong>4Ls + LETI</strong> và công nghệ lớp học thông minh, ICANCAM cam kết xây dựng môi trường học tập cảm hứng nhất.
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Transition: Story (Navy) -> CTA (Soft Orange) */}
+      <SectionTransition variant="navy-to-soft-orange" />
+
       {/* SECTION 10: CALL TO ACTION (CTA) */}
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaCard}>
-            <h2>Sẵn Sàng Cùng ANH NGỮ CAM Làm Chủ Tiếng Anh?</h2>
+            <h2>Sẵn Sàng Cùng ICANCAM Làm Chủ Tiếng Anh?</h2>
             <p>
               Hãy để con bạn trải nghiệm mô hình giáo dục hiện đại, kích hoạt khả năng tự học độc lập và tự tin giao tiếp ngay hôm nay.
             </p>
@@ -615,3 +631,5 @@ export const About: React.FC = () => {
     </div>
   );
 };
+
+export default About;

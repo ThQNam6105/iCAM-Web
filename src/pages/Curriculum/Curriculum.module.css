@@ -1,4 +1,4 @@
-/* ANH NGỮ CAM — Curriculum Page Modern Stylesheet */
+/* ICANCAM — Curriculum Page Modern Stylesheet */
 
 .curriculumWrapper {
   width: 100%;
@@ -9,9 +9,11 @@
 }
 
 .container {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 
 .orangeHighlight {
@@ -214,6 +216,7 @@
 }
 
 /* Course Meta */
+.infoMeta,
 .courseMeta {
   display: flex;
   flex-direction: column;
@@ -225,11 +228,12 @@
   font-size: 0.88rem;
 }
 
+.metaItem,
 .metaRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
+  color: #475569;
 }
 
 .metaLabel {
@@ -252,11 +256,14 @@
 /* Card Actions */
 .cardActions {
   display: flex;
-  flex-direction: column;
   gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
+.syllabusBtn,
 .detailBtn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -266,12 +273,14 @@
   color: #475569;
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
+.syllabusBtn:hover,
 .detailBtn:hover {
   border-color: #F58220;
   color: #F58220;
@@ -279,6 +288,7 @@
 }
 
 .registerBtn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -286,12 +296,13 @@
   background: #F58220;
   color: #ffffff !important;
   font-weight: 700;
-  font-size: 0.95rem;
-  padding: 0.85rem;
+  font-size: 0.92rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
   text-decoration: none;
   box-shadow: 0 6px 18px rgba(245, 130, 32, 0.25);
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .registerBtn:hover {
@@ -609,3 +620,4 @@
     padding: 3rem 1.5rem;
   }
 }
+

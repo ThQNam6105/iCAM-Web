@@ -9,6 +9,7 @@ import { FAQ } from '../pages/FAQ/FAQ';
 import { Careers } from '../pages/Careers/Careers';
 import { Contact } from '../pages/Contact/Contact';
 import { NotFound } from '../pages/NotFound/NotFound';
+import { ScrollToTop } from '../components/ScrollToTop/ScrollToTop';
 
 export const AppRouter: React.FC = () => {
   const base = import.meta.env.BASE_URL;
@@ -16,6 +17,7 @@ export const AppRouter: React.FC = () => {
 
   return (
     <BrowserRouter basename={basename}>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />

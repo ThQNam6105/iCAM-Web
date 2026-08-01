@@ -1,4 +1,4 @@
-/* ANH NGỮ CAM — FAQ / Q&A Page Modern Stylesheet */
+/* ICANCAM — FAQ / Q&A Page Modern Stylesheet */
 
 .faqWrapper {
   width: 100%;
@@ -9,9 +9,11 @@
 }
 
 .container {
-  max-width: 1100px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 
 .orangeHighlight {
@@ -40,6 +42,7 @@
 .heroContainer {
   position: relative;
   z-index: 2;
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
 }
@@ -78,7 +81,7 @@
 }
 
 /* Interactive Search Box */
-.searchBox {
+.searchBoxWrapper {
   position: relative;
   max-width: 680px;
   margin: 0 auto 2.5rem auto;
@@ -118,11 +121,13 @@
   background: #e2e8f0;
   border: none;
   color: #475569;
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.3rem 0.75rem;
-  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  border-radius: 50%;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .clearSearchBtn:hover {
@@ -166,39 +171,42 @@
 /* ==========================================
    ACCORDION FAQ LIST SECTION
    ========================================== */
-.faqListSection {
-  padding: 5rem 0;
-  background: #FFF9F2;
+.accordionSection {
+  padding: 4.5rem 0;
+  background: #FFF8F0;
+  width: 100%;
 }
 
-.faqAccordionList {
+.accordionList {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.1rem;
+  width: 100%;
 }
 
-.faqCard {
+.accordionItem {
   background: #ffffff;
-  border-radius: 18px;
-  border: 1px solid rgba(245, 130, 32, 0.15);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
   overflow: hidden;
   transition: all 0.3s ease;
-}
-
-.faqCard:hover {
-  border-color: #F58220;
-  box-shadow: 0 10px 30px rgba(245, 130, 32, 0.1);
-}
-
-.activeCard {
-  border-color: #F58220;
-  box-shadow: 0 12px 32px rgba(245, 130, 32, 0.12);
-}
-
-.questionButton {
   width: 100%;
-  padding: 1.75rem;
+}
+
+.accordionItem:hover {
+  border-color: #F58220;
+  box-shadow: 0 8px 24px rgba(245, 130, 32, 0.1);
+}
+
+.itemOpen {
+  border-color: #F58220;
+  box-shadow: 0 10px 28px rgba(245, 130, 32, 0.12);
+}
+
+.accordionHeader {
+  width: 100%;
+  padding: 1.5rem 1.75rem;
   background: transparent;
   border: none;
   text-align: left;
@@ -207,79 +215,89 @@
   justify-content: space-between;
   gap: 1.5rem;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
-.questionTitleGroup {
+.questionMeta {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
+  flex-grow: 1;
+  min-width: 0;
 }
 
-.categoryBadge {
-  background: #F58220;
-  color: #ffffff !important;
-  font-size: 0.75rem;
+.badgeCategory {
+  background: rgba(245, 130, 32, 0.12);
+  border: 1px solid rgba(245, 130, 32, 0.25);
+  color: #F58220 !important;
+  font-size: 0.8rem;
   font-weight: 700;
   font-family: 'Be Vietnam Pro', sans-serif;
-  padding: 0.35rem 0.85rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 9999px;
-  letter-spacing: 0.02em;
-  box-shadow: 0 4px 12px rgba(245, 130, 32, 0.25);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .questionText {
   font-size: 1.15rem;
-  font-weight: 800;
-  color: #0f172a !important;
-  line-height: 1.4;
+  font-weight: 700;
+  color: #09265F !important;
+  line-height: 1.45;
+  word-wrap: break-word;
 }
 
-.toggleIcon {
+.toggleIconWrap {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: #f8fafc;
+  color: #09265F;
+  transition: all 0.3s ease;
 }
 
-.answerBody {
-  padding: 0 1.75rem 1.75rem 1.75rem;
-  animation: slideDown 0.3s ease forwards;
+.itemOpen .toggleIconWrap {
+  background: #F58220;
+  color: #ffffff;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.answerContent {
+.accordionBody {
+  padding: 1.25rem 1.75rem 1.75rem 1.75rem;
   border-top: 1px dashed #e2e8f0;
-  padding-top: 1.25rem;
-  font-size: 0.98rem;
-  color: #475569;
+  animation: slideDown 0.3s ease forwards;
+  color: #334155;
+  font-size: 1.02rem;
+  font-weight: 400;
   line-height: 1.7;
 }
 
-.noResultsBox {
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.noResultsCard {
   text-align: center;
   padding: 4rem 2rem;
   background: #ffffff;
   border-radius: 20px;
   border: 1px dashed #cbd5e1;
+  width: 100%;
 }
 
-.noResultsBox h3 {
+.noResultsCard h3 {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #0f172a !important;
+  color: #09265F !important;
   margin: 1rem 0 0.5rem 0;
 }
 
-.noResultsBox p {
+.noResultsCard p {
   font-size: 0.95rem;
   color: #64748b;
 }
@@ -290,12 +308,14 @@
 .pillarsSection {
   padding: 5rem 0;
   background: #ffffff;
+  width: 100%;
 }
 
 .pillarsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
+  width: 100%;
 }
 
 .pillarCard {
@@ -314,23 +334,11 @@
   transform: translateY(-5px);
 }
 
-.pillarIcon {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
-  background: rgba(245, 130, 32, 0.1);
-  color: #F58220;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.25rem auto;
-}
-
-.pillarCard h4 {
+.pillarCard h3 {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #0f172a;
-  margin-bottom: 0.6rem;
+  color: #09265F;
+  margin: 1rem 0 0.6rem 0;
 }
 
 .pillarCard p {
@@ -344,7 +352,8 @@
    ========================================== */
 .ctaSection {
   padding: 5.5rem 0;
-  background: #FFF9F2;
+  background: #FFF8F0;
+  width: 100%;
 }
 
 .ctaCard {
@@ -354,6 +363,8 @@
   text-align: center;
   color: #ffffff;
   box-shadow: 0 20px 50px rgba(245, 130, 32, 0.3);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ctaCard h2 {
@@ -383,7 +394,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  background: #0f172a;
+  background: #09265F;
   color: #ffffff !important;
   font-weight: 700;
   font-size: 1rem;
@@ -394,9 +405,9 @@
 }
 
 .primaryCtaBtn:hover {
-  background: #1e293b;
+  background: #0f327a;
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 10px 25px rgba(9, 38, 95, 0.3);
 }
 
 .secondaryCtaBtn {
@@ -420,21 +431,53 @@
   transform: translateY(-2px);
 }
 
-/* RESPONSIVE */
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .questionText {
+    font-size: 1.08rem;
+  }
+}
+
 @media (max-width: 768px) {
   .heroSection {
     padding: 4rem 1rem 3rem 1rem;
   }
 
-  .questionButton {
-    padding: 1.25rem;
+  .container {
+    padding: 0 16px;
   }
 
-  .answerBody {
-    padding: 0 1.25rem 1.25rem 1.25rem;
+  .accordionHeader {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .accordionBody {
+    padding: 1rem 1.25rem 1.25rem 1.25rem;
+  }
+
+  .questionText {
+    font-size: 1.02rem;
   }
 
   .ctaCard {
     padding: 3rem 1.5rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .accordionHeader {
+    padding: 1rem;
+  }
+
+  .questionText {
+    font-size: 0.98rem;
   }
 }
