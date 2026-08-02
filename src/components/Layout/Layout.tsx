@@ -1,7 +1,8 @@
 import logoImg from '../../assets/ican.png';
+import footerLogo from '../../assets/footer-logo.jpg';
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { User, LogOut, Menu, X } from 'lucide-react';
+import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
+import { User, LogOut, Menu, X, ChevronUp, MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import styles from './Layout.module.css';
@@ -10,7 +11,26 @@ export const Layout: React.FC = () => {
   const { user, logout } = useAppStore();
   const { language, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   React.useLayoutEffect(() => {
     window.scrollTo(0, 0);
@@ -267,44 +287,180 @@ export const Layout: React.FC = () => {
       </main>
 
       <footer className={styles.footer}>
-        <div className={styles.footerContent}>
-          <div className={styles.footerLinks}>
-            <NavLink to="/about" className={styles.footerLink} onClick={closeMenu}>
-              {t.nav.about}
-            </NavLink>
-            <NavLink to="/curriculum" className={styles.footerLink} onClick={closeMenu}>
-              {t.nav.curriculum}
-            </NavLink>
-            <NavLink to="/news" className={styles.footerLink} onClick={closeMenu}>
-              {t.nav.news}
-            </NavLink>
-            <NavLink to="/faq" className={styles.footerLink} onClick={closeMenu}>
-              {t.nav.faq}
-            </NavLink>
-            <NavLink to="/careers" className={styles.footerLink} onClick={closeMenu}>
-              {t.nav.careers}
-            </NavLink>
-            <NavLink to="/contact" className={styles.footerLink} onClick={closeMenu}>
-              {t.nav.contact}
-            </NavLink>
+        <div className={styles.footerContainer}>
+          {/* Main Footer Row */}
+          <div className={styles.footerMainRow}>
+            {/* LEFT SECTION */}
+            <div className={styles.footerLeftSection}>
+              {/* Logo */}
+              <NavLink to="/" className={styles.footerLogoLink} onClick={closeMenu}>
+                <img src={footerLogo} alt="iCANCAM Logo" className={styles.footerLogoImg} />
+              </NavLink>
+
+              {/* Slogan */}
+              <p className={styles.footerSlogan}>PASSION FOR SUCCESS</p>
+
+              {/* Company Description */}
+              <p className={styles.footerDescription}>
+                {language === 'en'
+                  ? 'Empowering learners through practical English education and independent learning for the 21st century.'
+                  : 'Truyền cảm hứng học tập qua giáo dục Tiếng Anh thực tiễn và phát triển năng lực tự học độc lập cho thế kỷ 21.'}
+              </p>
+
+              {/* Company Information with Brand Orange Icons */}
+              <div className={styles.footerCompanyInfo}>
+                <div className={styles.infoItem}>
+                  <MapPin className={styles.infoIcon} size={18} />
+                  <span>344 A Tổ 13 KP 1, Trung Mỹ Tây, Hóc Môn & Quận 12, TP.HCM</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <Phone className={styles.infoIcon} size={18} />
+                  <span>0909 123 456</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <Mail className={styles.infoIcon} size={18} />
+                  <span>thieunam2005@gmail.com</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <Clock className={styles.infoIcon} size={18} />
+                  <div className={styles.hoursText}>
+                    <span style={{ fontWeight: 600 }}>{language === 'en' ? 'Monday – Sunday' : 'Thứ 2 – Chủ Nhật'}</span>
+                    <span className={styles.hoursDetail}>08:00 – 21:00</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media Row */}
+              <div className={styles.socialRow}>
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialIconBtn}
+                  aria-label="Facebook"
+                  data-tooltip="Facebook"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialIconBtn}
+                  aria-label="YouTube"
+                  data-tooltip="YouTube"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://tiktok.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialIconBtn}
+                  aria-label="TikTok"
+                  data-tooltip="TikTok"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-5.2-1.74 2.89 2.89 0 0 1 2.31-1.37V9.11a6.34 6.34 0 1 0 6.34 6.34V9.67a8.16 8.16 0 0 0 4.77 1.52V7.74a4.85 4.85 0 0 1-1-1.05z"/>
+                  </svg>
+                </a>
+                <a
+                  href="http://zaloapp.com/qr/p/1eek3rblfox15"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.socialIconBtn}
+                  aria-label="Zalo OA"
+                  data-tooltip="Zalo OA"
+                >
+                  <span style={{ fontWeight: 800, fontSize: '11px', letterSpacing: '-0.5px' }}>Zalo</span>
+                </a>
+              </div>
+            </div>
+
+            {/* RIGHT SECTION */}
+            <div className={styles.footerRightSection}>
+              {/* Quick Links Block */}
+              <div className={styles.quickLinksBlock}>
+                <h4 className={styles.footerColTitle}>
+                  {language === 'en' ? 'Quick Links' : 'Liên Kết Nhanh'}
+                </h4>
+                <div className={styles.footerNavGrid}>
+                  <NavLink to="/about" className={styles.footerLink} onClick={closeMenu}>
+                    {t.nav.about}
+                  </NavLink>
+                  <NavLink to="/curriculum" className={styles.footerLink} onClick={closeMenu}>
+                    {t.nav.curriculum}
+                  </NavLink>
+                  <NavLink to="/news" className={styles.footerLink} onClick={closeMenu}>
+                    {t.nav.news}
+                  </NavLink>
+                  <NavLink to="/faq" className={styles.footerLink} onClick={closeMenu}>
+                    {t.nav.faq}
+                  </NavLink>
+                  <NavLink to="/careers" className={styles.footerLink} onClick={closeMenu}>
+                    {t.nav.careers}
+                  </NavLink>
+                  <NavLink to="/contact" className={styles.footerLink} onClick={closeMenu}>
+                    {t.nav.contact}
+                  </NavLink>
+                </div>
+              </div>
+
+              {/* Call to Action Card */}
+              <div className={styles.ctaCard}>
+                <p className={styles.ctaText}>
+                  {language === 'en'
+                    ? 'Ready to start your English journey?'
+                    : 'Sẵn sàng bắt đầu hành trình Tiếng Anh?'}
+                </p>
+                <Link to="/contact" className={styles.ctaBtn} onClick={closeMenu}>
+                  {language === 'en' ? 'Book Free Assessment' : 'Đánh Giá Miễn Phí'}
+                </Link>
+              </div>
+            </div>
           </div>
-          <p style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <a
-              href="https://github.com/ThQNam6105"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'inherit', textDecoration: 'none', transition: 'color 0.2s' }}
-              onMouseOver={(e) => (e.currentTarget.style.color = 'hsl(var(--primary))')}
-              onMouseOut={(e) => (e.currentTarget.style.color = 'inherit')}
-            >
-              {t.footer.copyright} {new Date().getFullYear()}
-            </a>
-          </p>
+
+          {/* BOTTOM BAR */}
+          <div className={styles.footerBottomBar}>
+            <div className={styles.bottomCopyright}>
+              © 2026 iCANCAM Language School. {language === 'en' ? 'All rights reserved.' : 'Tất cả quyền được bảo lưu.'}
+            </div>
+            <div className={styles.bottomLegalLinks}>
+              <Link to="/contact" className={styles.legalLink} onClick={closeMenu}>
+                {language === 'en' ? 'Privacy Policy' : 'Chính sách bảo mật'}
+              </Link>
+              <span className={styles.legalSeparator}>|</span>
+              <Link to="/contact" className={styles.legalLink} onClick={closeMenu}>
+                {language === 'en' ? 'Terms of Service' : 'Điều khoản dịch vụ'}
+              </Link>
+              <span className={styles.legalSeparator}>|</span>
+              <Link to="/contact" className={styles.legalLink} onClick={closeMenu}>
+                {language === 'en' ? 'Cookie Policy' : 'Chính sách cookie'}
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
 
       {/* Floating Contact Shortcut Widget */}
       <div className={styles.floatingContactWidget}>
+        {/* Scroll To Top Button (Only visible on scroll down) */}
+        {showScrollTop && (
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className={`${styles.contactShortcutBtn} ${styles.scrollTopBtn}`}
+            data-tooltip={t.shortcuts.scrollTop}
+            aria-label="Back to Top"
+          >
+            <ChevronUp size={28} color="#ffffff" strokeWidth={2.8} />
+          </button>
+        )}
+
         {/* Zalo Shortcut */}
         <a
           href="http://zaloapp.com/qr/p/1eek3rblfox15"

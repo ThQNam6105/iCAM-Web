@@ -102,7 +102,7 @@ export const Home: React.FC = () => {
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(language === 'en' ? 'Thank you! ICANCAM team will contact you soon.' : 'Cảm ơn bạn đã đăng ký! ICANCAM sẽ liên hệ tư vấn sớm nhất.');
+    alert(language === 'en' ? 'Thank you! iCANCAM team will contact you soon.' : 'Cảm ơn bạn đã đăng ký! iCANCAM sẽ liên hệ tư vấn sớm nhất.');
     setFormData({ fullName: '', phone: '', email: '', childAge: '', city: '' });
   };
 
@@ -711,8 +711,12 @@ export const Home: React.FC = () => {
                                   {renderHighlightIcon(hl.iconType)}
                                 </div>
                                 <div className={styles.highlightTextWrapper}>
-                                  <p className={styles.highlightTitle}>{hl.title}</p>
-                                  <p className={styles.highlightSubText}>{hl.subText}</p>
+                                  <p className={styles.highlightTitle}>
+                                    {language === 'en' ? (hl.titleEn || hl.title) : hl.title}
+                                  </p>
+                                  <p className={styles.highlightSubText}>
+                                    {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
+                                  </p>
                                 </div>
                               </div>
                             ))}
@@ -802,7 +806,7 @@ export const Home: React.FC = () => {
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                           </svg>
-                          <span>{student.mainHighlight}</span>
+                          <span>{language === 'en' ? (student.mainHighlightEn || student.mainHighlight) : student.mainHighlight}</span>
                         </div>
 
                         {/* Hover Overlay */}
@@ -814,8 +818,12 @@ export const Home: React.FC = () => {
                                   {renderHighlightIcon(hl.iconType)}
                                 </div>
                                 <div className={styles.highlightTextWrapper}>
-                                  <h5 className={styles.highlightTitle}>{hl.title}</h5>
-                                  <p className={styles.highlightSubText}>{hl.subText}</p>
+                                  <h5 className={styles.highlightTitle}>
+                                    {language === 'en' ? (hl.titleEn || hl.title) : hl.title}
+                                  </h5>
+                                  <p className={styles.highlightSubText}>
+                                    {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
+                                  </p>
                                 </div>
                               </div>
                             ))}
@@ -827,7 +835,7 @@ export const Home: React.FC = () => {
                       <div className={styles.studentInfo}>
                         <div className={styles.studentNameWrapper}>
                           <span className={styles.studentName}>{student.name}</span>
-                          <span className={styles.verifiedIcon} title="Đã xác minh bởi iCAM">
+                          <span className={styles.verifiedIcon} title={language === 'en' ? 'Verified by ICANCAM' : 'Đã xác minh bởi ICANCAM'}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 16.5L6 12.5L7.41 11.09L10 13.67L16.59 7.09L18 8.5L10 16.5Z" fill="url(#paint0_linear_students)" />
                               <defs>
@@ -839,7 +847,9 @@ export const Home: React.FC = () => {
                             </svg>
                           </span>
                         </div>
-                        <p className={styles.studentRole}>{student.role}</p>
+                        <p className={styles.studentRole}>
+                          {language === 'en' ? (student.roleEn || student.role) : student.role}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -941,7 +951,7 @@ export const Home: React.FC = () => {
           <div className={styles.registerHeading}>
             <h2 className={styles.registerTitleSolo}>
               {language === 'en' ? 'Become an ' : 'Trở thành học viên của '}
-              <span className={styles.registerHighlight}>iCAM</span>
+              <span className={styles.registerHighlight}>iCANCAM</span>
               {language === 'en' ? ' student today' : ' ngay bây giờ'}
             </h2>
           </div>
@@ -956,7 +966,7 @@ export const Home: React.FC = () => {
                   {language === 'en' ? '30% TUITION DISCOUNT' : 'GIẢM 30% HỌC PHÍ'}
                 </h3>
                 <p className={styles.promoText}>
-                  {language === 'en' ? 'For new students enrolling at iCAM for the first time' : 'Cho học viên lần đầu đăng ký trở thành học viên iCAM'}
+                  {language === 'en' ? 'For students enrolling in September' : 'Cho học viên đăng ký trong tháng 9'}
                 </p>
                 <Link to="/contact" className={styles.promoBtn}>
                   {language === 'en' ? 'CLAIM NOW' : 'NHẬN NGAY'}

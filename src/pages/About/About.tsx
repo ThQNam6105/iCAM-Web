@@ -25,9 +25,11 @@ import {
   ChevronRight
 } from 'lucide-react';
 import styles from './About.module.css';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 export const About: React.FC = () => {
+  const { t } = useLanguage();
   const [activeMethodTab, setActiveMethodTab] = useState<'4ls' | 'leti'>('4ls');
   const [activeComparison, setActiveComparison] = useState<'traditional' | 'cam'>('cam');
 
@@ -39,27 +41,30 @@ export const About: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>ICANCAM — HÓC MÔN & QUẬN 12</span>
+            <span>{t.about.heroBadge}</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Mô Hình Giáo Dục Tiếng Anh <span className={styles.orangeHighlight}>Thế Kỷ 21</span>
+            {t.about.heroTitlePrefix}
+            <span className={styles.orangeHighlight}>
+              {t.about.heroTitleHighlight}
+            </span>
           </h1>
 
           <p className={styles.heroTagline}>
-            Tự tin giao tiếp • Học tập độc lập • Làm chủ ngôn ngữ
+            {t.about.heroTagline}
           </p>
 
           <p className={styles.heroDescription}>
-            ICANCAM tiên phong áp dụng mô hình giáo dục hiện đại, kết hợp phương pháp <strong>4Ls</strong> và <strong>LETI</strong> giúp học sinh không chỉ học tiếng Anh mà còn chủ động làm chủ và tự học suốt đời.
+            {t.about.heroDescription}
           </p>
 
           <div className={styles.heroActions}>
             <a href="#methodology" className={styles.primaryHeroBtn}>
-              Khám Phá Phương Pháp <ArrowRight size={18} />
+              {t.about.exploreMethodBtn} <ArrowRight size={18} />
             </a>
             <Link to="/contact" className={styles.secondaryHeroBtn}>
-              Đăng Ký Tư Vấn
+              {t.about.registerBtn}
             </Link>
           </div>
         </div>
@@ -74,13 +79,16 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Target size={16} />
-              <span>SỨ MỆNH CỦA ICANCAM</span>
+              <span>{t.about.missionTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              Khai Mở Năng Lực <span className={styles.orangeText}>Tự Học Độc Lập</span>
+              {t.about.missionTitlePrefix}
+              <span className={styles.orangeText}>
+                {t.about.missionTitleHighlight}
+              </span>
             </h2>
             <p className={styles.sectionSubtitle}>
-              Sứ mệnh của ICANCAM không chỉ dừng lại ở việc truyền đạt kiến thức, mà là đồng hành biến học sinh thành người sử dụng tiếng Anh tự tin, độc lập và có khả năng tự phát triển tri thức suốt đời.
+              {t.about.missionSubtitle}
             </p>
           </div>
 
@@ -95,10 +103,10 @@ export const About: React.FC = () => {
                 "I can communicate in English."
               </h3>
               <p className={styles.declarationSub}>
-                Tôi có thể giao tiếp Tiếng Anh tự tin
+                {t.about.declaration1Sub}
               </p>
               <p className={styles.declarationDesc}>
-                Tự tin biểu đạt ý tưởng, giao tiếp tự nhiên và không rào cản trong mọi tình huống giao tiếp đời sống.
+                {t.about.declaration1Desc}
               </p>
             </div>
 
@@ -111,10 +119,10 @@ export const About: React.FC = () => {
                 "I can master English."
               </h3>
               <p className={styles.declarationSub}>
-                Tôi có thể làm chủ Tiếng Anh
+                {t.about.declaration2Sub}
               </p>
               <p className={styles.declarationDesc}>
-                Làm chủ cả 4 kỹ năng Nghe - Nói - Đọc - Viết và chủ động ứng dụng ngôn ngữ linh hoạt theo mục tiêu cá nhân.
+                {t.about.declaration2Desc}
               </p>
             </div>
 
@@ -127,10 +135,10 @@ export const About: React.FC = () => {
                 "I can learn English independently."
               </h3>
               <p className={styles.declarationSub}>
-                Tôi có thể tự học Tiếng Anh độc lập
+                {t.about.declaration3Sub}
               </p>
               <p className={styles.declarationDesc}>
-                Sở hữu phương pháp tự học hiệu quả, có khả năng tự tìm tòi, mở rộng tri thức ngôn ngữ mà không phụ thuộc.
+                {t.about.declaration3Desc}
               </p>
             </div>
           </div>
@@ -146,10 +154,10 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Layers size={16} />
-              <span>GIÁ TRỊ CỐT LÕI</span>
+              <span>{t.about.valuesTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              4 Trụ Cột Năng Lực Học Viên
+              {t.about.valuesTitle}
             </h2>
           </div>
 
@@ -158,40 +166,32 @@ export const About: React.FC = () => {
               <div className={styles.valueIconBox}>
                 <HeartHandshake size={28} />
               </div>
-              <h3>Tự Tin Giao Tiếp</h3>
-              <p>
-                Loại bỏ sự e ngại, giúp học sinh chủ động đặt câu hỏi, thảo luận và bày tỏ quan điểm bằng tiếng Anh.
-              </p>
+              <h3>{t.about.val1Title}</h3>
+              <p>{t.about.val1Desc}</p>
             </div>
 
             <div className={styles.valueCard}>
               <div className={styles.valueIconBox}>
                 <BookOpen size={28} />
               </div>
-              <h3>Tự Học Độc Lập</h3>
-              <p>
-                Trang bị tư duy tự nghiên cứu, giúp học sinh chủ động tiếp cận nguồn tri thức mới mà không bị động.
-              </p>
+              <h3>{t.about.val2Title}</h3>
+              <p>{t.about.val2Desc}</p>
             </div>
 
             <div className={styles.valueCard}>
               <div className={styles.valueIconBox}>
                 <Award size={28} />
               </div>
-              <h3>Làm Chủ Ngôn Ngữ</h3>
-              <p>
-                Hiểu sâu bản chất ngôn ngữ để sử dụng tự nhiên như công cụ tư duy thay vì học thuộc lòng công thức.
-              </p>
+              <h3>{t.about.val3Title}</h3>
+              <p>{t.about.val3Desc}</p>
             </div>
 
             <div className={styles.valueCard}>
               <div className={styles.valueIconBox}>
                 <TrendingUp size={28} />
               </div>
-              <h3>Phát Triển Bền Vững</h3>
-              <p>
-                Tạo nền tảng vững chắc để học sinh tiếp tục tự học và nâng cao trình độ trong suốt hành trình tương lai.
-              </p>
+              <h3>{t.about.val4Title}</h3>
+              <p>{t.about.val4Desc}</p>
             </div>
           </div>
         </div>
@@ -206,13 +206,13 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Zap size={16} />
-              <span>SỰ KHÁC BIỆT</span>
+              <span>{t.about.whyTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              Học Qua Tương Tác Thay Vì Ghi Nhớ Thụ Động
+              {t.about.whyTitle}
             </h2>
             <p className={styles.sectionSubtitle}>
-              ICANCAM thay thế lối học vẹt rập khuôn bằng môi trường chủ động tương tác và ứng dụng thực tế.
+              {t.about.whySubtitle}
             </p>
           </div>
 
@@ -222,13 +222,13 @@ export const About: React.FC = () => {
               className={`${styles.toggleBtn} ${activeComparison === 'traditional' ? styles.activeToggle : ''}`}
               onClick={() => setActiveComparison('traditional')}
             >
-              Học Truyền Thống
+              {t.about.tabTraditional}
             </button>
             <button
               className={`${styles.toggleBtn} ${activeComparison === 'cam' ? styles.activeToggleOrange : ''}`}
               onClick={() => setActiveComparison('cam')}
             >
-              Mô Hình ICANCAM ★
+              {t.about.tabCam}
             </button>
           </div>
 
@@ -236,50 +236,50 @@ export const About: React.FC = () => {
           <div className={styles.comparisonGrid}>
             <div className={`${styles.comparisonCard} ${styles.traditionalSide} ${activeComparison === 'traditional' ? styles.highlightedSide : ''}`}>
               <div className={styles.comparisonHeader}>
-                <h3>Học Tiếng Anh Truyền Thống</h3>
-                <span className={styles.badgeDanger}>Ghi nhớ thụ động</span>
+                <h3>{t.about.tradHeaderTitle}</h3>
+                <span className={styles.badgeDanger}>{t.about.tradHeaderBadge}</span>
               </div>
               <ul className={styles.comparisonList}>
                 <li>
                   <span className={styles.crossIcon}>✕</span>
-                  <span>Học thuộc lòng từ vựng và công thức ngữ pháp khô khan.</span>
+                  <span>{t.about.tradItem1}</span>
                 </li>
                 <li>
                   <span className={styles.crossIcon}>✕</span>
-                  <span>Nghe giảng một chiều, ít cơ hội thực hành giao tiếp.</span>
+                  <span>{t.about.tradItem2}</span>
                 </li>
                 <li>
                   <span className={styles.crossIcon}>✕</span>
-                  <span>Học để đối phó bài kiểm tra, thiếu tính ứng dụng đời sống.</span>
+                  <span>{t.about.tradItem3}</span>
                 </li>
                 <li>
                   <span className={styles.crossIcon}>✕</span>
-                  <span>Bị động phụ thuộc vào giáo viên, thiếu phương pháp tự học.</span>
+                  <span>{t.about.tradItem4}</span>
                 </li>
               </ul>
             </div>
 
             <div className={`${styles.comparisonCard} ${styles.camSide} ${activeComparison === 'cam' ? styles.highlightedSide : ''}`}>
               <div className={styles.comparisonHeader}>
-                <h3>Phương Pháp ICANCAM</h3>
-                <span className={styles.badgeSuccess}>4Ls + LETI Tương tác</span>
+                <h3>{t.about.camHeaderTitle}</h3>
+                <span className={styles.badgeSuccess}>{t.about.camHeaderBadge}</span>
               </div>
               <ul className={styles.comparisonList}>
                 <li>
                   <span className={styles.checkIcon}><CheckCircle2 size={18} /></span>
-                  <span>Học qua tương tác, thảo luận nhóm và trải nghiệm tình huống thực tế.</span>
+                  <span>{t.about.camItem1}</span>
                 </li>
                 <li>
                   <span className={styles.checkIcon}><CheckCircle2 size={18} /></span>
-                  <span>Môi trường 100% tiếng Anh giúp kích hoạt phản xạ tự nhiên.</span>
+                  <span>{t.about.camItem2}</span>
                 </li>
                 <li>
                   <span className={styles.checkIcon}><CheckCircle2 size={18} /></span>
-                  <span>Rèn luyện tư duy phản biện, kỹ năng làm việc nhóm và giải quyết vấn đề.</span>
+                  <span>{t.about.camItem3}</span>
                 </li>
                 <li>
                   <span className={styles.checkIcon}><CheckCircle2 size={18} /></span>
-                  <span>Hình thành năng lực tự học độc lập và tự duy trì tri thức lâu dài.</span>
+                  <span>{t.about.camItem4}</span>
                 </li>
               </ul>
             </div>
@@ -296,13 +296,16 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <BookOpen size={16} />
-              <span>PHƯƠNG PHÁP GIẢNG DẠY</span>
+              <span>{t.about.methodTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              Sự Kết Hợp Đột Phá <span className={styles.orangeText}>4Ls & LETI</span>
+              {t.about.methodTitlePrefix}
+              <span className={styles.orangeText}>
+                {t.about.methodTitleHighlight}
+              </span>
             </h2>
             <p className={styles.sectionSubtitle}>
-              Mô hình giáo dục tiếng Anh thế kỷ 21 kết hợp hoàn thiện 4 kỹ năng ngôn ngữ cốt lõi với phương pháp học qua tương tác.
+              {t.about.methodSubtitle}
             </p>
           </div>
 
@@ -313,14 +316,14 @@ export const About: React.FC = () => {
               onClick={() => setActiveMethodTab('4ls')}
             >
               <Layers size={18} />
-              <span>Mô Hình 4Ls (Kỹ Năng Cốt Lõi)</span>
+              <span>{t.about.tab4Ls}</span>
             </button>
             <button
               className={`${styles.methodTab} ${activeMethodTab === 'leti' ? styles.activeTab : ''}`}
               onClick={() => setActiveMethodTab('leti')}
             >
               <Cpu size={18} />
-              <span>Phương Pháp LETI (Tương Tác)</span>
+              <span>{t.about.tabLeti}</span>
             </button>
           </div>
 
@@ -330,26 +333,26 @@ export const About: React.FC = () => {
               <div className={styles.fourLsGrid}>
                 <div className={styles.lsCard}>
                   <div className={styles.lsIcon}><Headphones size={24} /></div>
-                  <h4>Listening (Nghe)</h4>
-                  <p>Luyện nghe đa dạng ngữ điệu, tiếp thu thông tin chủ động và phản xạ nhanh.</p>
+                  <h4>{t.about.ls1Title}</h4>
+                  <p>{t.about.ls1Desc}</p>
                 </div>
 
                 <div className={styles.lsCard}>
                   <div className={styles.lsIcon}><Mic size={24} /></div>
-                  <h4>Speaking (Nói)</h4>
-                  <p>Phát âm chuẩn xác, diễn đạt ý tưởng trôi chảy và tự tin trước đám đông.</p>
+                  <h4>{t.about.ls2Title}</h4>
+                  <p>{t.about.ls2Desc}</p>
                 </div>
 
                 <div className={styles.lsCard}>
                   <div className={styles.lsIcon}><Book size={24} /></div>
-                  <h4>Reading (Đọc)</h4>
-                  <p>Đọc hiểu chuyên sâu, phân tích ngữ cảnh và tích lũy vốn từ phong phú.</p>
+                  <h4>{t.about.ls3Title}</h4>
+                  <p>{t.about.ls3Desc}</p>
                 </div>
 
                 <div className={styles.lsCard}>
                   <div className={styles.lsIcon}><PenTool size={24} /></div>
-                  <h4>Writing (Viết)</h4>
-                  <p>Tư duy logic, cấu trúc câu mạch lạc và biểu đạt văn bản hiệu quả.</p>
+                  <h4>{t.about.ls4Title}</h4>
+                  <p>{t.about.ls4Desc}</p>
                 </div>
               </div>
             </div>
@@ -359,56 +362,56 @@ export const About: React.FC = () => {
           {activeMethodTab === 'leti' && (
             <div className={styles.tabContentFade}>
               <div className={styles.letiBanner}>
-                <h3>LETI — Learning English Through Interactions</h3>
-                <p>Học Tiếng Anh Thông Qua Tương Tác Trực Tiếp & Trải Nghiệm Đa Dạng</p>
+                <h3>{t.about.letiBannerTitle}</h3>
+                <p>{t.about.letiBannerSub}</p>
               </div>
 
               <div className={styles.letiGrid}>
                 <div className={styles.letiCard}>
                   <Users size={22} className={styles.letiIcon} />
                   <div>
-                    <h5>Interaction (Tương Tác)</h5>
-                    <p>Tương tác hai chiều liên tục giữa giáo viên và học viên trong lớp.</p>
+                    <h5>{t.about.letiItem1Title}</h5>
+                    <p>{t.about.letiItem1Desc}</p>
                   </div>
                 </div>
 
                 <div className={styles.letiCard}>
                   <MessageSquare size={22} className={styles.letiIcon} />
                   <div>
-                    <h5>Communication (Giao Tiếp)</h5>
-                    <p>Thực hành trao đổi, trình bày quan điểm bằng tiếng Anh tự nhiên.</p>
+                    <h5>{t.about.letiItem2Title}</h5>
+                    <p>{t.about.letiItem2Desc}</p>
                   </div>
                 </div>
 
                 <div className={styles.letiCard}>
                   <Zap size={22} className={styles.letiIcon} />
                   <div>
-                    <h5>Application (Ứng Dụng)</h5>
-                    <p>Đưa kiến thức học được vào giải quyết các bài toán thực tế.</p>
+                    <h5>{t.about.letiItem3Title}</h5>
+                    <p>{t.about.letiItem3Desc}</p>
                   </div>
                 </div>
 
                 <div className={styles.letiCard}>
                   <Lightbulb size={22} className={styles.letiIcon} />
                   <div>
-                    <h5>Discussion (Thảo Luận)</h5>
-                    <p>Thảo luận nhóm phát triển tư duy phản biện và làm việc đồng đội.</p>
+                    <h5>{t.about.letiItem4Title}</h5>
+                    <p>{t.about.letiItem4Desc}</p>
                   </div>
                 </div>
 
                 <div className={styles.letiCard}>
                   <CheckCircle2 size={22} className={styles.letiIcon} />
                   <div>
-                    <h5>Practice (Thực Hành)</h5>
-                    <p>Luyện tập liên tục qua các bài tập tình huống và dự án học tập.</p>
+                    <h5>{t.about.letiItem5Title}</h5>
+                    <p>{t.about.letiItem5Desc}</p>
                   </div>
                 </div>
 
                 <div className={styles.letiCard}>
                   <Globe size={22} className={styles.letiIcon} />
                   <div>
-                    <h5>Real-Life Activities (Hoạt Động Thực Tế)</h5>
-                    <p>Trải nghiệm ngôn ngữ trong môi trường giao tiếp thực sự.</p>
+                    <h5>{t.about.letiItem6Title}</h5>
+                    <p>{t.about.letiItem6Desc}</p>
                   </div>
                 </div>
               </div>
@@ -426,39 +429,39 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Monitor size={16} />
-              <span>MÔI TRƯỜNG HỌC TẬP</span>
+              <span>{t.about.classroomTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              Lớp Học Thông Minh Thế Kỷ 21
+              {t.about.classroomTitle}
             </h2>
             <p className={styles.sectionSubtitle}>
-              Không gian học tập tích hợp công nghệ hiện đại mang lại trải nghiệm tương tác trực quan sống động.
+              {t.about.classroomSubtitle}
             </p>
           </div>
 
           <div className={styles.classroomGrid}>
             <div className={styles.classroomCard}>
               <div className={styles.classIcon}><Monitor size={32} /></div>
-              <h3>Bảng Tương Tác Thông Minh</h3>
-              <p>Smart Interactive Boards giúp bài học trở nên sinh động, cho phép học sinh trực tiếp thao tác và tương tác với nội dung giảng dạy.</p>
+              <h3>{t.about.class1Title}</h3>
+              <p>{t.about.class1Desc}</p>
             </div>
 
             <div className={styles.classroomCard}>
               <div className={styles.classIcon}><BookOpen size={32} /></div>
-              <h3>Phần Mềm Giáo Dục Anh Quốc</h3>
-              <p>British Educational Software chuẩn quốc tế cung cấp nguồn tài nguyên học tập đa dạng, phong phú và tương tác cao.</p>
+              <h3>{t.about.class2Title}</h3>
+              <p>{t.about.class2Desc}</p>
             </div>
 
             <div className={styles.classroomCard}>
               <div className={styles.classIcon}><Cpu size={32} /></div>
-              <h3>Học Tập Đa Phương Tiện</h3>
-              <p>Multimedia & Technology-Enhanced Education kết hợp hình ảnh, âm thanh và công nghệ giúp kích hoạt tối đa khả năng ghi nhớ.</p>
+              <h3>{t.about.class3Title}</h3>
+              <p>{t.about.class3Desc}</p>
             </div>
 
             <div className={styles.classroomCard}>
               <div className={styles.classIcon}><MessageSquare size={32} /></div>
-              <h3>Môi Trường 100% Tiếng Anh</h3>
-              <p>100% English-Speaking Environment tạo không gian "tắm ngôn ngữ" hoàn toàn, kích thích phản xạ giao tiếp tự nhiên.</p>
+              <h3>{t.about.class4Title}</h3>
+              <p>{t.about.class4Desc}</p>
             </div>
           </div>
         </div>
@@ -473,42 +476,42 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <TrendingUp size={16} />
-              <span>HÀNH TRÌNH HỌC VIÊN</span>
+              <span>{t.about.journeyTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              4 Bước Phát Triển Năng Lực Ngôn Ngữ
+              {t.about.journeyTitle}
             </h2>
           </div>
 
           <div className={styles.journeySteps}>
             <div className={styles.stepCard}>
               <div className={styles.stepNumber}>01</div>
-              <h4>Khai Mở & Tiếp Cận</h4>
-              <p>Tiếp xúc với môi trường 100% tiếng Anh và tiếp cận phương pháp học qua tương tác LETI.</p>
+              <h4>{t.about.step1Title}</h4>
+              <p>{t.about.step1Desc}</p>
             </div>
 
             <div className={styles.stepConnector}><ChevronRight size={24} /></div>
 
             <div className={styles.stepCard}>
               <div className={styles.stepNumber}>02</div>
-              <h4>Tương Tác & Giao Tiếp</h4>
-              <p>Thực hành liên tục 4Ls qua thảo luận nhóm, hoạt động thực tế và phản hồi hai chiều.</p>
+              <h4>{t.about.step2Title}</h4>
+              <p>{t.about.step2Desc}</p>
             </div>
 
             <div className={styles.stepConnector}><ChevronRight size={24} /></div>
 
             <div className={styles.stepCard}>
               <div className={styles.stepNumber}>03</div>
-              <h4>Tự Tin & Làm Chủ</h4>
-              <p>Hình thành phản xạ tự nhiên, tự tin trình bày ý tưởng và làm chủ cả 4 kỹ năng tiếng Anh.</p>
+              <h4>{t.about.step3Title}</h4>
+              <p>{t.about.step3Desc}</p>
             </div>
 
             <div className={styles.stepConnector}><ChevronRight size={24} /></div>
 
             <div className={styles.stepCard}>
               <div className={styles.stepNumber}>04</div>
-              <h4>Tự Học Độc Lập</h4>
-              <p>Làm chủ phương pháp tự học, tự duy trì và tiếp tục mở rộng tri thức suốt đời.</p>
+              <h4>{t.about.step4Title}</h4>
+              <p>{t.about.step4Desc}</p>
             </div>
           </div>
         </div>
@@ -523,10 +526,10 @@ export const About: React.FC = () => {
           <div className={styles.sectionHeader}>
             <div className={styles.sectionTag}>
               <Award size={16} />
-              <span>GIÁ TRỊ NHẬN ĐƯỢC</span>
+              <span>{t.about.outcomesTag}</span>
             </div>
             <h2 className={styles.sectionTitle}>
-              6 Năng Lực Toàn Diện Sau Khóa Học
+              {t.about.outcomesTitle}
             </h2>
           </div>
 
@@ -534,48 +537,48 @@ export const About: React.FC = () => {
             <div className={styles.outcomeItem}>
               <CheckCircle2 size={24} color="#F58220" />
               <div>
-                <h4>Tự Tin (Confidence)</h4>
-                <p>Mạnh dạn thể hiện bản thân và giao tiếp tự nhiên.</p>
+                <h4>{t.about.out1Title}</h4>
+                <p>{t.about.out1Desc}</p>
               </div>
             </div>
 
             <div className={styles.outcomeItem}>
               <CheckCircle2 size={24} color="#F58220" />
               <div>
-                <h4>Kỹ Năng Giao Tiếp (Communication)</h4>
-                <p>Biểu đạt suy nghĩ rõ ràng và lắng nghe thấu hiểu.</p>
+                <h4>{t.about.out2Title}</h4>
+                <p>{t.about.out2Desc}</p>
               </div>
             </div>
 
             <div className={styles.outcomeItem}>
               <CheckCircle2 size={24} color="#F58220" />
               <div>
-                <h4>Khả Năng Tự Học Độc Lập (Independent Learning)</h4>
-                <p>Chủ động tìm tòi và phát triển tri thức không phụ thuộc.</p>
+                <h4>{t.about.out3Title}</h4>
+                <p>{t.about.out3Desc}</p>
               </div>
             </div>
 
             <div className={styles.outcomeItem}>
               <CheckCircle2 size={24} color="#F58220" />
               <div>
-                <h4>Tư Duy Phản Biện (Critical Thinking)</h4>
-                <p>Phân tích thông tin và giải quyết vấn đề logic.</p>
+                <h4>{t.about.out4Title}</h4>
+                <p>{t.about.out4Desc}</p>
               </div>
             </div>
 
             <div className={styles.outcomeItem}>
               <CheckCircle2 size={24} color="#F58220" />
               <div>
-                <h4>Tiếng Anh Thực Tiễn (Practical English)</h4>
-                <p>Ứng dụng hiệu quả vào đời sống và học tập.</p>
+                <h4>{t.about.out5Title}</h4>
+                <p>{t.about.out5Desc}</p>
               </div>
             </div>
 
             <div className={styles.outcomeItem}>
               <CheckCircle2 size={24} color="#F58220" />
               <div>
-                <h4>Tư Duy Toàn Cầu (Global Mindset)</h4>
-                <p>Sẵn sàng hội nhập và kết nối với thế giới.</p>
+                <h4>{t.about.out6Title}</h4>
+                <p>{t.about.out6Desc}</p>
               </div>
             </div>
           </div>
@@ -592,15 +595,11 @@ export const About: React.FC = () => {
             <div className={styles.storyContent}>
               <div className={styles.sectionTagLight}>
                 <Compass size={16} />
-                <span>HÀNH TRÌNH ĐỔI MỚI</span>
+                <span>{t.about.storyTag}</span>
               </div>
-              <h2>Tiên Phong Giáo Dục Tại Hóc Môn & Quận 12</h2>
-              <p>
-                Với kinh nghiệm tích lũy trong giảng dạy tiếng Anh, ICANCAM không ngừng nghiên cứu và đổi mới nhằm mang mô hình giáo dục tiên phong thế kỷ 21 tới học sinh tại Hóc Môn và Quận 12.
-              </p>
-              <p>
-                Chúng tôi tin rằng mỗi học sinh đều có tiềm năng lớn để trở thành một người sử dụng tiếng Anh thành thạo và tự lập. Bằng sự kết hợp giữa <strong>4Ls + LETI</strong> và công nghệ lớp học thông minh, ICANCAM cam kết xây dựng môi trường học tập cảm hứng nhất.
-              </p>
+              <h2>{t.about.storyTitle}</h2>
+              <p>{t.about.storyP1}</p>
+              <p>{t.about.storyP2}</p>
             </div>
           </div>
         </div>
@@ -613,16 +612,14 @@ export const About: React.FC = () => {
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaCard}>
-            <h2>Sẵn Sàng Cùng ICANCAM Làm Chủ Tiếng Anh?</h2>
-            <p>
-              Hãy để con bạn trải nghiệm mô hình giáo dục hiện đại, kích hoạt khả năng tự học độc lập và tự tin giao tiếp ngay hôm nay.
-            </p>
+            <h2>{t.about.ctaTitle}</h2>
+            <p>{t.about.ctaDesc}</p>
             <div className={styles.ctaButtons}>
               <Link to="/contact" className={styles.primaryCtaBtn}>
-                Đăng Ký Tư Vấn Ngay <ArrowRight size={18} />
+                {t.about.ctaPrimaryBtn} <ArrowRight size={18} />
               </Link>
               <Link to="/curriculum" className={styles.secondaryCtaBtn}>
-                Xem Chương Trình Học
+                {t.about.ctaSecondaryBtn}
               </Link>
             </div>
           </div>

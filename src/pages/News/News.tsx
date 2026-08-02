@@ -15,7 +15,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 export const News: React.FC = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -44,15 +44,18 @@ export const News: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>TIN TỨC & SỰ KIỆN ICANCAM</span>
+            <span>{t.news.heroBadge}</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Cập Nhật Tin Tức & <span className={styles.orangeHighlight}>Sự Kiện Nổi Bật</span>
+            {t.news.heroTitlePrefix}
+            <span className={styles.orangeHighlight}>
+              {t.news.heroTitleHighlight}
+            </span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Theo dõi các hoạt động giáo dục, đấu trường trí tuệ, thông tin học bổng cùng cẩm nang nuôi dạy con thời đại số từ ICANCAM.
+            {t.news.heroSubtitle}
           </p>
 
           {/* Category Filter Pills */}
@@ -61,25 +64,25 @@ export const News: React.FC = () => {
               className={`${styles.filterBtn} ${activeCategory === 'all' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('all')}
             >
-              Tất Cả Tin Tức
+              {t.news.filterAll}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'events' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('events')}
             >
-              Sự Kiện & Đấu Trường
+              {t.news.filterEvents}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'scholarship' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('scholarship')}
             >
-              Chương Trình Học Bổng
+              {t.news.filterScholarship}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'tips' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('tips')}
             >
-              Cẩm Nang Phụ Huynh
+              {t.news.filterTips}
             </button>
           </div>
         </div>
@@ -109,7 +112,7 @@ export const News: React.FC = () => {
                   <span className={styles.dateLabel}>
                     <Calendar size={15} /> {featuredArticle.date}
                   </span>
-                  <span className={styles.badgeHighlight}>MỚI NHẤT</span>
+                  <span className={styles.badgeHighlight}>{t.news.latestTag}</span>
                 </div>
 
                 <h2 className={styles.featuredTitle}>
@@ -120,7 +123,7 @@ export const News: React.FC = () => {
                 </p>
 
                 <div className={styles.readMoreBtn}>
-                  Đọc Chi Tiết Bài Viết <ArrowRight size={18} />
+                  {t.news.readMoreBtn} <ArrowRight size={18} />
                 </div>
               </div>
             </div>
@@ -135,8 +138,8 @@ export const News: React.FC = () => {
       <section className={styles.articlesGridSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionCategoryTag}>DANH SÁCH BÀI VIẾT</span>
-            <h2 className={styles.sectionGridTitle}>Tin Tức Giáo Dục & Hoạt Động Mới Nhất</h2>
+            <span className={styles.sectionCategoryTag}>{t.news.gridTag}</span>
+            <h2 className={styles.sectionGridTitle}>{t.news.gridTitle}</h2>
           </div>
 
           <div className={styles.articlesGrid}>
@@ -167,7 +170,7 @@ export const News: React.FC = () => {
                   </p>
 
                   <div className={styles.articleReadMoreLink}>
-                    Đọc bài viết <ChevronRight size={16} />
+                    {t.news.readCardBtn} <ChevronRight size={16} />
                   </div>
                 </div>
               </div>
@@ -183,12 +186,12 @@ export const News: React.FC = () => {
       <section className={styles.newsletterSection}>
         <div className={styles.container}>
           <div className={styles.newsletterCard}>
-            <h2>Nhận Bản Tin Giáo Dục & Thông Tin Học Bổng</h2>
-            <p>Đăng ký email để không bỏ lỡ các kỳ thi đấu trường trí tuệ, cơ hội học bổng và bí quyết học giỏi tiếng Anh từ ICANCAM.</p>
+            <h2>{t.news.newsletterTitle}</h2>
+            <p>{t.news.newsletterDesc}</p>
 
             {subscribed && (
               <div className={styles.subscribeSuccessAlert}>
-                Đăng ký thành công! Cảm ơn bạn đã đăng ký nhận bản tin ICANCAM.
+                {t.news.newsletterSuccess}
               </div>
             )}
 
@@ -196,13 +199,13 @@ export const News: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder="Nhập email của bạn..."
+                placeholder={t.news.newsletterInputPlaceholder}
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 className={styles.newsletterInput}
               />
               <button type="submit" className={styles.newsletterSubmitBtn}>
-                <Send size={18} /> Đăng Ký
+                <Send size={18} /> {t.news.newsletterSubmitBtn}
               </button>
             </form>
           </div>
@@ -247,7 +250,7 @@ export const News: React.FC = () => {
 
             <div className={styles.modalFooter}>
               <Link to="/contact" className={styles.modalActionBtn} onClick={() => setSelectedArticle(null)}>
-                <BookOpen size={18} /> Đăng Ký Tư Vấn Khóa Học
+                <BookOpen size={18} /> {t.news.modalCourseConsultBtn}
               </Link>
             </div>
           </div>

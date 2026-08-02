@@ -20,7 +20,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 
 export const Contact: React.FC = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -57,29 +57,32 @@ export const Contact: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>ICANCAM — HÓC MÔN & QUẬN 12</span>
+            <span>{t.contact.heroBadge}</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Liên Hệ & <span className={styles.orangeHighlight}>Đăng Ký Tư Vấn</span>
+            {language === 'en' ? 'Contact Us & ' : 'Liên Hệ & '}
+            <span className={styles.orangeHighlight}>
+              {language === 'en' ? 'Book Consultation' : 'Đăng Ký Tư Vấn'}
+            </span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Đừng ngần ngại liên hệ để nhận tư vấn lộ trình học cá nhân hóa và đăng ký kiểm tra trình độ 4 kỹ năng hoàn toàn miễn phí cùng đội ngũ chuyên gia ICANCAM.
+            {t.contact.heroSubtitle}
           </p>
 
           {/* Quick Contact Badges */}
           <div className={styles.quickContactRow}>
             <div className={styles.quickBadge}>
               <PhoneCall size={16} color="#F58220" />
-              <span>Hotline: 0909 123 456</span>
+              <span>{t.contact.hotlineBadge}</span>
             </div>
             <a
               href={googleMapsUrl}
               target="_blank"
               rel="noreferrer"
               className={styles.quickBadgeLink}
-              title="Xem bản đồ chỉ đường"
+              title={language === 'en' ? 'View directions on map' : 'Xem bản đồ chỉ đường'}
             >
               <MapPin size={16} color="#F58220" />
               <span>{fullAddress}</span>
@@ -87,7 +90,7 @@ export const Contact: React.FC = () => {
             </a>
             <div className={styles.quickBadge}>
               <Clock size={16} color="#F58220" />
-              <span>T2 - CN: 08:00 - 21:30</span>
+              <span>{t.contact.hoursBadge}</span>
             </div>
           </div>
         </div>
@@ -107,15 +110,15 @@ export const Contact: React.FC = () => {
                 <div className={styles.campusHeader}>
                   <Building2 size={22} color="#F58220" />
                   <div>
-                    <h3>Trụ Sở ICANCAM</h3>
-                    <span className={styles.subTag}>Hóc Môn & Quận 12</span>
+                    <h3>{t.contact.campusTitle}</h3>
+                    <span className={styles.subTag}>{t.contact.subTag}</span>
                   </div>
                 </div>
                 <div className={styles.campusBody}>
                   <div className={styles.infoRow}>
                     <MapPin size={20} className={styles.icon} />
                     <div>
-                      <strong>Địa chỉ chính thức:</strong>
+                      <strong>{t.contact.addressLabel}</strong>
                       <p className={styles.addressText}>{fullAddress}</p>
                     </div>
                   </div>
@@ -123,7 +126,7 @@ export const Contact: React.FC = () => {
                   <div className={styles.infoRow}>
                     <Phone size={18} className={styles.icon} />
                     <div>
-                      <strong>Hotline tuyển sinh & tư vấn:</strong>
+                      <strong>{t.contact.hotlineLabel}</strong>
                       <p>0909 123 456 - 0909 789 012</p>
                     </div>
                   </div>
@@ -131,7 +134,7 @@ export const Contact: React.FC = () => {
                   <div className={styles.infoRow}>
                     <Mail size={18} className={styles.icon} />
                     <div>
-                      <strong>Email hỗ trợ:</strong>
+                      <strong>{t.contact.emailLabel}</strong>
                       <p>
                         <a href="mailto:thieunam2005@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
                           thieunam2005@gmail.com
@@ -147,7 +150,7 @@ export const Contact: React.FC = () => {
                     rel="noreferrer"
                     className={styles.mapsDirectionBtn}
                   >
-                    <Navigation size={18} /> Định Vị Trên Google Maps <ExternalLink size={15} />
+                    <Navigation size={18} /> {t.contact.mapsBtn} <ExternalLink size={15} />
                   </a>
                 </div>
               </div>
@@ -157,16 +160,16 @@ export const Contact: React.FC = () => {
                 <div className={styles.workingItem}>
                   <Clock size={20} color="#F58220" />
                   <div>
-                    <h4>Giờ Làm Việc Trung Tâm</h4>
-                    <p>Thứ 2 – Chủ Nhật | 08:00 – 21:30 (Mở cửa tất cả các ngày trong tuần)</p>
+                    <h4>{t.contact.hoursTitle}</h4>
+                    <p>{t.contact.hoursDesc}</p>
                   </div>
                 </div>
 
                 <div className={styles.workingItem}>
                   <ShieldCheck size={20} color="#F58220" />
                   <div>
-                    <h4>Cam Kết Tư Vấn</h4>
-                    <p>Tư vấn viên liên hệ hỗ trợ trong vòng 24h & Test trình độ miễn phí 100%.</p>
+                    <h4>{t.contact.commitTitle}</h4>
+                    <p>{t.contact.commitDesc}</p>
                   </div>
                 </div>
               </div>
@@ -188,48 +191,48 @@ export const Contact: React.FC = () => {
                 <div className={styles.formCardHeader}>
                   <GraduationCap size={28} color="#F58220" />
                   <div>
-                    <h2>Đăng Ký Tư Vấn & Test Trình Độ</h2>
-                    <p>Học viên được kiểm tra trình độ 4 kỹ năng miễn phí và nhận lộ trình học cá nhân hóa.</p>
+                    <h2>{t.contact.formTitle}</h2>
+                    <p>{t.contact.formDesc}</p>
                   </div>
                 </div>
 
                 {submitted && (
                   <div className={styles.successAlert}>
                     <CheckCircle2 size={20} />
-                    <span>Gửi thông tin thành công! Bộ phận tư vấn ICANCAM sẽ liên hệ lại với bạn trong vòng 24h làm việc.</span>
+                    <span>{t.contact.successAlert}</span>
                   </div>
                 )}
 
                 <form onSubmit={handleSubmit} className={styles.contactForm}>
                   <div className={styles.formGroup}>
-                    <label htmlFor="name">Họ và tên *</label>
+                    <label htmlFor="name">{t.contact.fullNameLabel}</label>
                     <input
                       type="text"
                       id="name"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Nhập họ và tên..."
+                      placeholder={language === 'en' ? 'Enter full name...' : 'Nhập họ và tên...'}
                       required
                     />
                   </div>
 
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label htmlFor="phone">Số điện thoại *</label>
+                      <label htmlFor="phone">{t.contact.phoneLabel}</label>
                       <input
                         type="tel"
                         id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="Nhập số điện thoại..."
+                        placeholder={language === 'en' ? 'Enter phone number...' : 'Nhập số điện thoại...'}
                         required
                       />
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label htmlFor="email">Địa chỉ Email</label>
+                      <label htmlFor="email">{t.contact.emailInputLabel}</label>
                       <input
                         type="email"
                         id="email"
@@ -243,20 +246,20 @@ export const Contact: React.FC = () => {
 
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label htmlFor="branch">Cơ sở đăng ký *</label>
+                      <label htmlFor="branch">{t.contact.branchLabel}</label>
                       <select
                         id="branch"
                         name="branch"
                         value={formData.branch}
                         onChange={handleChange}
                       >
-                        <option value="trungmytay">Cơ sở Trung Mỹ Tây (344 A Tổ 13 KP 1, HCM)</option>
-                        <option value="hocmon">Cơ sở Hóc Môn & Quận 12</option>
+                        <option value="trungmytay">{t.contact.branchOpt1}</option>
+                        <option value="hocmon">{t.contact.branchOpt2}</option>
                       </select>
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label htmlFor="course">Khóa học quan tâm *</label>
+                      <label htmlFor="course">{t.contact.courseLabel}</label>
                       <select
                         id="course"
                         name="course"
@@ -274,19 +277,19 @@ export const Contact: React.FC = () => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor="message">Lời nhắn / Yêu cầu thêm</label>
+                    <label htmlFor="message">{t.contact.messageLabel}</label>
                     <textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
-                      placeholder="Ghi chú thêm nhu cầu của bạn..."
+                      placeholder={language === 'en' ? 'Add any notes or requirements...' : 'Ghi chú thêm nhu cầu của bạn...'}
                       rows={4}
                     />
                   </div>
 
                   <button type="submit" className={styles.submitBtn}>
-                    <Send size={18} /> Gửi Yêu Cầu Tư Vấn Ngay
+                    <Send size={18} /> {t.contact.submitBtn}
                   </button>
                 </form>
               </div>
@@ -305,7 +308,7 @@ export const Contact: React.FC = () => {
             <div className={styles.mapHeaderInfo}>
               <MapPin size={32} color="#F58220" />
               <div>
-                <h3>Vị Trí Bản Đồ Trung Tâm ICANCAM</h3>
+                <h3>{t.contact.mapTitle}</h3>
                 <p className={styles.mapAddress}>{fullAddress}</p>
               </div>
             </div>
@@ -331,7 +334,7 @@ export const Contact: React.FC = () => {
                 rel="noreferrer"
                 className={styles.openMapsBtn}
               >
-                <Navigation size={18} /> Mở Ứng Dụng Google Maps Chỉ Đường <ExternalLink size={16} />
+                <Navigation size={18} /> {t.contact.openAppBtn} <ExternalLink size={16} />
               </a>
             </div>
           </div>

@@ -148,35 +148,35 @@ const jobsData: Job[] = [
     ],
     benefitsVi: [
       'Lương cứng ổn định + Hoa hồng doanh số cao + Thưởng KPI vượt trội',
-      'Được đào tạo bài bản kỹ năng tư vấn tâm lý khách hàng & dịch vụ',
-      'Chế độ bảo hiểm, du lịch hàng năm và quà tặng sinh nhật'
+      'Môi trường làm việc năng động, lộ trình thăng tiến Trưởng nhóm / Quản lý',
+      'Được đào tạo bài bản kỹ năng tư vấn chuyên nghiệp'
     ],
     benefitsEn: [
-      'Solid base salary + High sales commission + Overachievement KPI bonuses',
-      'Structured training on customer psychology & educational service',
-      'Social insurance, annual retreats, and birthday gifts'
+      'Competitive base salary + Generous commission + KPI bonuses',
+      'Dynamic environment, career track to Team Leader / Admissions Manager',
+      'Comprehensive professional sales & consultation training'
     ]
   },
   {
     id: 4,
     category: 'ops',
     categoryLabelVi: 'VẬN HÀNH & DỊCH VỤ',
-    categoryLabelEn: 'OPERATIONS & SERVICE',
-    titleVi: 'Chuyên Viên Vận Hành Lớp Học & Dịch Vụ Khách Hàng',
-    titleEn: 'Classroom Operations & Customer Service Specialist',
+    categoryLabelEn: 'OPERATIONS & SERVICES',
+    titleVi: 'Chuyên Viên Dịch Vụ Khách Hàng (Customer Care Officer)',
+    titleEn: 'Customer Care & Academic Support Officer',
     departmentVi: 'Bộ Phận Vận Hành',
     departmentEn: 'Operations Department',
     typeVi: 'Full-time',
     typeEn: 'Full-time',
     locationVi: 'Hóc Môn & Quận 12, TP.HCM',
     locationEn: 'Hoc Mon & District 12, HCMC',
-    salaryVi: '8.000.000đ – 14.000.000đ / tháng',
-    salaryEn: '8,000,000VND – 14,000,000VND / month',
-    descVi: 'Quản lý vận hành phòng học thông minh Smartboard, theo dõi lịch học, hỗ trợ phụ huynh và quản lý cơ sở vật chất trung tâm.',
-    descEn: 'Manage Smartboard classroom operations, schedule tracking, parent support, and campus facility care.',
+    salaryVi: '8.500.000đ – 14.000.000đ / tháng',
+    salaryEn: '8,500,000VND – 14,000,000VND / month',
+    descVi: 'Quản lý điểm danh, theo dõi lịch học, hỗ trợ giải đáp thắc mắc của phụ huynh và đảm bảo cơ sở vật chất phòng học.',
+    descEn: 'Manage class attendance, track study schedules, assist parent inquiries, and oversee classroom facilities.',
     requirementsVi: [
-      'Tốt nghiệp Cao đẳng / Đại học, có kỹ năng quản lý công việc tốt',
-      'Cẩn thận, chỉn chu, có trách nhiệm và giải quyết vấn đề nhanh nhẹn',
+      'Tốt nghiệp Cao đẳng / Đại học, khả năng bao quát công việc tốt',
+      'Cẩn thận, chỉn chu, có trách nhiệm và kỹ năng xử lý tình huống tốt',
       'Thành thạo tin học văn phòng và các phần mềm quản lý'
     ],
     requirementsEn: [
@@ -198,7 +198,7 @@ const jobsData: Job[] = [
 ];
 
 export const Careers: React.FC = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -231,15 +231,18 @@ export const Careers: React.FC = () => {
         <div className={styles.heroContainer}>
           <div className={styles.heroBadge}>
             <Sparkles size={16} />
-            <span>GIA NHẬP ĐỘI NGŨ ICANCAM</span>
+            <span>{t.careers.heroBadge}</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Cơ Hội Nghề Nghiệp & <span className={styles.orangeHighlight}>Phát Triển Sự Nghiệp</span>
+            {t.careers.heroTitlePrefix}
+            <span className={styles.orangeHighlight}>
+              {t.careers.heroTitleHighlight}
+            </span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            Cùng ICANCAM kiến tạo môi trường giáo dục 21st hiện đại tại Hóc Môn & Quận 12, chắp cánh cho thế hệ trẻ tự tin làm chủ ngôn ngữ và tự học suốt đời.
+            {t.careers.heroSubtitle}
           </p>
 
           {/* Category Filter Pills */}
@@ -248,25 +251,25 @@ export const Careers: React.FC = () => {
               className={`${styles.filterBtn} ${activeCategory === 'all' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('all')}
             >
-              Tất Cả Vị Trí
+              {t.careers.filterAll}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'academic' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('academic')}
             >
-              Khối Học Thuật & Giáo Viên
+              {t.careers.filterAcademic}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'sales' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('sales')}
             >
-              Tư Vấn & Tuyển Sinh
+              {t.careers.filterSales}
             </button>
             <button
               className={`${styles.filterBtn} ${activeCategory === 'ops' ? styles.activeFilter : ''}`}
               onClick={() => setActiveCategory('ops')}
             >
-              Vận Hành & Dịch Vụ
+              {t.careers.filterOps}
             </button>
           </div>
         </div>
@@ -279,33 +282,33 @@ export const Careers: React.FC = () => {
       <section className={styles.cultureSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionTag}>VĂN HÓA LÀM VIỆC</span>
-            <h2 className={styles.sectionTitle}>Tại Sao Bạn NÊN Đồng Hành Cùng ICANCAM?</h2>
+            <span className={styles.sectionTag}>{t.careers.cultureTag}</span>
+            <h2 className={styles.sectionTitle}>{t.careers.cultureTitle}</h2>
           </div>
 
           <div className={styles.cultureGrid}>
             <div className={styles.cultureCard}>
               <Award size={32} color="#F58220" />
-              <h3>Thu Nhập & Thưởng Cạnh Tranh</h3>
-              <p>Mức lương thưởng xứng đáng theo năng lực, thưởng KPI và chất lượng giảng dạy hàng tháng/quý.</p>
+              <h3>{t.careers.cultureCard1Title}</h3>
+              <p>{t.careers.cultureCard1Desc}</p>
             </div>
 
             <div className={styles.cultureCard}>
               <GraduationCap size={32} color="#F58220" />
-              <h3>Đào Tạo Chuyên Chức Định Kỳ</h3>
-              <p>Tập huấn phương pháp 4Ls + LETI & kỹ năng ứng dụng công nghệ Smartboard cùng chuyên gia.</p>
+              <h3>{t.careers.cultureCard2Title}</h3>
+              <p>{t.careers.cultureCard2Desc}</p>
             </div>
 
             <div className={styles.cultureCard}>
               <Zap size={32} color="#F58220" />
-              <h3>Lộ Trình Thăng Tiến Rõ Ràng</h3>
-              <p>Cơ hội thăng tiến lên Trưởng bộ phận, Quản lý chuyên môn & Giám đốc cơ sở theo đánh giá minh bạch.</p>
+              <h3>{t.careers.cultureCard3Title}</h3>
+              <p>{t.careers.cultureCard3Desc}</p>
             </div>
 
             <div className={styles.cultureCard}>
               <Users size={32} color="#F58220" />
-              <h3>Môi Trường Trẻ Trung & Gắn Kết</h3>
-              <p>Đồng nghiệp nhiệt huyết, văn hóa tôn trọng, hỗ trợ lẫn nhau cùng các hoạt động Teambuilding hàng năm.</p>
+              <h3>{t.careers.cultureCard4Title}</h3>
+              <p>{t.careers.cultureCard4Desc}</p>
             </div>
           </div>
         </div>
@@ -339,24 +342,24 @@ export const Careers: React.FC = () => {
                 <div className={styles.jobMetaList}>
                   <div className={styles.jobMetaItem}>
                     <Briefcase size={15} color="#F58220" />
-                    <span><strong>Phong ban:</strong> {language === 'en' ? job.departmentEn : job.departmentVi}</span>
+                    <span><strong>{t.careers.deptLabel}</strong> {language === 'en' ? job.departmentEn : job.departmentVi}</span>
                   </div>
                   <div className={styles.jobMetaItem}>
                     <Clock size={15} color="#F58220" />
-                    <span><strong>Hình thức:</strong> {language === 'en' ? job.typeEn : job.typeVi}</span>
+                    <span><strong>{t.careers.typeLabel}</strong> {language === 'en' ? job.typeEn : job.typeVi}</span>
                   </div>
                   <div className={styles.jobMetaItem}>
                     <MapPin size={15} color="#F58220" />
-                    <span><strong>Địa điểm:</strong> {language === 'en' ? job.locationEn : job.locationVi}</span>
+                    <span><strong>{t.careers.locLabel}</strong> {language === 'en' ? job.locationEn : job.locationVi}</span>
                   </div>
                 </div>
 
                 <div className={styles.jobActions}>
                   <button className={styles.viewJobBtn} onClick={() => setSelectedJob(job)}>
-                    Xem Chi Tiết <ChevronRight size={16} />
+                    {t.careers.viewDetailBtn} <ChevronRight size={16} />
                   </button>
                   <button className={styles.applyNowBtn} onClick={() => setSelectedJob(job)}>
-                    <Send size={16} /> Ứng Tuyển Ngay
+                    <Send size={16} /> {t.careers.applyNowBtn}
                   </button>
                 </div>
               </div>
@@ -372,11 +375,11 @@ export const Careers: React.FC = () => {
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaCard}>
-            <h2>Chưa Tìm Thấy Vị Trí Phù Hợp Nào?</h2>
-            <p>Đừng ngần ngại gửi hồ sơ ứng tuyển tự do (Talent Pool) cho ICANCAM. Chúng tôi luôn mở cửa chào đón các nhân tố tài năng đồng hành lâu dài!</p>
+            <h2>{t.careers.ctaTitle}</h2>
+            <p>{t.careers.ctaDesc}</p>
             <div className={styles.ctaButtons}>
               <a href="mailto:thieunam2005@gmail.com" className={styles.primaryCtaBtn}>
-                Gửi CV Qua Email <Send size={16} />
+                {t.careers.ctaSendEmailBtn} <Send size={16} />
               </a>
             </div>
           </div>
@@ -403,12 +406,12 @@ export const Careers: React.FC = () => {
 
             {submitted ? (
               <div className={styles.successAlert}>
-                🎉 Nộp hồ sơ thành công! Bộ phận Tuyển sinh ICANCAM sẽ liên hệ với bạn trong vòng 48h làm việc.
+                {t.careers.successAlert}
               </div>
             ) : (
               <>
                 <div className={styles.modalSection}>
-                  <h3>Yêu Cầu Công Việc</h3>
+                  <h3>{t.careers.modalReqTitle}</h3>
                   <ul className={styles.bulletList}>
                     {(language === 'en' ? selectedJob.requirementsEn : selectedJob.requirementsVi).map((req, idx) => (
                       <li key={idx}><CheckCircle2 size={16} color="#F58220" /> <span>{req}</span></li>
@@ -417,7 +420,7 @@ export const Careers: React.FC = () => {
                 </div>
 
                 <div className={styles.modalSection}>
-                  <h3>Quyền Lợi Đãi Ngộ</h3>
+                  <h3>{t.careers.modalBenTitle}</h3>
                   <ul className={styles.bulletList}>
                     {(language === 'en' ? selectedJob.benefitsEn : selectedJob.benefitsVi).map((ben, idx) => (
                       <li key={idx}><Star size={16} color="#F58220" /> <span>{ben}</span></li>
@@ -426,25 +429,25 @@ export const Careers: React.FC = () => {
                 </div>
 
                 <div className={styles.applyFormWrapper}>
-                  <h3>Form Nộp Hồ Sơ Nhanh</h3>
+                  <h3>{t.careers.modalFormTitle}</h3>
                   <form onSubmit={handleApplySubmit} className={styles.applyForm}>
                     <div className={styles.formRow}>
                       <div className={styles.formGroup}>
-                        <label>Họ và tên *</label>
+                        <label>{t.careers.fullNameLabel}</label>
                         <input
                           type="text"
                           required
-                          placeholder="Nhập họ và tên..."
+                          placeholder={t.careers.fullNamePlaceholder}
                           value={applicantData.fullName}
                           onChange={e => setApplicantData({ ...applicantData, fullName: e.target.value })}
                         />
                       </div>
                       <div className={styles.formGroup}>
-                        <label>Số điện thoại *</label>
+                        <label>{t.careers.phoneLabel}</label>
                         <input
                           type="tel"
                           required
-                          placeholder="Nhập số điện thoại..."
+                          placeholder={t.careers.phonePlaceholder}
                           value={applicantData.phone}
                           onChange={e => setApplicantData({ ...applicantData, phone: e.target.value })}
                         />
@@ -452,7 +455,7 @@ export const Careers: React.FC = () => {
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Email *</label>
+                      <label>{t.careers.emailLabel}</label>
                       <input
                         type="email"
                         required
@@ -463,17 +466,17 @@ export const Careers: React.FC = () => {
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Link CV / Ghi chú thêm</label>
+                      <label>{t.careers.noteLabel}</label>
                       <textarea
                         rows={3}
-                        placeholder="Dán link Google Drive CV hoặc ghi chú kinh nghiệm..."
+                        placeholder={t.careers.notePlaceholder}
                         value={applicantData.note}
                         onChange={e => setApplicantData({ ...applicantData, note: e.target.value })}
                       />
                     </div>
 
                     <button type="submit" className={styles.submitApplyBtn}>
-                      <Send size={18} /> Gửi Hồ Sơ Ứng Tuyển
+                      <Send size={18} /> {t.careers.submitApplyBtn}
                     </button>
                   </form>
                 </div>

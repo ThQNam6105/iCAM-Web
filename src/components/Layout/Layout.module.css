@@ -1,4 +1,4 @@
-﻿.layout {
+.layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -218,7 +218,7 @@
 
 .footer {
   border-top: 1px solid var(--border-muted);
-  padding: 2.5rem 0;
+  padding: 4rem 0 2rem 0;
   background: hsl(224deg 39% 10%);
   margin-top: auto;
   --text-primary: 0deg 0% 100%;
@@ -226,35 +226,312 @@
   --text-muted: 215deg 15% 55%;
 }
 
-.footerContent {
+.footerContainer {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 6rem 0 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  text-align: center;
-  color: hsl(var(--text-secondary));
-  font-size: 0.9rem;
+  gap: 3.5rem;
 }
 
-.footerLinks {
+.footerMainRow {
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4rem;
+}
+
+/* LEFT SECTION */
+.footerLeftSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 480px;
+}
+
+.footerLogoLink {
+  display: inline-block;
+  text-decoration: none;
+  transition: transform 250ms ease;
+}
+
+.footerLogoLink:hover {
+  transform: scale(1.03);
+}
+
+.footerLogoImg {
+  height: 128px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.footerSlogan {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: #F58220;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.footerDescription {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: hsl(var(--text-secondary));
+  margin: 0;
+}
+
+.footerCompanyInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  line-height: 1.5;
+}
+
+.infoIcon {
+  color: #F58220;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hoursText {
+  display: flex;
+  flex-direction: column;
+}
+
+.hoursDetail {
+  color: hsl(var(--text-secondary));
+}
+
+.socialRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.socialIconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  text-decoration: none;
+  transition: all 250ms ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.socialIconBtn:hover {
+  background: #F58220;
+  border-color: #F58220;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(245, 130, 32, 0.35);
+  color: #ffffff;
+}
+
+/* Tooltip on hover for social icons */
+.socialIconBtn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 48px;
+  background-color: rgba(13, 22, 53, 0.95);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 250ms ease;
+  transform: translateY(4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.socialIconBtn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* RIGHT SECTION */
+.footerRightSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+  width: 100%;
+  max-width: 460px;
+}
+
+.quickLinksBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.footerColTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+  position: relative;
+}
+
+.footerColTitle::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 3px;
+  background: #F58220;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+}
+
+.footerNavGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 1rem 2.5rem;
 }
 
 .footerLink {
-  color: hsl(var(--text-primary));
+  color: hsl(var(--text-secondary));
   font-weight: 600;
-  transition: var(--transition-fast);
+  font-size: 0.95rem;
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-bottom: 3px;
+  transition: all 250ms ease;
+  width: fit-content;
+}
+
+.footerLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #F58220;
+  transition: width 250ms ease;
+  border-radius: 1px;
 }
 
 .footerLink:hover {
-  color: hsl(var(--primary));
-  text-decoration: underline;
+  color: #F58220;
+  transform: translateX(4px);
+}
+
+.footerLink:hover::after {
+  width: 100%;
+}
+
+/* CALL TO ACTION CARD */
+.ctaCard {
+  background: #132247;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  text-align: center;
+}
+
+.ctaText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.ctaBtn {
+  background: #F58220;
+  color: #ffffff;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.7rem 1.4rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 250ms ease;
+  box-shadow: 0 4px 14px rgba(245, 130, 32, 0.3);
+  border: none;
+}
+
+.ctaBtn:hover {
+  transform: scale(1.03);
+  background: #e07110;
+  box-shadow: 0 6px 18px rgba(245, 130, 32, 0.45);
+  color: #ffffff;
+}
+
+/* BOTTOM BAR */
+.footerBottomBar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.88rem;
+  color: hsl(var(--text-muted));
+}
+
+.bottomCopyright {
+  margin: 0;
+  font-size: 0.88rem;
+  color: hsl(var(--text-muted));
+}
+
+.bottomLegalLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.legalLink {
+  color: hsl(var(--text-muted));
+  text-decoration: none;
+  transition: color 250ms ease;
+  font-weight: 500;
+}
+
+.legalLink:hover {
+  color: #F58220;
+}
+
+.legalSeparator {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
 }
 
 .userBadge {
@@ -340,6 +617,28 @@
 }
 
 /* Specific Buttons colors */
+.scrollTopBtn {
+  background: linear-gradient(135deg, #F58220 0%, #ff9e42 100%);
+  border: none;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.scrollTopBtn:hover {
+  background: linear-gradient(135deg, #e07110 0%, #F58220 100%);
+  box-shadow: 0 10px 25px rgba(245, 130, 32, 0.45);
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .zaloBtn {
   background-color: #0088FF;
 }
@@ -360,7 +659,23 @@
   background-color: #d93025;
 }
 
-/* Media Query cho Mobile */
+/* Media Query cho Mobile & Tablet */
+@media (max-width: 992px) {
+  .footerContainer {
+    padding: 0 2rem;
+  }
+
+  .footerMainRow {
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .footerLeftSection,
+  .footerRightSection {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .navLinks,
   .navActions {
@@ -369,6 +684,87 @@
 
   .hamburger {
     display: block;
+  }
+
+  .footerContainer {
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .footerLeftSection {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footerLogoImg {
+    height: 95px;
+  }
+
+  .footerSlogan {
+    text-align: center;
+  }
+
+  .footerDescription {
+    text-align: center;
+  }
+
+  .footerCompanyInfo {
+    align-items: center;
+    text-align: center;
+  }
+
+  .infoItem {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.35rem;
+  }
+
+  .hoursText {
+    align-items: center;
+  }
+
+  .socialRow {
+    justify-content: center;
+  }
+
+  .footerRightSection {
+    align-items: center;
+    text-align: center;
+  }
+
+  .quickLinksBlock {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .footerColTitle::after {
+    margin: 0.5rem auto 0 auto;
+  }
+
+  .footerNavGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 1.5rem;
+    justify-items: center;
+    width: 100%;
+  }
+
+  .ctaCard {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .footerBottomBar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.85rem;
+  }
+
+  .bottomLegalLinks {
+    justify-content: center;
   }
 }
 

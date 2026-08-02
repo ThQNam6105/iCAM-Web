@@ -641,7 +641,7 @@
 
 .classroomGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 
@@ -914,6 +914,10 @@
 
   .stepCard {
     width: 100%;
+  }
+
+  .classroomGrid {
+    grid-template-columns: 1fr;
   }
 
   .storyBox {
