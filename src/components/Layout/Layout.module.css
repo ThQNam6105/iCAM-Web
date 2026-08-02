@@ -511,6 +511,42 @@
   color: hsl(var(--text-muted));
 }
 
+.designerCreditLink {
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 0.88rem;
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  transition: color 250ms ease;
+}
+
+.designerCreditLink::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #F58220;
+  transition: width 250ms ease;
+}
+
+.designerCreditLink:hover {
+  color: #F58220;
+}
+
+.designerCreditLink:hover::after {
+  width: 100%;
+}
+
+.designerCreditLink:focus-visible {
+  outline: 2px solid #F58220;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .bottomLegalLinks {
   display: flex;
   align-items: center;

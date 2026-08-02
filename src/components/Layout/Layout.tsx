@@ -427,7 +427,16 @@ export const Layout: React.FC = () => {
           {/* BOTTOM BAR */}
           <div className={styles.footerBottomBar}>
             <div className={styles.bottomCopyright}>
-              © 2026 iCANCAM Language School. {language === 'en' ? 'All rights reserved.' : 'Tất cả quyền được bảo lưu.'}
+              © 2026 iCANCAM Language School.{' '}
+              {language === 'en' ? 'Designed by ' : 'Thiết kế bởi '}
+              <a
+                href="https://www.facebook.com/tqnam6105"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.designerCreditLink}
+              >
+                THIEUNAM
+              </a>.
             </div>
             <div className={styles.bottomLegalLinks}>
               <Link to="/contact" className={styles.legalLink} onClick={closeMenu}>
