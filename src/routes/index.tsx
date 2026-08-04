@@ -11,6 +11,9 @@ import { Contact } from '../pages/Contact/Contact';
 import { NotFound } from '../pages/NotFound/NotFound';
 import { ScrollToTop } from '../components/ScrollToTop/ScrollToTop';
 
+import { AdminLogin } from '../pages/Admin/AdminLogin';
+import { AdminDashboard } from '../pages/Admin/AdminDashboard';
+
 export const AppRouter: React.FC = () => {
   const base = import.meta.env.BASE_URL;
   const basename = base.endsWith('/') && base.length > 1 ? base.slice(0, -1) : base;
@@ -19,6 +22,8 @@ export const AppRouter: React.FC = () => {
     <BrowserRouter basename={basename}>
       <ScrollToTop />
       <Routes>
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="curriculum" element={<Curriculum />} />

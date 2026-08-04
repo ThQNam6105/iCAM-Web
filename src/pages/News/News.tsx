@@ -13,17 +13,33 @@ import styles from './News.module.css';
 import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
+import { getNewsPosts, type DynamicNewsItem } from '../../services/newsService';
 
 export const News: React.FC = () => {
   const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<Article | DynamicNewsItem | null>(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [articles, setArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
+    const dynamic = getNewsPosts();
+    return dynamic.length > 0 ? dynamic : articlesData;
+  });
+
+  React.useEffect(() => {
+    const handleFocus = () => {
+      const dynamic = getNewsPosts();
+      if (dynamic.length > 0) {
+        setArticles(dynamic);
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const filteredArticles = activeCategory === 'all'
-    ? articlesData
-    : articlesData.filter(art => art.category === activeCategory);
+    ? articles
+    : articles.filter(art => art.category === activeCategory);
 
   const featuredArticle = filteredArticles[0] || articlesData[0];
   const remainingArticles = filteredArticles.length > 1 ? filteredArticles.slice(1) : filteredArticles;

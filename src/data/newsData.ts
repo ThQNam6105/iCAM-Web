@@ -3,7 +3,7 @@ import newsParenting from '../assets/news_parenting.png';
 import newsLimit from '../assets/news_limit.png';
 
 export interface Article {
-  id: number;
+  id: number | string;
   category: 'events' | 'scholarship' | 'tips';
   categoryLabel: string;
   categoryLabelEn?: string;
