@@ -320,5 +320,10 @@ export const en: typeof vi = {
     newsletterSubmitBtn: 'Subscribe',
     modalCourseConsultBtn: 'Book Course Consultation',
   },
+  notFound: {
+    title: 'Page not found',
+    subtitle: 'The page you are looking for does not exist or has been moved to another address. Please return to the Homepage.',
+    backHomeBtn: 'Back to Homepage',
+  },
 };
 

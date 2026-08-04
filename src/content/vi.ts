@@ -318,5 +318,10 @@ export const vi = {
     newsletterSubmitBtn: 'Đăng Ký',
     modalCourseConsultBtn: 'Đăng Ký Tư Vấn Khóa Học',
   },
+  notFound: {
+    title: 'Không tìm thấy trang',
+    subtitle: 'Đường dẫn bạn truy cập không tồn tại hoặc đã được chuyển sang địa chỉ khác. Vui lòng quay lại Trang chủ.',
+    backHomeBtn: 'Quay lại Trang chủ',
+  },
 };
 
