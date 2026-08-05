@@ -283,31 +283,25 @@ export const AdminDashboard: React.FC = () => {
                         <Eye size={15} />
                       </button>
 
-                      {post.isCustom ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingPost(post);
-                              setIsEditModalOpen(true);
-                            }}
-                            className={styles.actionBtn}
-                            title="Chỉnh sửa"
-                          >
-                            <Edit2 size={15} /> Sửa
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeleteCandidateId(post.id)}
-                            className={`${styles.actionBtn} ${styles.actionDelete}`}
-                            title="Xóa bài"
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        </>
-                      ) : (
-                        <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Hệ thống</span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingPost(post);
+                          setIsEditModalOpen(true);
+                        }}
+                        className={styles.actionBtn}
+                        title="Chỉnh sửa"
+                      >
+                        <Edit2 size={15} /> Sửa
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteCandidateId(post.id)}
+                        className={`${styles.actionBtn} ${styles.actionDelete}`}
+                        title="Xóa bài"
+                      >
+                        <Trash2 size={15} /> Xóa
+                      </button>
                     </div>
                   </td>
                 </tr>

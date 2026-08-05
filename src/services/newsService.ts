@@ -1,6 +1,6 @@
 import { articlesData, type Article } from '../data/newsData';
 
-const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v2';
+const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v3';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
 
 export type PostStatus = 'draft' | 'published' | 'archived';
@@ -46,15 +46,18 @@ export const calculateReadingTime = (content: string): string => {
   return `${minutes} phút đọc`;
 };
 
-// Get raw combined posts from storage + default data
+// Get raw combined posts from storage (seed with default data if empty)
 export const getAllNewsPosts = (): DynamicNewsItem[] => {
   try {
     const customPostsRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const customPosts: DynamicNewsItem[] = customPostsRaw ? JSON.parse(customPostsRaw) : [];
+    if (customPostsRaw) {
+      return JSON.parse(customPostsRaw);
+    }
 
-    const defaultPosts: DynamicNewsItem[] = articlesData.map((post) => ({
+    // Seed default articles into localStorage so all of them are editable & deletable
+    const initialPosts: DynamicNewsItem[] = articlesData.map((post) => ({
       ...post,
-      id: String(post.id),
+      id: `default_${post.id}`,
       slug: generateSlug(post.title),
       status: 'published',
       author: 'iCANCAM Editor',
@@ -64,25 +67,14 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
       publishedAt: post.date,
       featured: true,
       readingTime: '3 phút đọc',
-      isCustom: false,
+      isCustom: true,
     }));
 
-    return [...customPosts, ...defaultPosts];
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initialPosts));
+    return initialPosts;
   } catch (error) {
     console.error('Error reading news posts:', error);
-    return articlesData.map((post) => ({
-      ...post,
-      id: String(post.id),
-      slug: generateSlug(post.title),
-      status: 'published',
-      author: 'iCANCAM Editor',
-      tags: ['Anh ngữ'],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      featured: false,
-      readingTime: '3 phút đọc',
-      isCustom: false,
-    }));
+    return [];
   }
 };
 
@@ -137,8 +129,7 @@ export const getFilteredNewsPosts = (options: PostFilterOptions): DynamicNewsIte
 export const createNewsPost = (
   data: Omit<DynamicNewsItem, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>
 ): DynamicNewsItem => {
-  const customPostsRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
-  const customPosts: DynamicNewsItem[] = customPostsRaw ? JSON.parse(customPostsRaw) : [];
+  const posts = getAllNewsPosts();
 
   const now = new Date().toISOString();
   const createdPost: DynamicNewsItem = {
@@ -152,7 +143,7 @@ export const createNewsPost = (
     isCustom: true,
   };
 
-  const updatedPosts = [createdPost, ...customPosts];
+  const updatedPosts = [createdPost, ...posts];
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedPosts));
   return createdPost;
 };
@@ -162,37 +153,33 @@ export const updateNewsPost = (
   id: string | number,
   data: Partial<Omit<DynamicNewsItem, 'id' | 'createdAt' | 'isCustom'>>
 ): DynamicNewsItem | null => {
-  const customPostsRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
-  const customPosts: DynamicNewsItem[] = customPostsRaw ? JSON.parse(customPostsRaw) : [];
+  const posts = getAllNewsPosts();
 
-  const index = customPosts.findIndex((p) => String(p.id) === String(id));
+  const index = posts.findIndex((p) => String(p.id) === String(id));
   if (index === -1) return null;
 
   const now = new Date().toISOString();
   const updatedPost: DynamicNewsItem = {
-    ...customPosts[index],
+    ...posts[index],
     ...data,
     updatedAt: now,
     publishedAt:
-      data.status === 'published' && !customPosts[index].publishedAt
+      data.status === 'published' && !posts[index].publishedAt
         ? new Date().toLocaleDateString('vi-VN')
-        : customPosts[index].publishedAt,
-    readingTime: data.content ? calculateReadingTime(data.content) : customPosts[index].readingTime,
+        : posts[index].publishedAt,
+    readingTime: data.content ? calculateReadingTime(data.content) : posts[index].readingTime,
   };
 
-  customPosts[index] = updatedPost;
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(customPosts));
+  posts[index] = updatedPost;
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
   return updatedPost;
 };
 
 // Delete post
 export const deleteNewsPost = (id: string | number): boolean => {
   try {
-    const customPostsRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!customPostsRaw) return false;
-
-    const customPosts: DynamicNewsItem[] = JSON.parse(customPostsRaw);
-    const filtered = customPosts.filter((post) => String(post.id) !== String(id));
+    const posts = getAllNewsPosts();
+    const filtered = posts.filter((post) => String(post.id) !== String(id));
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
     return true;
