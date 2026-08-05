@@ -74,10 +74,13 @@ export const AdminSidebar: React.FC = () => {
           <span>Hỏi Đáp (FAQ)</span>
         </div>
 
-        <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
+        <NavLink
+          to="/admin/careers"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+        >
           <Briefcase size={18} />
           <span>Tuyển Dụng (Careers)</span>
-        </div>
+        </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <Settings size={18} />

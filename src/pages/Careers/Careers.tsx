@@ -197,6 +197,8 @@ const jobsData: Job[] = [
   }
 ];
 
+import { fetchCareersFromSupabase, getAllCareers, type CareersItem } from '../../services/careersService';
+
 export const Careers: React.FC = () => {
   const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -209,9 +211,45 @@ export const Careers: React.FC = () => {
     note: '',
   });
 
+  const [dynamicJobs, setDynamicJobs] = useState<CareersItem[]>(() => {
+    return getAllCareers().filter((j) => j.status === 'open');
+  });
+
+  React.useEffect(() => {
+    fetchCareersFromSupabase().then(() => {
+      const openJobs = getAllCareers().filter((j) => j.status === 'open');
+      setDynamicJobs(openJobs);
+    });
+  }, []);
+
+  const mappedDynamic: Job[] = dynamicJobs.map((j, idx) => ({
+    id: 1000 + idx,
+    category: j.department.includes('Đào Tạo') ? 'academic' : j.department.includes('Tuyển Sinh') ? 'sales' : 'ops',
+    categoryLabelVi: j.department.toUpperCase(),
+    categoryLabelEn: j.department.toUpperCase(),
+    titleVi: j.title,
+    titleEn: j.titleEn || j.title,
+    departmentVi: j.department,
+    departmentEn: j.department,
+    typeVi: j.type,
+    typeEn: j.type,
+    locationVi: j.location,
+    locationEn: j.location,
+    salaryVi: j.salary,
+    salaryEn: j.salary,
+    descVi: j.description,
+    descEn: j.description,
+    requirementsVi: [j.requirements],
+    requirementsEn: [j.requirements],
+    benefitsVi: [j.benefits],
+    benefitsEn: [j.benefits],
+  }));
+
+  const allCombinedJobs = mappedDynamic.length > 0 ? mappedDynamic : jobsData;
+
   const filteredJobs = activeCategory === 'all'
-    ? jobsData
-    : jobsData.filter(job => job.category === activeCategory);
+    ? allCombinedJobs
+    : allCombinedJobs.filter(job => job.category === activeCategory);
 
   const handleApplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
