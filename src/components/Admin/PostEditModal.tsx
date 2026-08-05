@@ -310,15 +310,19 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <SeoPanel
+              articleTitle={title}
+              articleExcerpt={excerpt}
+              coverImage={image}
               slug={slug}
               metaTitle={metaTitle}
               metaDescription={metaDescription}
               ogImage={ogImage}
-              canonicalUrl={canonicalUrl}
+              canonicalUrlOverride={canonicalUrl}
+              onChangeSlug={setSlug}
               onChangeMetaTitle={setMetaTitle}
               onChangeMetaDescription={setMetaDescription}
               onChangeOgImage={setOgImage}
-              onChangeCanonicalUrl={setCanonicalUrl}
+              onChangeCanonicalUrlOverride={setCanonicalUrl}
             />
 
             <QualityChecker
