@@ -389,9 +389,20 @@ export const Careers: React.FC = () => {
                 <h3 className={styles.jobTitle}>
                   {language === 'en' ? job.titleEn : job.titleVi}
                 </h3>
-                <p className={styles.jobDesc}>
-                  {language === 'en' ? job.descEn : job.descVi}
-                </p>
+                {(() => {
+                  const descText = language === 'en' ? job.descEn : job.descVi;
+                  const bullets = parseBulletItems(descText);
+                  if (bullets.length > 1) {
+                    return (
+                      <ul className={styles.cardBulletList}>
+                        {bullets.map((item, idx) => (
+                          <li key={idx}>• {item}</li>
+                        ))}
+                      </ul>
+                    );
+                  }
+                  return <p className={styles.jobDesc}>{descText}</p>;
+                })()}
 
                 <div className={styles.jobMetaList}>
                   <div className={styles.jobMetaItem}>
