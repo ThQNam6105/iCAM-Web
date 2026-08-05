@@ -1,125 +1,242 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import footerLogo from '../../assets/footer-logo.jpg';
+import React, { useState, useMemo } from 'react';
 import {
-  getNewsPosts,
-  addNewsPost,
+  FileText,
+  CheckCircle,
+  Clock,
+  FolderTree,
+  Plus,
+  Search,
+  Edit2,
+  Trash2,
+  Eye,
+  Inbox
+} from 'lucide-react';
+import {
+  getAllNewsPosts,
+  getFilteredNewsPosts,
+  createNewsPost,
+  updateNewsPost,
   deleteNewsPost,
-  isAdminAuthenticated,
-  logoutAdmin,
-  type DynamicNewsItem
+  type DynamicNewsItem,
+  type PostStatus
 } from '../../services/newsService';
+import { PostEditModal } from '../../components/Admin/PostEditModal';
+import { PostPreviewModal } from '../../components/Admin/PostPreviewModal';
+import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
+import { useToast } from '../../components/Toast/Toast';
 import styles from './AdminDashboard.module.css';
 
 export const AdminDashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const [posts, setPosts] = useState<DynamicNewsItem[]>(() => getNewsPosts());
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { showToast } = useToast();
 
-  // New post form state
-  const [title, setTitle] = useState('');
-  const [titleEn, setTitleEn] = useState('');
-  const [category, setCategory] = useState<'events' | 'scholarship' | 'tips'>('events');
-  const [categoryLabel, setCategoryLabel] = useState('SỰ KIỆN NỔI BẬT');
-  const [categoryLabelEn, setCategoryLabelEn] = useState('FEATURED EVENT');
-  const [image, setImage] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [excerptEn, setExcerptEn] = useState('');
-  const [content, setContent] = useState('');
-  const [contentEn, setContentEn] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    if (!isAdminAuthenticated()) {
-      navigate('/admin/login');
-    }
-  }, [navigate]);
+  // Filter & Search states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<PostStatus | 'all'>('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
+
+  // Modal states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<DynamicNewsItem | null>(null);
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewPostData, setPreviewPostData] = useState<DynamicNewsItem | null>(null);
+
+  const [deleteCandidateId, setDeleteCandidateId] = useState<string | number | null>(null);
 
   const loadPosts = () => {
-    setPosts(getNewsPosts());
+    setRefreshKey((prev) => prev + 1);
   };
 
-  const handleLogout = () => {
-    logoutAdmin();
-    navigate('/admin/login');
+  const allRawPosts = useMemo(() => {
+    return getAllNewsPosts();
+  }, [refreshKey]);
+
+  const posts = useMemo(() => {
+    return getFilteredNewsPosts({
+      searchQuery,
+      category: selectedCategory,
+      status: selectedStatus,
+      sortBy,
+    });
+  }, [searchQuery, selectedCategory, selectedStatus, sortBy, refreshKey]);
+
+  // Statistics calculation
+  const stats = useMemo(() => {
+    const total = allRawPosts.length;
+    const published = allRawPosts.filter((p) => p.status === 'published').length;
+    const drafts = allRawPosts.filter((p) => p.status === 'draft').length;
+    const categories = new Set(allRawPosts.map((p) => p.category)).size;
+    return { total, published, drafts, categories };
+  }, [allRawPosts]);
+
+  // Create or Update handler
+  const handleSavePost = (postData: Partial<DynamicNewsItem>) => {
+    if (editingPost) {
+      updateNewsPost(editingPost.id, postData);
+      showToast('Đã lưu thay đổi bài viết thành công! ✓', 'success');
+    } else {
+      createNewsPost(postData as Omit<DynamicNewsItem, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>);
+      showToast('Đã đăng bài viết mới thành công! ✓', 'success');
+    }
+    loadPosts();
   };
 
-  const handleDelete = (id: string | number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) {
-      deleteNewsPost(id);
+  // Delete handler
+  const handleConfirmDelete = () => {
+    if (deleteCandidateId) {
+      deleteNewsPost(deleteCandidateId);
+      showToast('Đã xóa bài viết thành công!', 'info');
+      setDeleteCandidateId(null);
       loadPosts();
     }
   };
 
-  const handleCreatePost = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !excerpt || !content) {
-      alert('Vui lòng điền đầy đủ Tiêu đề, Tóm tắt và Nội dung bài viết!');
-      return;
-    }
-
-    addNewsPost({
-      title,
-      titleEn: titleEn || title,
-      category,
-      categoryLabel,
-      categoryLabelEn: categoryLabelEn || categoryLabel,
-      date: new Date().toLocaleDateString('vi-VN'),
-      url: '/news',
-      image: image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
-      excerpt,
-      excerptEn: excerptEn || excerpt,
-      content,
-      contentEn: contentEn || content,
-    });
-
-    // Reset form
-    setTitle('');
-    setTitleEn('');
-    setImage('');
-    setExcerpt('');
-    setExcerptEn('');
-    setContent('');
-    setContentEn('');
-    setIsModalOpen(false);
-    loadPosts();
-  };
-
   return (
-    <div className={styles.dashboardWrapper}>
-      {/* Top Header Bar */}
-      <header className={styles.topBar}>
-        <div className={styles.brandMeta}>
-          <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
+    <div className={styles.container}>
+      {/* Page Header */}
+      <div className={styles.pageHeader}>
+        <div>
+          <h1 className={styles.pageTitle}>Quản Lý Bài Viết & Tin Tức</h1>
+          <p className={styles.pageSubtitle}>Quản lý, chỉnh sửa, xem trước và xuất bản tin tức iCANCAM</p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setEditingPost(null);
+            setIsEditModalOpen(true);
+          }}
+          className={styles.createBtn}
+        >
+          <Plus size={18} /> Thêm Bài Viết Mới
+        </button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
           <div>
-            <h1 className={styles.dashboardTitle}>Bảng Quản Trị Bài Viết iCANCAM</h1>
-            <p className={styles.dashboardSubtitle}>Đăng bài mới, xem và quản lý tin tức - sự kiện</p>
+            <div className={styles.statValue}>{stats.total}</div>
+            <div className={styles.statLabel}>Tổng Bài Viết</div>
+          </div>
+          <div className={styles.statIcon}>
+            <FileText size={24} />
           </div>
         </div>
 
-        <div className={styles.topActions}>
-          <button onClick={() => setIsModalOpen(true)} className={styles.newPostBtn}>
-            + Đăng Bài Viết Mới
-          </button>
-          <button onClick={handleLogout} className={styles.logoutBtn}>
-            Đăng Xuất
-          </button>
-        </div>
-      </header>
-
-      {/* Main Posts Table */}
-      <main className={styles.mainContainer}>
-        <div className={styles.tableCard}>
-          <div className={styles.tableHeader}>
-            <h2 className={styles.tableTitle}>Danh Sách Bài Viết ({posts.length})</h2>
+        <div className={styles.statCard}>
+          <div>
+            <div className={styles.statValue}>{stats.published}</div>
+            <div className={styles.statLabel}>Đã Xuất Bản</div>
           </div>
+          <div className={styles.statIcon} style={{ color: '#10b981' }}>
+            <CheckCircle size={24} />
+          </div>
+        </div>
 
+        <div className={styles.statCard}>
+          <div>
+            <div className={styles.statValue}>{stats.drafts}</div>
+            <div className={styles.statLabel}>Bản Nháp (Drafts)</div>
+          </div>
+          <div className={styles.statIcon} style={{ color: '#F58220' }}>
+            <Clock size={24} />
+          </div>
+        </div>
+
+        <div className={styles.statCard}>
+          <div>
+            <div className={styles.statValue}>{stats.categories}</div>
+            <div className={styles.statLabel}>Danh Mục Nổi Bật</div>
+          </div>
+          <div className={styles.statIcon} style={{ color: '#8b5cf6' }}>
+            <FolderTree size={24} />
+          </div>
+        </div>
+      </div>
+
+      {/* Toolbar Filters & Search */}
+      <div className={styles.toolbarCard}>
+        <div className={styles.searchBox}>
+          <Search size={18} />
+          <input
+            type="text"
+            placeholder="Tìm kiếm bài viết theo tiêu đề, slug, danh mục..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
+
+        <div className={styles.filterControls}>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className={styles.selectFilter}
+          >
+            <option value="all">Tất cả Danh mục</option>
+            <option value="events">Sự kiện nổi bật</option>
+            <option value="scholarship">Học bổng & Thành tích</option>
+            <option value="tips">Bí quyết Tiếng Anh</option>
+          </select>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value as PostStatus | 'all')}
+            className={styles.selectFilter}
+          >
+            <option value="all">Tất cả Trạng thái</option>
+            <option value="published">Đã xuất bản (Published)</option>
+            <option value="draft">Bản nháp (Draft)</option>
+            <option value="archived">Lưu trữ (Archived)</option>
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
+            className={styles.selectFilter}
+          >
+            <option value="newest">Mới nhất trước</option>
+            <option value="oldest">Cũ nhất trước</option>
+            <option value="alphabetical">Xếp theo A-Z</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Posts Table or Empty State */}
+      <div className={styles.tableCard}>
+        {posts.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>
+              <Inbox size={32} />
+            </div>
+            <h3 className={styles.emptyTitle}>Chưa tìm thấy bài viết nào</h3>
+            <p className={styles.emptyDesc}>
+              Không có bài viết nào phù hợp với bộ lọc hiện tại. Vui lòng thử tìm kiếm từ khóa khác hoặc tạo bài viết mới.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingPost(null);
+                setIsEditModalOpen(true);
+              }}
+              className={styles.createBtn}
+            >
+              <Plus size={18} /> Tạo Bài Viết Đầu Tiên
+            </button>
+          </div>
+        ) : (
           <table className={styles.postsTable}>
             <thead>
               <tr>
                 <th>Hình ảnh</th>
-                <th>Tiêu đề</th>
+                <th>Tiêu đề & Slug</th>
                 <th>Danh mục</th>
-                <th>Ngày đăng</th>
+                <th>Trạng thái</th>
+                <th>Ngày cập nhật</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -131,153 +248,107 @@ export const AdminDashboard: React.FC = () => {
                   </td>
                   <td>
                     <div style={{ fontWeight: 700 }}>{post.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{post.titleEn}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>/{post.slug}</div>
                   </td>
                   <td>
                     <span className={styles.badgeCategory}>{post.categoryLabel}</span>
                   </td>
-                  <td>{post.date}</td>
                   <td>
-                    {post.isCustom ? (
-                      <button onClick={() => handleDelete(post.id)} className={styles.deleteBtn}>
-                        Xóa Bài
+                    <span
+                      className={`${styles.statusBadge} ${
+                        post.status === 'published'
+                          ? styles.statusPublished
+                          : post.status === 'draft'
+                          ? styles.statusDraft
+                          : styles.statusArchived
+                      }`}
+                    >
+                      {post.status}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                    {new Date(post.updatedAt || post.createdAt).toLocaleDateString('vi-VN')}
+                  </td>
+                  <td>
+                    <div className={styles.actionsCell}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewPostData(post);
+                          setIsPreviewOpen(true);
+                        }}
+                        className={styles.actionBtn}
+                        title="Xem trước"
+                      >
+                        <Eye size={15} />
                       </button>
-                    ) : (
-                      <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Mặc định</span>
-                    )}
+
+                      {post.isCustom ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingPost(post);
+                              setIsEditModalOpen(true);
+                            }}
+                            className={styles.actionBtn}
+                            title="Chỉnh sửa"
+                          >
+                            <Edit2 size={15} /> Sửa
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteCandidateId(post.id)}
+                            className={`${styles.actionBtn} ${styles.actionDelete}`}
+                            title="Xóa bài"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </>
+                      ) : (
+                        <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Hệ thống</span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      </main>
+        )}
+      </div>
 
-      {/* Create New Post Modal */}
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2 className={styles.modalTitle}>Thêm Bài Viết Mới</h2>
+      {/* Edit & Create Modal */}
+      <PostEditModal
+        key={editingPost ? String(editingPost.id) : 'new_post'}
+        isOpen={isEditModalOpen}
+        postToEdit={editingPost}
+        onSave={handleSavePost}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingPost(null);
+        }}
+      />
 
-            <form onSubmit={handleCreatePost} className={styles.formGrid}>
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Tiêu đề bài viết (Tiếng Việt) *</label>
-                <input
-                  type="text"
-                  placeholder="Nhập tiêu đề Tiếng Việt..."
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className={styles.input}
-                  required
-                />
-              </div>
+      {/* Single Post Preview Modal */}
+      <PostPreviewModal
+        isOpen={isPreviewOpen}
+        post={previewPostData || {}}
+        onClose={() => {
+          setIsPreviewOpen(false);
+          setPreviewPostData(null);
+        }}
+      />
 
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Tiêu đề bài viết (Tiếng Anh - Tiêu chuẩn)</label>
-                <input
-                  type="text"
-                  placeholder="Title in English..."
-                  value={titleEn}
-                  onChange={(e) => setTitleEn(e.target.value)}
-                  className={styles.input}
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Danh mục bài viết</label>
-                <select
-                  value={category}
-                  onChange={(e) => {
-                    const val = e.target.value as 'events' | 'scholarship' | 'tips';
-                    setCategory(val);
-                    if (val === 'events') {
-                      setCategoryLabel('SỰ KIỆN NỔI BẬT');
-                      setCategoryLabelEn('FEATURED EVENT');
-                    } else if (val === 'scholarship') {
-                      setCategoryLabel('HỌC BỔNG & THÀNH TÍCH');
-                      setCategoryLabelEn('SCHOLARSHIP & ACHIEVEMENTS');
-                    } else {
-                      setCategoryLabel('BÍ QUYẾT TIẾNG ANH');
-                      setCategoryLabelEn('ENGLISH TIPS');
-                    }
-                  }}
-                  className={styles.select}
-                >
-                  <option value="events">SỰ KIỆN NỔI BẬT</option>
-                  <option value="scholarship">HỌC BỔNG & THÀNH TÍCH</option>
-                  <option value="tips">BÍ QUYẾT TIẾNG ANH</option>
-                </select>
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>URL Hình ảnh bài viết (Hình bìa)</label>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className={styles.input}
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Tóm tắt bài viết (Tiếng Việt) *</label>
-                <textarea
-                  rows={2}
-                  placeholder="Tóm tắt nội dung ngắn gọn..."
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  className={styles.textarea}
-                  required
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Tóm tắt bài viết (Tiếng Anh)</label>
-                <textarea
-                  rows={2}
-                  placeholder="Short excerpt in English..."
-                  value={excerptEn}
-                  onChange={(e) => setExcerptEn(e.target.value)}
-                  className={styles.textarea}
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Nội dung chi tiết bài viết (Tiếng Việt) *</label>
-                <textarea
-                  rows={5}
-                  placeholder="Nhập nội dung đầy đủ..."
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className={styles.textarea}
-                  required
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Nội dung chi tiết bài viết (Tiếng Anh)</label>
-                <textarea
-                  rows={4}
-                  placeholder="Full article content in English..."
-                  value={contentEn}
-                  onChange={(e) => setContentEn(e.target.value)}
-                  className={styles.textarea}
-                />
-              </div>
-
-              <div className={styles.modalActions}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className={styles.cancelBtn}>
-                  Hủy Bỏ
-                </button>
-                <button type="submit" className={styles.saveBtn}>
-                  Đăng Bài Ngay
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Delete Confirmation Dialog */}
+      <ConfirmModal
+        isOpen={deleteCandidateId !== null}
+        title="Xác nhận xóa bài viết"
+        message="Hành động này sẽ xóa vĩnh viễn bài viết khỏi hệ thống và không thể hoàn tác. Bạn có chắc chắn muốn xóa?"
+        confirmLabel="Xóa Vĩnh Viễn"
+        cancelLabel="Hủy Bỏ"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteCandidateId(null)}
+      />
     </div>
   );
 };

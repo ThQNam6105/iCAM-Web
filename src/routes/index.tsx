@@ -13,6 +13,8 @@ import { ScrollToTop } from '../components/ScrollToTop/ScrollToTop';
 
 import { AdminLogin } from '../pages/Admin/AdminLogin';
 import { AdminDashboard } from '../pages/Admin/AdminDashboard';
+import { AdminLayout } from '../components/Admin/AdminLayout';
+import { ProtectedRoute } from '../components/Admin/ProtectedRoute';
 
 export const AppRouter: React.FC = () => {
   const base = import.meta.env.BASE_URL;
@@ -23,7 +25,16 @@ export const AppRouter: React.FC = () => {
       <ScrollToTop />
       <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+        </Route>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="curriculum" element={<Curriculum />} />

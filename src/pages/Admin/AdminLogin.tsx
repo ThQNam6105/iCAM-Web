@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import footerLogo from '../../assets/footer-logo.jpg';
-import { loginAdmin } from '../../services/newsService';
+import { authService } from '../../services/authService';
 import styles from './AdminLogin.module.css';
 
 export const AdminLogin: React.FC = () => {
@@ -11,7 +11,7 @@ export const AdminLogin: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginAdmin(password)) {
+    if (authService.login(password)) {
       setError('');
       navigate('/admin');
     } else {

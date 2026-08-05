@@ -13,7 +13,7 @@ import styles from './News.module.css';
 import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
-import { getNewsPosts, type DynamicNewsItem } from '../../services/newsService';
+import { getPublicNewsPosts, type DynamicNewsItem } from '../../services/newsService';
 
 export const News: React.FC = () => {
   const { language, t } = useLanguage();
@@ -22,13 +22,13 @@ export const News: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [articles, setArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
-    const dynamic = getNewsPosts();
+    const dynamic = getPublicNewsPosts();
     return dynamic.length > 0 ? dynamic : articlesData;
   });
 
   React.useEffect(() => {
     const handleFocus = () => {
-      const dynamic = getNewsPosts();
+      const dynamic = getPublicNewsPosts();
       if (dynamic.length > 0) {
         setArticles(dynamic);
       }
