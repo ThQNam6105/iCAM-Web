@@ -30,7 +30,7 @@ export const AdminLogin: React.FC = () => {
           {error && <div className={styles.errorAlert}>{error}</div>}
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Mật khẩu Quản trị (Admin Password)</label>
+            <label className={styles.label}>Admin Password</label>
             <input
               type="password"
               placeholder="Nhập mật khẩu Quản trị..."
