@@ -15,7 +15,7 @@ export const AdminLogin: React.FC = () => {
       setError('');
       navigate('/admin');
     } else {
-      setError('Mật khẩu không chính xác. Mật khẩu mặc định: icancam2026');
+      setError('Mật khẩu không chính xác');
     }
   };
 
@@ -33,7 +33,7 @@ export const AdminLogin: React.FC = () => {
             <label className={styles.label}>Mật khẩu Quản trị (Admin Password)</label>
             <input
               type="password"
-              placeholder="Nhập mật khẩu (Mặc định: icancam2026)"
+              placeholder="Nhập mật khẩu Quản trị..."
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}

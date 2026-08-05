@@ -1,8 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useLanguage } from '../../contexts/LanguageContext';
 import styles from './NotFound.module.css';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export const NotFound: React.FC = () => {
   const { t } = useLanguage();
@@ -19,4 +19,3 @@ export const NotFound: React.FC = () => {
     </div>
   );
 };
-
