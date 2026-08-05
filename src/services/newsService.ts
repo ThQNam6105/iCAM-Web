@@ -230,8 +230,8 @@ export const validatePostForm = (data: Partial<DynamicNewsItem>): ValidationErro
   if (!data.content || data.content.trim().length < 20) {
     errors.content = 'Nội dung chi tiết phải dài ít nhất 20 ký tự.';
   }
-  if (!data.image || !data.image.startsWith('http')) {
-    errors.image = 'Vui lòng nhập đường dẫn hình ảnh hợp lệ (bắt đầu bằng http:// hoặc https://).';
+  if (!data.image || (!data.image.startsWith('http') && !data.image.startsWith('data:image/'))) {
+    errors.image = 'Vui lòng nhập đường dẫn URL hình ảnh hoặc tải ảnh từ máy tính lên.';
   }
   return errors;
 };

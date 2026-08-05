@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Eye, Upload, Save, RefreshCw, History } from 'lucide-react';
 import {
   type DynamicNewsItem,
@@ -33,6 +33,25 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   onClose,
 }) => {
   const { showToast } = useToast();
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Vui lòng chọn file định dạng hình ảnh (PNG, JPG, WEBP...)', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const base64Data = evt.target?.result as string;
+      setImage(base64Data);
+      showToast('Đã tải ảnh từ máy tính lên thành công! ✓', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
 
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [titleEn, setTitleEn] = useState(postToEdit?.titleEn || '');
@@ -247,21 +266,29 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Hình ảnh bìa bài viết (URL) *</label>
+              <label className={styles.label}>Hình ảnh bìa bài viết (URL hoặc Tải từ máy tính) *</label>
+              <input
+                type="file"
+                ref={coverImageInputRef}
+                accept="image/*"
+                onChange={handleCoverImageUpload}
+                style={{ display: 'none' }}
+              />
               <div className={styles.imageInputGroup}>
                 <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
+                  type="text"
+                  placeholder="Dán URL ảnh hoặc bấm Tải ảnh từ máy..."
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
                   className={styles.input}
                 />
                 <button
                   type="button"
-                  onClick={() => showToast('Thư viện Media Upload sẽ được tích hợp trong bản cập nhật kế tiếp!', 'info')}
+                  onClick={() => coverImageInputRef.current?.click()}
                   className={styles.uploadPlaceholderBtn}
+                  title="Chọn ảnh từ máy tính / điện thoại"
                 >
-                  <Upload size={16} /> Tải ảnh
+                  <Upload size={16} /> Tải ảnh từ máy
                 </button>
               </div>
               {errors.image && <span className={styles.errorText}>{errors.image}</span>}

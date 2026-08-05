@@ -118,10 +118,32 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
+  const imageFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Local inline image upload handler
+  const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const base64Data = evt.target?.result as string;
+      execCmd('insertImage', base64Data);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const insertImage = () => {
-    const url = prompt('Nhập đường dẫn hình ảnh (URL):', 'https://');
-    if (url) {
-      execCmd('insertImage', url);
+    // Open local file picker or ask for URL
+    if (confirm('Bấm OK để TẢI ẢNH TỪ MÁY TÍNH, hoặc bấm CANCEL để dán đường dẫn URL ảnh!')) {
+      imageFileInputRef.current?.click();
+    } else {
+      const url = prompt('Nhập đường dẫn hình ảnh (URL):', 'https://');
+      if (url) {
+        execCmd('insertImage', url);
+      }
     }
   };
 
@@ -132,6 +154,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ref={fileInputRef}
         accept=".docx,.doc,.txt,.html"
         onChange={handleFileUpload}
+        style={{ display: 'none' }}
+      />
+      <input
+        type="file"
+        ref={imageFileInputRef}
+        accept="image/*"
+        onChange={handleInlineImageUpload}
         style={{ display: 'none' }}
       />
 
