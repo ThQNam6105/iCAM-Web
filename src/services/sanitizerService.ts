@@ -6,7 +6,7 @@
 
 const ALLOWED_TAGS = new Set([
   'p', 'h2', 'h3', 'ul', 'ol', 'li', 'strong', 'em', 'u', 's',
-  'blockquote', 'a', 'img', 'hr', 'div', 'span', 'b', 'i', 'sub', 'sup'
+  'blockquote', 'a', 'img', 'video', 'source', 'iframe', 'hr', 'div', 'span', 'b', 'i', 'sub', 'sup'
 ]);
 
 export const sanitizeHtml = (htmlInput: string): string => {

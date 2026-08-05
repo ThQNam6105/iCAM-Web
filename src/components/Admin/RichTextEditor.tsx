@@ -12,6 +12,7 @@ import {
   Quote,
   Link as LinkIcon,
   Image as ImageIcon,
+  Video,
   RemoveFormatting,
   Maximize2,
   Minimize2,
@@ -119,6 +120,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const videoFileInputRef = useRef<HTMLInputElement>(null);
 
   // Local inline image upload handler
   const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,14 +137,47 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     reader.readAsDataURL(file);
   };
 
+  // Local inline video upload handler
+  const handleInlineVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const base64Data = evt.target?.result as string;
+      const videoHtml = `<video controls style="max-width:100%; border-radius:12px; margin: 1rem 0;" src="${base64Data}"></video>`;
+      execCmd('insertHTML', videoHtml);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const insertImage = () => {
-    // Open local file picker or ask for URL
     if (confirm('Bấm OK để TẢI ẢNH TỪ MÁY TÍNH, hoặc bấm CANCEL để dán đường dẫn URL ảnh!')) {
       imageFileInputRef.current?.click();
     } else {
       const url = prompt('Nhập đường dẫn hình ảnh (URL):', 'https://');
       if (url) {
         execCmd('insertImage', url);
+      }
+    }
+  };
+
+  const insertVideo = () => {
+    if (confirm('Bấm OK để TẢI CLIP VIDEO TỪ MÁY TÍNH, hoặc bấm CANCEL để dán đường dẫn Video/YouTube URL!')) {
+      videoFileInputRef.current?.click();
+    } else {
+      const url = prompt('Nhập đường dẫn Video URL (MP4, YouTube, Vimeo...):', 'https://');
+      if (url) {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+          const ytId = url.split('v=')[1] || url.split('/').pop();
+          const iframeHtml = `<iframe width="100%" height="380" src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen style="border-radius:12px; margin: 1rem 0;"></iframe>`;
+          execCmd('insertHTML', iframeHtml);
+        } else {
+          const videoHtml = `<video controls style="max-width:100%; border-radius:12px; margin: 1rem 0;" src="${url}"></video>`;
+          execCmd('insertHTML', videoHtml);
+        }
       }
     }
   };
@@ -161,6 +196,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ref={imageFileInputRef}
         accept="image/*"
         onChange={handleInlineImageUpload}
+        style={{ display: 'none' }}
+      />
+      <input
+        type="file"
+        ref={videoFileInputRef}
+        accept="video/*"
+        onChange={handleInlineVideoUpload}
         style={{ display: 'none' }}
       />
 
@@ -347,6 +389,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             title="Chèn hình ảnh vào bài viết"
           >
             <ImageIcon size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={insertVideo}
+            className={styles.toolBtn}
+            title="Chèn video clip ngắn / YouTube vào bài viết"
+          >
+            <Video size={15} />
           </button>
         </div>
 
