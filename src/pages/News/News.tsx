@@ -259,9 +259,12 @@ export const News: React.FC = () => {
               <p className={styles.leadExcerpt}>
                 {language === 'en' ? (selectedArticle.excerptEn || selectedArticle.excerpt) : selectedArticle.excerpt}
               </p>
-              <p>
-                {language === 'en' ? (selectedArticle.contentEn || selectedArticle.content) : selectedArticle.content}
-              </p>
+              <div
+                className={styles.articleFullContent}
+                dangerouslySetInnerHTML={{
+                  __html: language === 'en' ? (selectedArticle.contentEn || selectedArticle.content) : selectedArticle.content,
+                }}
+              />
             </div>
 
             <div className={styles.modalFooter}>

@@ -20,6 +20,8 @@ interface PostEditModalProps {
   onClose: () => void;
 }
 
+import { RichTextEditor } from './RichTextEditor';
+
 export const PostEditModal: React.FC<PostEditModalProps> = ({
   isOpen,
   postToEdit,
@@ -261,24 +263,20 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Nội dung chi tiết bài viết (Tiếng Việt) *</label>
-              <textarea
-                rows={5}
-                placeholder="Nội dung bài viết chi tiết..."
+              <RichTextEditor
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className={styles.textarea}
+                onChange={setContent}
+                placeholder="Soạn thảo nội dung bài viết Tiếng Việt như trên Word..."
               />
               {errors.content && <span className={styles.errorText}>{errors.content}</span>}
             </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Nội dung chi tiết bài viết (Tiếng Anh)</label>
-              <textarea
-                rows={4}
-                placeholder="Full content in English..."
+              <RichTextEditor
                 value={contentEn}
-                onChange={(e) => setContentEn(e.target.value)}
-                className={styles.textarea}
+                onChange={setContentEn}
+                placeholder="Full article content in English..."
               />
             </div>
 

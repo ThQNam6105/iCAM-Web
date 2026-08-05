@@ -1,0 +1,141 @@
+.editorContainer {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editorContainer:focus-within {
+  border-color: #F58220;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.2);
+}
+
+/* Word-like Formatting Toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: #0f1c3f;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 0.3rem;
+}
+
+.toolBtn {
+  background: transparent;
+  color: #cbd5e1;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.toolBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.toolBtnActive {
+  background: rgba(245, 130, 32, 0.25);
+  color: #F58220;
+}
+
+.selectHeader {
+  background: #132247;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.selectHeader option {
+  background: #132247;
+  color: #ffffff;
+}
+
+/* Content Editable Area */
+.editableContent {
+  min-height: 200px;
+  max-height: 450px;
+  padding: 1rem 1.25rem;
+  color: #ffffff;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  outline: none;
+  overflow-y: auto;
+}
+
+.editableContent[contenteditable='true']:empty:before {
+  content: attr(data-placeholder);
+  color: #64748b;
+  pointer-events: none;
+  display: block;
+}
+
+/* Internal HTML Formatting Styles inside Editor */
+.editableContent h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #F58220;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.editableContent h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0.75rem 0 0.4rem 0;
+}
+
+.editableContent blockquote {
+  border-left: 4px solid #F58220;
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  color: #cbd5e1;
+  font-style: italic;
+  background: rgba(245, 130, 32, 0.08);
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  border-radius: 0 6px 6px 0;
+}
+
+.editableContent ul,
+.editableContent ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.editableContent a {
+  color: #F58220;
+  text-decoration: underline;
+}
+
+.editableContent img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+}

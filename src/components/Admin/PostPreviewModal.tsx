@@ -60,7 +60,10 @@ export const PostPreviewModal: React.FC<PostPreviewModalProps> = ({ isOpen, post
               <span>Trạng thái: {post.status || 'draft'}</span>
             </div>
             <p className={styles.excerpt}>{post.excerpt || 'Chưa có tóm tắt bài viết...'}</p>
-            <div className={styles.content}>{post.content || 'Chưa có nội dung chi tiết...'}</div>
+            <div
+              className={styles.content}
+              dangerouslySetInnerHTML={{ __html: post.content || 'Chưa có nội dung chi tiết...' }}
+            />
           </div>
         </div>
       </div>
