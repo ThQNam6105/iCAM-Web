@@ -1,4 +1,5 @@
 import { articlesData, type Article } from '../data/newsData';
+import { supabase } from './supabaseClient';
 
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v3';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
@@ -44,6 +45,46 @@ export const calculateReadingTime = (content: string): string => {
   const words = content.trim().split(/\s+/).length;
   const minutes = Math.max(1, Math.ceil(words / 180));
   return `${minutes} phút đọc`;
+};
+
+// Sync and fetch posts from Supabase Database
+export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
+  try {
+    const { data, error } = await supabase.from('news_posts').select('*').order('created_at', { ascending: false });
+    if (!error && data && data.length > 0) {
+      const postsFromDb: DynamicNewsItem[] = data.map((item) => ({
+        id: item.id,
+        title: item.title,
+        titleEn: item.title_en || item.title,
+        slug: item.slug,
+        category: item.category,
+        categoryLabel: item.category_label,
+        categoryLabelEn: item.category_label_en,
+        status: item.status as PostStatus,
+        author: item.author || 'iCANCAM Editor',
+        excerpt: item.excerpt,
+        excerptEn: item.excerpt_en || item.excerpt,
+        content: item.content,
+        contentEn: item.content_en || item.content,
+        image: item.image,
+        url: item.url || '/news',
+        date: item.date || item.published_at,
+        publishedAt: item.published_at,
+        readingTime: item.reading_time || '3 phút đọc',
+        featured: item.featured ?? true,
+        isCustom: item.is_custom ?? true,
+        tags: item.tags || ['Anh ngữ', 'Giáo dục'],
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
+      }));
+
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
+      return postsFromDb;
+    }
+  } catch (err) {
+    console.warn('Supabase table not created yet or offline, using local storage cache:', err);
+  }
+  return getAllNewsPosts();
 };
 
 // Get raw combined posts from storage (seed with default data if empty)
@@ -125,6 +166,39 @@ export const getFilteredNewsPosts = (options: PostFilterOptions): DynamicNewsIte
   return posts;
 };
 
+// Helper to sync single post to Supabase
+const syncPostToSupabase = async (post: DynamicNewsItem) => {
+  try {
+    await supabase.from('news_posts').upsert({
+      id: String(post.id),
+      title: post.title,
+      title_en: post.titleEn,
+      slug: post.slug,
+      category: post.category,
+      category_label: post.categoryLabel,
+      category_label_en: post.categoryLabelEn,
+      status: post.status,
+      author: post.author,
+      excerpt: post.excerpt,
+      excerpt_en: post.excerptEn,
+      content: post.content,
+      content_en: post.contentEn,
+      image: post.image,
+      url: post.url,
+      date: post.date,
+      published_at: post.publishedAt,
+      reading_time: post.readingTime,
+      featured: post.featured,
+      is_custom: post.isCustom,
+      tags: post.tags,
+      created_at: post.createdAt,
+      updated_at: post.updatedAt,
+    });
+  } catch (err) {
+    console.warn('Supabase sync warning:', err);
+  }
+};
+
 // Create new post
 export const createNewsPost = (
   data: Omit<DynamicNewsItem, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>
@@ -145,6 +219,10 @@ export const createNewsPost = (
 
   const updatedPosts = [createdPost, ...posts];
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedPosts));
+
+  // Sync background to Supabase
+  syncPostToSupabase(createdPost);
+
   return createdPost;
 };
 
@@ -172,6 +250,10 @@ export const updateNewsPost = (
 
   posts[index] = updatedPost;
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+
+  // Sync background to Supabase
+  syncPostToSupabase(updatedPost);
+
   return updatedPost;
 };
 
@@ -182,6 +264,10 @@ export const deleteNewsPost = (id: string | number): boolean => {
     const filtered = posts.filter((post) => String(post.id) !== String(id));
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
+
+    // Async delete from Supabase
+    supabase.from('news_posts').delete().eq('id', String(id)).then();
+
     return true;
   } catch (error) {
     console.error('Error deleting news post:', error);

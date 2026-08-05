@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   FileText,
   CheckCircle,
@@ -17,6 +17,7 @@ import {
   createNewsPost,
   updateNewsPost,
   deleteNewsPost,
+  fetchPostsFromSupabase,
   type DynamicNewsItem,
   type PostStatus
 } from '../../services/newsService';
@@ -49,6 +50,12 @@ export const AdminDashboard: React.FC = () => {
   const loadPosts = () => {
     setRefreshKey((prev) => prev + 1);
   };
+
+  useEffect(() => {
+    fetchPostsFromSupabase().then(() => {
+      loadPosts();
+    });
+  }, []);
 
   const allRawPosts = useMemo(() => {
     return getAllNewsPosts();
