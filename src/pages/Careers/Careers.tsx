@@ -222,6 +222,22 @@ export const Careers: React.FC = () => {
     });
   }, []);
 
+  const parseBulletItems = (input: string | string[]): string[] => {
+    if (!input) return [];
+    if (Array.isArray(input)) {
+      return input.flatMap((item) =>
+        item
+          .split(/\n|•/)
+          .map((s) => s.replace(/^[-•\s]+/, '').trim())
+          .filter((s) => s.length > 0)
+      );
+    }
+    return input
+      .split(/\n|•/)
+      .map((s) => s.replace(/^[-•\s]+/, '').trim())
+      .filter((s) => s.length > 0);
+  };
+
   const mappedDynamic: Job[] = dynamicJobs.map((j, idx) => ({
     id: 1000 + idx,
     category: j.department.includes('Đào Tạo') ? 'academic' : j.department.includes('Tuyển Sinh') ? 'sales' : 'ops',
@@ -239,10 +255,10 @@ export const Careers: React.FC = () => {
     salaryEn: j.salary,
     descVi: j.description,
     descEn: j.description,
-    requirementsVi: [j.requirements],
-    requirementsEn: [j.requirements],
-    benefitsVi: [j.benefits],
-    benefitsEn: [j.benefits],
+    requirementsVi: parseBulletItems(j.requirements),
+    requirementsEn: parseBulletItems(j.requirements),
+    benefitsVi: parseBulletItems(j.benefits),
+    benefitsEn: parseBulletItems(j.benefits),
   }));
 
   const allCombinedJobs = mappedDynamic.length > 0 ? mappedDynamic : jobsData;
@@ -451,7 +467,7 @@ export const Careers: React.FC = () => {
                 <div className={styles.modalSection}>
                   <h3>{t.careers.modalReqTitle}</h3>
                   <ul className={styles.bulletList}>
-                    {(language === 'en' ? selectedJob.requirementsEn : selectedJob.requirementsVi).map((req, idx) => (
+                    {parseBulletItems(language === 'en' ? selectedJob.requirementsEn : selectedJob.requirementsVi).map((req, idx) => (
                       <li key={idx}><CheckCircle2 size={16} color="#F58220" /> <span>{req}</span></li>
                     ))}
                   </ul>
@@ -460,7 +476,7 @@ export const Careers: React.FC = () => {
                 <div className={styles.modalSection}>
                   <h3>{t.careers.modalBenTitle}</h3>
                   <ul className={styles.bulletList}>
-                    {(language === 'en' ? selectedJob.benefitsEn : selectedJob.benefitsVi).map((ben, idx) => (
+                    {parseBulletItems(language === 'en' ? selectedJob.benefitsEn : selectedJob.benefitsVi).map((ben, idx) => (
                       <li key={idx}><Star size={16} color="#F58220" /> <span>{ben}</span></li>
                     ))}
                   </ul>
