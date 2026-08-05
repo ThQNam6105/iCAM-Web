@@ -13,7 +13,7 @@ import styles from './News.module.css';
 import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
-import { getPublicNewsPosts, type DynamicNewsItem } from '../../services/newsService';
+import { getPublicNewsPosts, fetchPostsFromSupabase, type DynamicNewsItem } from '../../services/newsService';
 
 import { generateTableOfContents } from '../../utils/tocGenerator';
 import { TableOfContents } from '../../components/TableOfContents/TableOfContents';
@@ -30,11 +30,20 @@ export const News: React.FC = () => {
   });
 
   React.useEffect(() => {
-    const handleFocus = () => {
+    fetchPostsFromSupabase().then(() => {
       const dynamic = getPublicNewsPosts();
       if (dynamic.length > 0) {
         setArticles(dynamic);
       }
+    });
+
+    const handleFocus = () => {
+      fetchPostsFromSupabase().then(() => {
+        const dynamic = getPublicNewsPosts();
+        if (dynamic.length > 0) {
+          setArticles(dynamic);
+        }
+      });
     };
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
