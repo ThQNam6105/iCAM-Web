@@ -67,8 +67,8 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
         <div className={styles.header}>
           <h3 className={styles.title}>
             {jobToEdit ? 'Chỉnh Sửa Vị Trí Tuyển Dụng' : 'Tạo Vị Trí Tuyển Dụng Mới'}
