@@ -7,6 +7,23 @@
   flex-direction: column;
 }
 
+.fullscreenEditor {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #0B1635;
+  border-radius: 0;
+  border: none;
+  height: 100vh;
+}
+
+.fullscreenEditor .editableContent {
+  max-height: calc(100vh - 70px);
+  min-height: calc(100vh - 70px);
+  padding: 3rem 10%;
+  font-size: 1.1rem;
+}
+
 .editorContainer:focus-within {
   border-color: #F58220;
   box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.2);
@@ -56,11 +73,6 @@
   color: #ffffff;
 }
 
-.toolBtnActive {
-  background: rgba(245, 130, 32, 0.25);
-  color: #F58220;
-}
-
 .selectHeader {
   background: #132247;
   color: #ffffff;
@@ -77,10 +89,44 @@
   color: #ffffff;
 }
 
+/* Find and Replace Bar */
+.findReplaceBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(245, 130, 32, 0.1);
+  border-bottom: 1px solid rgba(245, 130, 32, 0.2);
+}
+
+.searchInput {
+  background: #132247;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  color: #ffffff;
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.replaceBtn {
+  background: #F58220;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 /* Content Editable Area */
 .editableContent {
-  min-height: 200px;
-  max-height: 450px;
+  min-height: 220px;
+  max-height: 480px;
   padding: 1rem 1.25rem;
   color: #ffffff;
   font-size: 0.95rem;

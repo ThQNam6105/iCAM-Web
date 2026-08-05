@@ -15,6 +15,9 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 import { getPublicNewsPosts, type DynamicNewsItem } from '../../services/newsService';
 
+import { generateTableOfContents } from '../../utils/tocGenerator';
+import { TableOfContents } from '../../components/TableOfContents/TableOfContents';
+
 export const News: React.FC = () => {
   const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -259,12 +262,19 @@ export const News: React.FC = () => {
               <p className={styles.leadExcerpt}>
                 {language === 'en' ? (selectedArticle.excerptEn || selectedArticle.excerpt) : selectedArticle.excerpt}
               </p>
-              <div
-                className={styles.articleFullContent}
-                dangerouslySetInnerHTML={{
-                  __html: language === 'en' ? (selectedArticle.contentEn || selectedArticle.content) : selectedArticle.content,
-                }}
-              />
+              {(() => {
+                const rawContent = language === 'en' ? (selectedArticle.contentEn || selectedArticle.content) : selectedArticle.content;
+                const { cleanHtml, toc } = generateTableOfContents(rawContent);
+                return (
+                  <>
+                    <TableOfContents toc={toc} />
+                    <div
+                      className={styles.articleFullContent}
+                      dangerouslySetInnerHTML={{ __html: cleanHtml }}
+                    />
+                  </>
+                );
+              })()}
             </div>
 
             <div className={styles.modalFooter}>

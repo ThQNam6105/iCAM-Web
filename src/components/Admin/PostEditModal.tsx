@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, Upload, Save, RefreshCw } from 'lucide-react';
+import { Eye, Upload, Save, RefreshCw, History } from 'lucide-react';
 import {
   type DynamicNewsItem,
   type PostStatus,
@@ -21,6 +21,10 @@ interface PostEditModalProps {
 }
 
 import { RichTextEditor } from './RichTextEditor';
+import { SeoPanel } from './SeoPanel';
+import { QualityChecker } from './QualityChecker';
+import { RevisionHistoryModal } from './RevisionHistoryModal';
+import { createPostRevision, getPostRevisions, type PostRevision } from '../../services/revisionService';
 
 export const PostEditModal: React.FC<PostEditModalProps> = ({
   isOpen,
@@ -43,6 +47,18 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [content, setContent] = useState(postToEdit?.content || '');
   const [contentEn, setContentEn] = useState(postToEdit?.contentEn || '');
   const [errors, setErrors] = useState<ValidationError>({});
+
+  // SEO States
+  const [metaTitle, setMetaTitle] = useState(postToEdit?.title || '');
+  const [metaDescription, setMetaDescription] = useState(postToEdit?.excerpt || '');
+  const [ogImage, setOgImage] = useState(postToEdit?.image || '');
+  const [canonicalUrl, setCanonicalUrl] = useState('');
+
+  // Revision History States
+  const [isRevisionOpen, setIsRevisionOpen] = useState(false);
+  const [revisions] = useState<PostRevision[]>(() =>
+    postToEdit?.id ? getPostRevisions(postToEdit.id) : []
+  );
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [lastAutosave, setLastAutosave] = useState<string | null>(null);
@@ -98,6 +114,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     }
 
     onSave(postData);
+    if (postToEdit?.id) {
+      createPostRevision({ ...postData, id: postToEdit.id });
+    }
     clearDraftAutosave();
     onClose();
   };
@@ -125,6 +144,16 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </h2>
 
             <div className={styles.headerActions}>
+              {revisions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setIsRevisionOpen(true)}
+                  className={styles.previewBtn}
+                  title="Xem lịch sử phiên bản"
+                >
+                  <History size={16} /> Phiên bản ({revisions.length})
+                </button>
+              )}
               {lastAutosave && (
                 <span className={styles.autosaveBadge}>
                   <RefreshCw size={12} /> Đã lưu nháp {lastAutosave}
@@ -280,6 +309,26 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               />
             </div>
 
+            <SeoPanel
+              slug={slug}
+              metaTitle={metaTitle}
+              metaDescription={metaDescription}
+              ogImage={ogImage}
+              canonicalUrl={canonicalUrl}
+              onChangeMetaTitle={setMetaTitle}
+              onChangeMetaDescription={setMetaDescription}
+              onChangeOgImage={setOgImage}
+              onChangeCanonicalUrl={setCanonicalUrl}
+            />
+
+            <QualityChecker
+              title={title}
+              excerpt={excerpt}
+              content={content}
+              image={image}
+              metaDescription={metaDescription}
+            />
+
             <div className={styles.modalActions}>
               <button type="button" onClick={onClose} className={styles.cancelBtn}>
                 Hủy Bỏ
@@ -297,6 +346,20 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
         isOpen={isPreviewOpen}
         post={currentPreviewData}
         onClose={() => setIsPreviewOpen(false)}
+      />
+
+      <RevisionHistoryModal
+        isOpen={isRevisionOpen}
+        revisions={revisions}
+        onRestore={(rev) => {
+          setTitle(rev.title);
+          setContent(rev.content);
+          setExcerpt(rev.excerpt);
+          setStatus(rev.status as PostStatus);
+          setIsRevisionOpen(false);
+          showToast(`Đã khôi phục phiên bản v${rev.versionNumber}!`, 'success');
+        }}
+        onClose={() => setIsRevisionOpen(false)}
       />
     </>
   );

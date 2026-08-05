@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   Bold,
   Italic,
@@ -12,8 +12,19 @@ import {
   Quote,
   Link as LinkIcon,
   Image as ImageIcon,
-  RemoveFormatting
+  RemoveFormatting,
+  Maximize2,
+  Minimize2,
+  FileDown,
+  Search,
+  Undo2,
+  Redo2,
+  Minus,
+  Sparkles,
 } from 'lucide-react';
+import { cleanWordHtml, parseWordDocument } from '../../services/importService';
+import { sanitizeHtml } from '../../services/sanitizerService';
+import { EDUCATION_BLOCKS } from './EducationBlocks';
 import styles from './RichTextEditor.module.css';
 
 interface RichTextEditorProps {
@@ -28,6 +39,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Nhập nội dung bài viết...',
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [replaceText, setReplaceText] = useState('');
 
   // Sync value from props to contenteditable div when prop changes externally
   useEffect(() => {
@@ -38,15 +55,60 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const execCmd = (command: string, val: string = '') => {
     document.execCommand(command, false, val);
+    triggerChange();
+  };
+
+  const triggerChange = () => {
     if (contentRef.current) {
-      onChange(contentRef.current.innerHTML);
+      const sanitized = sanitizeHtml(contentRef.current.innerHTML);
+      onChange(sanitized);
     }
   };
 
   const handleInput = () => {
-    if (contentRef.current) {
-      onChange(contentRef.current.innerHTML);
+    triggerChange();
+  };
+
+  // Clean MS Word Paste listener (Ctrl+V)
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const htmlData = e.clipboardData.getData('text/html');
+    if (htmlData && htmlData.includes('mso-')) {
+      e.preventDefault();
+      const cleaned = cleanWordHtml(htmlData);
+      document.execCommand('insertHTML', false, cleaned);
+      triggerChange();
     }
+  };
+
+  // Word DOCX File Import
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const parsedHtml = await parseWordDocument(file);
+      if (contentRef.current) {
+        contentRef.current.innerHTML += parsedHtml;
+        triggerChange();
+      }
+    } catch (err) {
+      console.error('Error importing Word document:', err);
+    }
+  };
+
+  // Insert Custom Educational Block
+  const insertEducationBlock = (blockHtml: string) => {
+    execCmd('insertHTML', blockHtml);
+  };
+
+  // Find and Replace Inside Article
+  const handleFindAndReplace = () => {
+    if (!searchText || !contentRef.current) return;
+    const currentContent = contentRef.current.innerHTML;
+    const regex = new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    const replaced = currentContent.replace(regex, replaceText);
+    contentRef.current.innerHTML = replaced;
+    triggerChange();
   };
 
   const insertLink = () => {
@@ -64,9 +126,39 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   return (
-    <div className={styles.editorContainer}>
+    <div className={`${styles.editorContainer} ${isFullscreen ? styles.fullscreenEditor : ''}`}>
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept=".docx,.doc,.txt,.html"
+        onChange={handleFileUpload}
+        style={{ display: 'none' }}
+      />
+
       {/* Word-like Formatting Toolbar */}
       <div className={styles.toolbar}>
+        {/* Undo / Redo */}
+        <div className={styles.toolbarGroup}>
+          <button
+            type="button"
+            onClick={() => execCmd('undo')}
+            className={styles.toolBtn}
+            title="Hoàn tác (Undo - Ctrl+Z)"
+          >
+            <Undo2 size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('redo')}
+            className={styles.toolBtn}
+            title="Làm lại (Redo - Ctrl+Shift+Z)"
+          >
+            <Redo2 size={15} />
+          </button>
+        </div>
+
+        <div className={styles.divider} />
+
         {/* Headings */}
         <select
           onChange={(e) => execCmd('formatBlock', e.target.value)}
@@ -88,7 +180,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="In đậm (Bold - Ctrl+B)"
           >
-            <Bold size={16} />
+            <Bold size={15} />
           </button>
           <button
             type="button"
@@ -96,7 +188,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="In nghiêng (Italic - Ctrl+I)"
           >
-            <Italic size={16} />
+            <Italic size={15} />
           </button>
           <button
             type="button"
@@ -104,7 +196,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Gạch chân (Underline - Ctrl+U)"
           >
-            <Underline size={16} />
+            <Underline size={15} />
           </button>
           <button
             type="button"
@@ -112,7 +204,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Gạch ngang (Strikethrough)"
           >
-            <Strikethrough size={16} />
+            <Strikethrough size={15} />
           </button>
         </div>
 
@@ -126,7 +218,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Danh sách gạch đầu dòng (Bullet List)"
           >
-            <List size={16} />
+            <List size={15} />
           </button>
           <button
             type="button"
@@ -134,7 +226,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Danh sách đánh số (Numbered List)"
           >
-            <ListOrdered size={16} />
+            <ListOrdered size={15} />
           </button>
         </div>
 
@@ -148,7 +240,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Căn trái"
           >
-            <AlignLeft size={16} />
+            <AlignLeft size={15} />
           </button>
           <button
             type="button"
@@ -156,7 +248,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Căn giữa"
           >
-            <AlignCenter size={16} />
+            <AlignCenter size={15} />
           </button>
           <button
             type="button"
@@ -164,9 +256,32 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Căn phải"
           >
-            <AlignRight size={16} />
+            <AlignRight size={15} />
           </button>
         </div>
+
+        <div className={styles.divider} />
+
+        {/* Custom Education Blocks Dropdown */}
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              insertEducationBlock(e.target.value);
+              e.target.value = '';
+            }
+          }}
+          className={styles.selectHeader}
+          defaultValue=""
+        >
+          <option value="" disabled>
+            ✨ Chèn Khung Giáo Dục iCANCAM...
+          </option>
+          {EDUCATION_BLOCKS.map((block) => (
+            <option key={block.id} value={block.html}>
+              {block.name}
+            </option>
+          ))}
+        </select>
 
         <div className={styles.divider} />
 
@@ -178,7 +293,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Trích dẫn (Blockquote)"
           >
-            <Quote size={16} />
+            <Quote size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('insertHorizontalRule')}
+            className={styles.toolBtn}
+            title="Đường phân cách (Divider)"
+          >
+            <Minus size={15} />
           </button>
           <button
             type="button"
@@ -186,7 +309,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Chèn đường dẫn (Link)"
           >
-            <LinkIcon size={16} />
+            <LinkIcon size={15} />
           </button>
           <button
             type="button"
@@ -194,7 +317,37 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.toolBtn}
             title="Chèn hình ảnh vào bài viết"
           >
-            <ImageIcon size={16} />
+            <ImageIcon size={15} />
+          </button>
+        </div>
+
+        <div className={styles.divider} />
+
+        {/* Import & Search & Fullscreen */}
+        <div className={styles.toolbarGroup}>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={styles.toolBtn}
+            title="Nhập tài liệu MS Word (.docx)"
+          >
+            <FileDown size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowSearch(!showSearch)}
+            className={styles.toolBtn}
+            title="Tìm kiếm & Thay thế"
+          >
+            <Search size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className={styles.toolBtn}
+            title={isFullscreen ? 'Thoát toàn màn hình' : 'Chế độ Tập Trung Soạn Thảo (Fullscreen)'}
+          >
+            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
         </div>
 
@@ -207,15 +360,39 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           className={styles.toolBtn}
           title="Xóa định dạng (Clear Formatting)"
         >
-          <RemoveFormatting size={16} />
+          <RemoveFormatting size={15} />
         </button>
       </div>
+
+      {/* Find and Replace Bar */}
+      {showSearch && (
+        <div className={styles.findReplaceBar}>
+          <input
+            type="text"
+            placeholder="Từ cần tìm..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className={styles.searchInput}
+          />
+          <input
+            type="text"
+            placeholder="Thay thế bằng..."
+            value={replaceText}
+            onChange={(e) => setReplaceText(e.target.value)}
+            className={styles.searchInput}
+          />
+          <button type="button" onClick={handleFindAndReplace} className={styles.replaceBtn}>
+            <Sparkles size={14} /> Thay Thế All
+          </button>
+        </div>
+      )}
 
       {/* Editable Visual Area */}
       <div
         ref={contentRef}
         contentEditable
         onInput={handleInput}
+        onPaste={handlePaste}
         className={styles.editableContent}
         data-placeholder={placeholder}
         suppressContentEditableWarning

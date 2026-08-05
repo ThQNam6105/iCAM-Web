@@ -1,0 +1,48 @@
+.tocCard {
+  background: rgba(245, 130, 32, 0.05);
+  border: 1px solid rgba(245, 130, 32, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.tocHeader {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0B1635;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.level2 {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.level3 {
+  font-weight: 500;
+  font-size: 0.86rem;
+  padding-left: 1rem;
+}
+
+.tocLink {
+  color: #F58220;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.tocLink:hover {
+  text-decoration: underline;
+  color: #0B1635;
+}
