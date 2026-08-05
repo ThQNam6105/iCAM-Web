@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard,
   FileText,
   FolderTree,
   Image as ImageIcon,
@@ -42,16 +41,8 @@ export const AdminSidebar: React.FC = () => {
           end
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <LayoutDashboard size={18} />
-          <span>Dashboard</span>
-        </NavLink>
-
-        <NavLink
-          to="/admin"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-        >
           <FileText size={18} />
-          <span>Quản lý Bài viết</span>
+          <span>Quản lý Bài viết & Dashboard</span>
         </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Tính năng phát triển trong tương lai">
