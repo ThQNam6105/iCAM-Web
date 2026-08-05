@@ -75,10 +75,36 @@
   gap: 0.4rem;
 }
 
+.labelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .label {
   font-size: 0.85rem;
   font-weight: 700;
   color: #cbd5e1;
+}
+
+.bulletBtn {
+  background: rgba(245, 130, 32, 0.15);
+  color: #F58220;
+  border: 1px solid rgba(245, 130, 32, 0.3);
+  border-radius: 6px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s;
+}
+
+.bulletBtn:hover {
+  background: #F58220;
+  color: #ffffff;
 }
 
 .input,
