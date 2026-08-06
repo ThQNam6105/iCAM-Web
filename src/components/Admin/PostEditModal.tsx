@@ -10,10 +10,6 @@ import {
   ZoomOut,
   RotateCcw,
   Move,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
 } from 'lucide-react';
 import {
   type DynamicNewsItem,
@@ -79,9 +75,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [imageZoom, setImageZoom] = useState<number>(postToEdit?.imageZoom ?? 100);
   const [panX, setPanX] = useState<number>(postToEdit?.panX ?? 50);
   const [panY, setPanY] = useState<number>(postToEdit?.panY ?? 50);
-  const [excerptAlign, setExcerptAlign] = useState<'left' | 'center' | 'right' | 'justify'>(
-    postToEdit?.excerptAlign || 'left'
-  );
 
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef<{ x: number; y: number; startPanX: number; startPanY: number }>({
@@ -201,7 +194,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
       panY,
       excerpt,
       excerptEn: excerptEn || excerpt,
-      excerptAlign,
       content,
       contentEn: contentEn || content,
       url: '/news',
@@ -460,50 +452,13 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <div className={styles.labelHeaderRow}>
-                <label className={styles.label}>Tóm tắt bài viết (Tiếng Việt) *</label>
-                <div className={styles.excerptAlignGroup}>
-                  <button
-                    type="button"
-                    onClick={() => setExcerptAlign('left')}
-                    className={`${styles.excerptAlignBtn} ${excerptAlign === 'left' ? styles.excerptAlignBtnActive : ''}`}
-                    title="Căn trái (Left)"
-                  >
-                    <AlignLeft size={13} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setExcerptAlign('center')}
-                    className={`${styles.excerptAlignBtn} ${excerptAlign === 'center' ? styles.excerptAlignBtnActive : ''}`}
-                    title="Căn giữa (Center)"
-                  >
-                    <AlignCenter size={13} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setExcerptAlign('right')}
-                    className={`${styles.excerptAlignBtn} ${excerptAlign === 'right' ? styles.excerptAlignBtnActive : ''}`}
-                    title="Căn phải (Right)"
-                  >
-                    <AlignRight size={13} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setExcerptAlign('justify')}
-                    className={`${styles.excerptAlignBtn} ${excerptAlign === 'justify' ? styles.excerptAlignBtnActive : ''}`}
-                    title="Căn đều hai bên (Justify)"
-                  >
-                    <AlignJustify size={13} />
-                  </button>
-                </div>
-              </div>
+              <label className={styles.label}>Tóm tắt bài viết (Tiếng Việt) *</label>
               <textarea
                 rows={2}
                 placeholder="Tóm tắt nội dung bài viết..."
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 className={styles.textarea}
-                style={{ textAlign: excerptAlign }}
               />
               {errors.excerpt && <span className={styles.errorText}>{errors.excerpt}</span>}
             </div>

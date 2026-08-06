@@ -218,6 +218,7 @@
   color: #64748b;
   line-height: 1.65;
   margin-bottom: 2rem;
+  text-align: justify;
 }
 
 .readMoreBtn {
@@ -367,6 +368,7 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-align: justify;
 }
 
 .articleReadMoreLink {
@@ -643,6 +645,7 @@
   font-weight: 600;
   color: #09265F;
   margin-bottom: 1.25rem;
+  text-align: justify;
 }
 
 .modalFooter {
