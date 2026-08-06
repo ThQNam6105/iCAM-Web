@@ -1,5 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, Upload, Save, RefreshCw, History } from 'lucide-react';
+import {
+  Eye,
+  Upload,
+  Save,
+  RefreshCw,
+  History,
+  Sliders,
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  ArrowUp,
+  ArrowDown,
+  Maximize2,
+  Minimize2,
+} from 'lucide-react';
 import {
   type DynamicNewsItem,
   type PostStatus,
@@ -61,6 +75,12 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [categoryLabel, setCategoryLabel] = useState(postToEdit?.categoryLabel || 'SỰ KIỆN NỔI BẬT');
   const [categoryLabelEn, setCategoryLabelEn] = useState(postToEdit?.categoryLabelEn || 'FEATURED EVENT');
   const [image, setImage] = useState(postToEdit?.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop');
+  const [imagePosition, setImagePosition] = useState<'center' | 'top' | 'bottom' | 'left' | 'right'>(
+    postToEdit?.imagePosition || 'center'
+  );
+  const [imageFit, setImageFit] = useState<'cover' | 'contain'>(
+    postToEdit?.imageFit || 'cover'
+  );
   const [excerpt, setExcerpt] = useState(postToEdit?.excerpt || '');
   const [excerptEn, setExcerptEn] = useState(postToEdit?.excerptEn || '');
   const [content, setContent] = useState(postToEdit?.content || '');
@@ -116,6 +136,8 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
       categoryLabel,
       categoryLabelEn: categoryLabelEn || categoryLabel,
       image: image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
+      imagePosition,
+      imageFit,
       excerpt,
       excerptEn: excerptEn || excerpt,
       content,
@@ -292,6 +314,80 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 </button>
               </div>
               {errors.image && <span className={styles.errorText}>{errors.image}</span>}
+
+              {image && (
+                <div className={styles.coverControlPanel}>
+                  <div className={styles.coverControlTitle}>
+                    <Sliders size={15} color="#F58220" /> Căn Chỉnh Vị Trí & Trọng Tâm Ảnh Bìa (Cover Image Alignment)
+                  </div>
+
+                  <div className={styles.coverPreviewWrapper}>
+                    <img
+                      src={image}
+                      alt="Preview Cover"
+                      className={styles.coverPreviewImg}
+                      style={{ objectFit: imageFit, objectPosition: imagePosition }}
+                    />
+                  </div>
+
+                  <div className={styles.alignBtnGrid}>
+                    <span className={styles.alignSubLabel}>Trọng tâm vị trí ảnh (Focal Position):</span>
+                    <button
+                      type="button"
+                      onClick={() => setImagePosition('center')}
+                      className={`${styles.alignBtn} ${imagePosition === 'center' ? styles.alignBtnActive : ''}`}
+                    >
+                      <AlignCenter size={13} /> Căn Giữa (Center)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImagePosition('top')}
+                      className={`${styles.alignBtn} ${imagePosition === 'top' ? styles.alignBtnActive : ''}`}
+                    >
+                      <ArrowUp size={13} /> Căn Trên (Top)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImagePosition('bottom')}
+                      className={`${styles.alignBtn} ${imagePosition === 'bottom' ? styles.alignBtnActive : ''}`}
+                    >
+                      <ArrowDown size={13} /> Căn Dưới (Bottom)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImagePosition('left')}
+                      className={`${styles.alignBtn} ${imagePosition === 'left' ? styles.alignBtnActive : ''}`}
+                    >
+                      <AlignLeft size={13} /> Căn Trái (Left)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImagePosition('right')}
+                      className={`${styles.alignBtn} ${imagePosition === 'right' ? styles.alignBtnActive : ''}`}
+                    >
+                      <AlignRight size={13} /> Căn Phải (Right)
+                    </button>
+                  </div>
+
+                  <div className={styles.alignBtnGrid}>
+                    <span className={styles.alignSubLabel}>Chế độ hiển thị lấp đầy (Fit Mode):</span>
+                    <button
+                      type="button"
+                      onClick={() => setImageFit('cover')}
+                      className={`${styles.alignBtn} ${imageFit === 'cover' ? styles.alignBtnActive : ''}`}
+                    >
+                      <Maximize2 size={13} /> Phủ Kín Khung (Cover)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageFit('contain')}
+                      className={`${styles.alignBtn} ${imageFit === 'contain' ? styles.alignBtnActive : ''}`}
+                    >
+                      <Minimize2 size={13} /> Giữ Nguyên Tỷ Lệ (Contain)
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={styles.inputGroup}>

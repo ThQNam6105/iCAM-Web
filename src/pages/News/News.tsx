@@ -158,6 +158,10 @@ export const News: React.FC = () => {
                   src={featuredArticle.image}
                   alt={language === 'en' ? (featuredArticle.titleEn || featuredArticle.title) : featuredArticle.title}
                   className={styles.featuredImage}
+                  style={{
+                    objectFit: featuredArticle.imageFit || 'cover',
+                    objectPosition: featuredArticle.imagePosition || 'center',
+                  }}
                 />
                 <div className={styles.featuredTag}>
                   {language === 'en' ? (featuredArticle.categoryLabelEn || featuredArticle.categoryLabel) : featuredArticle.categoryLabel}
@@ -207,6 +211,10 @@ export const News: React.FC = () => {
                     src={article.image}
                     alt={language === 'en' ? (article.titleEn || article.title) : article.title}
                     className={styles.articleImage}
+                    style={{
+                      objectFit: article.imageFit || 'cover',
+                      objectPosition: article.imagePosition || 'center',
+                    }}
                   />
                   <div className={styles.articleCategoryBadge}>
                     {language === 'en' ? (article.categoryLabelEn || article.categoryLabel) : article.categoryLabel}
@@ -331,6 +339,10 @@ export const News: React.FC = () => {
                 <img
                   src={selectedArticle.image}
                   alt={language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
+                  style={{
+                    objectFit: selectedArticle.imageFit || 'cover',
+                    objectPosition: selectedArticle.imagePosition || 'center',
+                  }}
                 />
               </div>
 

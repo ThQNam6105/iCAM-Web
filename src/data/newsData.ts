@@ -16,6 +16,8 @@ export interface Article {
   content: string;
   contentEn?: string;
   image: string;
+  imagePosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+  imageFit?: 'cover' | 'contain';
 }
 
 const placeholderImg = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop';
