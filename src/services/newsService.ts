@@ -18,6 +18,12 @@ export interface DynamicNewsItem extends Article {
   featured: boolean;
   readingTime: string;
   isCustom?: boolean;
+  ogImage?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  canonicalUrlOverride?: string;
+  noIndex?: boolean;
+  noFollow?: boolean;
 }
 
 export interface PostFilterOptions {

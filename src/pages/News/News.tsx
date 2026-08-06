@@ -301,8 +301,63 @@ export const News: React.FC = () => {
           setTimeout(() => setCopiedLink(false), 3000);
         };
 
+        const schemaTitle = language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title;
+        const schemaExcerpt = language === 'en' ? (selectedArticle.excerptEn || selectedArticle.excerpt) : selectedArticle.excerpt;
+        const schemaOgImage = 'ogImage' in selectedArticle && selectedArticle.ogImage ? selectedArticle.ogImage : selectedArticle.image;
+
+        const newsArticleSchema = {
+          '@context': 'https://schema.org',
+          '@type': 'NewsArticle',
+          'headline': schemaTitle,
+          'description': schemaExcerpt,
+          'image': [schemaOgImage],
+          'datePublished': selectedArticle.date,
+          'author': {
+            '@type': 'Organization',
+            'name': 'iCANCAM English Center',
+            'url': window.location.origin
+          },
+          'publisher': {
+            '@type': 'Organization',
+            'name': 'iCANCAM English Center'
+          },
+          'mainEntityOfPage': {
+            '@type': 'WebPage',
+            '@id': shareUrl
+          }
+        };
+
+        const breadcrumbSchema = {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Trang chủ',
+              'item': window.location.origin
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': 'Tin tức - Sự kiện',
+              'item': `${window.location.origin}/news`
+            },
+            {
+              '@type': 'ListItem',
+              'position': 3,
+              'name': schemaTitle,
+              'item': shareUrl
+            }
+          ]
+        };
+
         return (
           <div className={styles.modalOverlay} onClick={() => handleSelectArticle(null)}>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify([newsArticleSchema, breadcrumbSchema]) }}
+            />
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
               <button className={styles.closeModalBtn} onClick={() => handleSelectArticle(null)}>
                 <X size={24} />

@@ -144,8 +144,12 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   // SEO States
   const [metaTitle, setMetaTitle] = useState(postToEdit?.title || '');
   const [metaDescription, setMetaDescription] = useState(postToEdit?.excerpt || '');
-  const [ogImage, setOgImage] = useState(postToEdit?.image || '');
-  const [canonicalUrl, setCanonicalUrl] = useState('');
+  const [ogTitle, setOgTitle] = useState(postToEdit?.ogTitle || '');
+  const [ogDescription, setOgDescription] = useState(postToEdit?.ogDescription || '');
+  const [ogImage, setOgImage] = useState(postToEdit?.ogImage || '');
+  const [canonicalUrl, setCanonicalUrl] = useState(postToEdit?.canonicalUrlOverride || '');
+  const [noIndex, setNoIndex] = useState(postToEdit?.noIndex || false);
+  const [noFollow, setNoFollow] = useState(postToEdit?.noFollow || false);
 
   // Revision History States
   const [isRevisionOpen, setIsRevisionOpen] = useState(false);
@@ -197,6 +201,12 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
       excerptEn: excerptEn || excerpt,
       content,
       contentEn: contentEn || content,
+      ogTitle,
+      ogDescription,
+      ogImage,
+      canonicalUrlOverride: canonicalUrl,
+      noIndex,
+      noFollow,
       url: '/news',
       author: 'iCANCAM Admin',
       tags: ['Anh ngữ', 'Giáo dục'],
@@ -506,17 +516,26 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             <SeoPanel
               articleTitle={title}
               articleExcerpt={excerpt}
+              articleContent={content}
               coverImage={image}
               slug={slug}
               metaTitle={metaTitle}
               metaDescription={metaDescription}
+              ogTitle={ogTitle}
+              ogDescription={ogDescription}
               ogImage={ogImage}
               canonicalUrlOverride={canonicalUrl}
+              noIndex={noIndex}
+              noFollow={noFollow}
               onChangeSlug={setSlug}
               onChangeMetaTitle={setMetaTitle}
               onChangeMetaDescription={setMetaDescription}
+              onChangeOgTitle={setOgTitle}
+              onChangeOgDescription={setOgDescription}
               onChangeOgImage={setOgImage}
               onChangeCanonicalUrlOverride={setCanonicalUrl}
+              onChangeNoIndex={setNoIndex}
+              onChangeNoFollow={setNoFollow}
             />
 
             <QualityChecker
