@@ -6,13 +6,6 @@ import {
   RefreshCw,
   History,
   Sliders,
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  ArrowUp,
-  ArrowDown,
-  Maximize2,
-  Minimize2,
   ZoomIn,
   ZoomOut,
   RotateCcw,
@@ -79,12 +72,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [categoryLabel, setCategoryLabel] = useState(postToEdit?.categoryLabel || 'SỰ KIỆN NỔI BẬT');
   const [categoryLabelEn, setCategoryLabelEn] = useState(postToEdit?.categoryLabelEn || 'FEATURED EVENT');
   const [image, setImage] = useState(postToEdit?.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop');
-  const [imagePosition, setImagePosition] = useState<'center' | 'top' | 'bottom' | 'left' | 'right'>(
-    postToEdit?.imagePosition || 'center'
-  );
-  const [imageFit, setImageFit] = useState<'cover' | 'contain'>(
-    postToEdit?.imageFit || 'cover'
-  );
   const [imageZoom, setImageZoom] = useState<number>(postToEdit?.imageZoom ?? 100);
   const [panX, setPanX] = useState<number>(postToEdit?.panX ?? 50);
   const [panY, setPanY] = useState<number>(postToEdit?.panY ?? 50);
@@ -202,8 +189,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
       categoryLabel,
       categoryLabelEn: categoryLabelEn || categoryLabel,
       image: image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
-      imagePosition,
-      imageFit,
       imageZoom,
       panX,
       panY,
@@ -407,7 +392,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       alt="Preview Cover"
                       className={styles.coverPreviewImg}
                       style={{
-                        objectFit: imageFit,
+                        objectFit: 'cover',
                         objectPosition: `${panX}% ${panY}%`,
                         transform: `scale(${imageZoom / 100})`,
                         transformOrigin: `${panX}% ${panY}%`,
@@ -455,91 +440,11 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                         setImageZoom(100);
                         setPanX(50);
                         setPanY(50);
-                        setImagePosition('center');
                       }}
                       className={styles.alignBtn}
                       title="Đặt lại Mặc Định"
                     >
                       <RotateCcw size={13} /> Đặt lại
-                    </button>
-                  </div>
-
-                  {/* Position Presets */}
-                  <div className={styles.alignBtnGrid}>
-                    <span className={styles.alignSubLabel}>Góc hiển thị nhanh (Presets):</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanX(50);
-                        setPanY(50);
-                        setImagePosition('center');
-                      }}
-                      className={`${styles.alignBtn} ${panX === 50 && panY === 50 ? styles.alignBtnActive : ''}`}
-                    >
-                      <AlignCenter size={13} /> Căn Giữa (Center)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanX(50);
-                        setPanY(0);
-                        setImagePosition('top');
-                      }}
-                      className={`${styles.alignBtn} ${panX === 50 && panY === 0 ? styles.alignBtnActive : ''}`}
-                    >
-                      <ArrowUp size={13} /> Căn Trên (Top)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanX(50);
-                        setPanY(100);
-                        setImagePosition('bottom');
-                      }}
-                      className={`${styles.alignBtn} ${panX === 50 && panY === 100 ? styles.alignBtnActive : ''}`}
-                    >
-                      <ArrowDown size={13} /> Căn Dưới (Bottom)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanX(0);
-                        setPanY(50);
-                        setImagePosition('left');
-                      }}
-                      className={`${styles.alignBtn} ${panX === 0 && panY === 50 ? styles.alignBtnActive : ''}`}
-                    >
-                      <AlignLeft size={13} /> Căn Trái (Left)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPanX(100);
-                        setPanY(50);
-                        setImagePosition('right');
-                      }}
-                      className={`${styles.alignBtn} ${panX === 100 && panY === 50 ? styles.alignBtnActive : ''}`}
-                    >
-                      <AlignRight size={13} /> Căn Phải (Right)
-                    </button>
-                  </div>
-
-                  {/* Fit Modes */}
-                  <div className={styles.alignBtnGrid}>
-                    <span className={styles.alignSubLabel}>Chế độ hiển thị lấp đầy (Fit Mode):</span>
-                    <button
-                      type="button"
-                      onClick={() => setImageFit('cover')}
-                      className={`${styles.alignBtn} ${imageFit === 'cover' ? styles.alignBtnActive : ''}`}
-                    >
-                      <Maximize2 size={13} /> Phủ Kín Khung (Cover)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setImageFit('contain')}
-                      className={`${styles.alignBtn} ${imageFit === 'contain' ? styles.alignBtnActive : ''}`}
-                    >
-                      <Minimize2 size={13} /> Giữ Nguyên Tỷ Lệ (Contain)
                     </button>
                   </div>
                 </div>
