@@ -36,12 +36,36 @@ export const sanitizeHtml = (htmlInput: string): string => {
           }
         }
 
-        // Clean attributes (remove on* event handlers, style tags, and javascript: links)
+        // Clean attributes (remove on* event handlers and dangerous javascript: URIs)
         const attrNames = Array.from(el.attributes).map((a) => a.name);
         for (const attr of attrNames) {
           const lowerAttr = attr.toLowerCase();
-          if (lowerAttr.startsWith('on') || lowerAttr === 'style') {
+          if (lowerAttr.startsWith('on')) {
             el.removeAttribute(attr);
+          }
+          if (lowerAttr === 'style') {
+            const styleVal = el.getAttribute('style') || '';
+            // Only keep safe inline CSS properties (text-align, color, background-color, etc.)
+            const safeProps = styleVal
+              .split(';')
+              .filter((rule) => {
+                const cleanRule = rule.trim().toLowerCase();
+                return (
+                  cleanRule.startsWith('text-align') ||
+                  cleanRule.startsWith('color') ||
+                  cleanRule.startsWith('background') ||
+                  cleanRule.startsWith('border') ||
+                  cleanRule.startsWith('margin') ||
+                  cleanRule.startsWith('max-width') ||
+                  cleanRule.startsWith('width')
+                );
+              })
+              .join('; ');
+            if (safeProps) {
+              el.setAttribute('style', safeProps);
+            } else {
+              el.removeAttribute('style');
+            }
           }
           if (lowerAttr === 'href' || lowerAttr === 'src') {
             const val = el.getAttribute(attr) || '';

@@ -9,6 +9,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  AlignJustify,
   Quote,
   Link as LinkIcon,
   Image as ImageIcon,
@@ -328,6 +329,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             title="Căn phải"
           >
             <AlignRight size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => execCmd('justifyFull')}
+            className={styles.toolBtn}
+            title="Căn đều hai bên (Justify)"
+          >
+            <AlignJustify size={15} />
           </button>
         </div>
 
