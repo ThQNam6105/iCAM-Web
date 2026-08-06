@@ -802,5 +802,25 @@
   .bottomLegalLinks {
     justify-content: center;
   }
+
+  .floatingContactWidget {
+    right: 10px;
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  .contactShortcutBtn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .contactShortcutBtn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .contactShortcutBtn::after {
+    display: none;
+  }
 }
 

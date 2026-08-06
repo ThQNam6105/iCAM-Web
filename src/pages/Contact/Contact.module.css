@@ -144,6 +144,9 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .campusCard {
@@ -153,6 +156,13 @@
   border: 1px solid rgba(245, 130, 32, 0.2);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .campusCard:hover {
@@ -168,12 +178,15 @@
   margin-bottom: 1.25rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px dashed #e2e8f0;
+  min-width: 0;
 }
 
 .campusHeader h3 {
   font-size: 1.3rem;
   font-weight: 800;
   color: #0f172a !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .subTag {
@@ -185,6 +198,8 @@
   border-radius: 9999px;
   display: inline-block;
   margin-top: 0.2rem;
+  max-width: 100%;
+  word-break: break-word;
 }
 
 .campusBody {
@@ -193,6 +208,7 @@
   gap: 1.1rem;
   font-size: 0.95rem;
   color: #475569;
+  min-width: 0;
 }
 
 .infoRow {
@@ -200,6 +216,9 @@
   align-items: flex-start;
   gap: 0.75rem;
   line-height: 1.5;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .addressText {
@@ -207,6 +226,8 @@
   font-weight: 700;
   font-size: 1rem;
   margin-top: 0.2rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .icon {
@@ -299,6 +320,8 @@
 /* RIGHT COLUMN: CONSULTATION FORM */
 .formColumn {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .formCard {
@@ -307,6 +330,12 @@
   padding: 2.5rem;
   border: 1px solid rgba(245, 130, 32, 0.2);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .formCardHeader {
@@ -316,6 +345,7 @@
   margin-bottom: 2rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid #f1f5f9;
+  min-width: 0;
 }
 
 .formCardHeader h2 {
@@ -323,41 +353,59 @@
   font-weight: 800;
   color: #0f172a !important;
   margin-bottom: 0.4rem;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .formCardHeader p {
   font-size: 0.92rem;
   color: #64748b;
   line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .contactForm {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .formGroup label {
   font-size: 0.88rem;
   font-weight: 700;
   color: #334155;
+  word-break: break-word;
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 0.9rem 1.1rem;
   border-radius: 12px;
   border: 1px solid #cbd5e1;
@@ -367,6 +415,7 @@
   background: #ffffff;
   color: #0f172a;
   transition: all 0.3s ease;
+  text-overflow: ellipsis;
 }
 
 .formGroup input:focus,
@@ -490,24 +539,99 @@
 @media (max-width: 960px) {
   .splitLayout {
     grid-template-columns: 1fr;
+    gap: 1.75rem;
   }
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 14px;
+  }
+
   .heroSection {
-    padding: 4rem 1rem 3rem 1rem;
+    padding: 3.5rem 1rem 2.5rem 1rem;
+  }
+
+  .mainSection {
+    padding: 3rem 0;
   }
 
   .formRow {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  .formCard {
-    padding: 1.75rem 1.25rem;
-  }
-
+  .formCard,
+  .campusCard,
+  .workingCard,
   .mapCard {
-    padding: 1.5rem;
+    padding: 1.5rem 1.1rem;
+    border-radius: 18px;
+  }
+
+  .formCardHeader {
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .formCardHeader h2 {
+    font-size: 1.25rem;
+  }
+
+  .formCardHeader p {
+    font-size: 0.86rem;
+  }
+
+  .campusHeader h3 {
+    font-size: 1.15rem;
+  }
+
+  .addressText {
+    font-size: 0.92rem;
+  }
+
+  .shortcutGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .formGroup input,
+  .formGroup select,
+  .formGroup textarea {
+    padding: 0.75rem 0.95rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+
+  .formCard,
+  .campusCard,
+  .workingCard,
+  .mapCard {
+    padding: 1.25rem 0.85rem;
+    border-radius: 14px;
+  }
+
+  .shortcutGrid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .formCardHeader h2 {
+    font-size: 1.15rem;
+  }
+
+  .mapsDirectionBtn,
+  .submitBtn,
+  .openMapsBtn {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem 1rem;
+    font-size: 0.92rem;
   }
 }
 
