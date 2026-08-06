@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Sparkles,
   Calendar,
@@ -7,21 +7,37 @@ import {
   ChevronRight,
   X,
   Send,
-  BookOpen
+  BookOpen,
+  Share2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import styles from './News.module.css';
 import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 import { getPublicNewsPosts, fetchPostsFromSupabase, type DynamicNewsItem } from '../../services/newsService';
-
 import { generateTableOfContents } from '../../utils/tocGenerator';
 import { TableOfContents } from '../../components/TableOfContents/TableOfContents';
+import { useToast } from '../../components/Toast/Toast';
 
 export const News: React.FC = () => {
   const { language, t } = useLanguage();
+  const { showToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [selectedArticle, setSelectedArticle] = useState<Article | DynamicNewsItem | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<Article | DynamicNewsItem | null>(() => {
+    const urlSlug = new URLSearchParams(window.location.search).get('slug');
+    if (urlSlug) {
+      const dynamic = getPublicNewsPosts();
+      const allArts = dynamic.length > 0 ? dynamic : articlesData;
+      return allArts.find((a) => ('slug' in a && a.slug === urlSlug) || String(a.id) === urlSlug) || null;
+    }
+    return null;
+  });
+  const [copiedLink, setCopiedLink] = useState(false);
+
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [articles, setArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
@@ -29,7 +45,7 @@ export const News: React.FC = () => {
     return dynamic.length > 0 ? dynamic : articlesData;
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchPostsFromSupabase().then(() => {
       const dynamic = getPublicNewsPosts();
       if (dynamic.length > 0) {
@@ -48,6 +64,19 @@ export const News: React.FC = () => {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
+
+  const handleSelectArticle = (art: Article | DynamicNewsItem | null) => {
+    setSelectedArticle(art);
+    if (art) {
+      const slugVal = 'slug' in art ? art.slug : String(art.id);
+      setSearchParams({ slug: slugVal }, { replace: true });
+      document.title = `${art.title} | iCANCAM English Center`;
+    } else {
+      searchParams.delete('slug');
+      setSearchParams(searchParams, { replace: true });
+      document.title = 'Tin Tức & Sự Kiện | iCANCAM English Center';
+    }
+  };
 
   const filteredArticles = activeCategory === 'all'
     ? articles
@@ -123,7 +152,7 @@ export const News: React.FC = () => {
       {featuredArticle && (
         <section className={styles.featuredSection}>
           <div className={styles.container}>
-            <div className={styles.featuredCard} onClick={() => setSelectedArticle(featuredArticle)}>
+            <div className={styles.featuredCard} onClick={() => handleSelectArticle(featuredArticle)}>
               <div className={styles.featuredImageWrapper}>
                 <img
                   src={featuredArticle.image}
@@ -172,7 +201,7 @@ export const News: React.FC = () => {
 
           <div className={styles.articlesGrid}>
             {remainingArticles.map(article => (
-              <div key={article.id} className={styles.articleCard} onClick={() => setSelectedArticle(article)}>
+              <div key={article.id} className={styles.articleCard} onClick={() => handleSelectArticle(article)}>
                 <div className={styles.articleImageWrapper}>
                   <img
                     src={article.image}
@@ -241,59 +270,98 @@ export const News: React.FC = () => {
       </section>
 
       {/* ARTICLE READER MODAL */}
-      {selectedArticle && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedArticle(null)}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <button className={styles.closeModalBtn} onClick={() => setSelectedArticle(null)}>
-              <X size={24} />
-            </button>
+      {selectedArticle && (() => {
+        const currentSlug = 'slug' in selectedArticle ? selectedArticle.slug : String(selectedArticle.id);
+        const shareUrl = `${window.location.origin}${window.location.pathname}?slug=${currentSlug}`;
 
-            <div className={styles.modalCategoryBadge}>
-              {language === 'en' ? (selectedArticle.categoryLabelEn || selectedArticle.categoryLabel) : selectedArticle.categoryLabel}
-            </div>
+        const handleCopyLink = () => {
+          navigator.clipboard.writeText(shareUrl);
+          setCopiedLink(true);
+          showToast('Đã sao chép đường dẫn bài viết! Bạn có thể dán để chia sẻ.', 'success');
+          setTimeout(() => setCopiedLink(false), 3000);
+        };
 
-            <h2 className={styles.modalTitle}>
-              {language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
-            </h2>
+        return (
+          <div className={styles.modalOverlay} onClick={() => handleSelectArticle(null)}>
+            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+              <button className={styles.closeModalBtn} onClick={() => handleSelectArticle(null)}>
+                <X size={24} />
+              </button>
 
-            <div className={styles.modalMetaRow}>
-              <span><Calendar size={15} /> {selectedArticle.date}</span>
-            </div>
+              <div className={styles.modalCategoryBadge}>
+                {language === 'en' ? (selectedArticle.categoryLabelEn || selectedArticle.categoryLabel) : selectedArticle.categoryLabel}
+              </div>
 
-            <div className={styles.modalImageWrapper}>
-              <img
-                src={selectedArticle.image}
-                alt={language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
-              />
-            </div>
+              <h2 className={styles.modalTitle}>
+                {language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
+              </h2>
 
-            <div className={styles.modalBodyText}>
-              <p className={styles.leadExcerpt}>
-                {language === 'en' ? (selectedArticle.excerptEn || selectedArticle.excerpt) : selectedArticle.excerpt}
-              </p>
-              {(() => {
-                const rawContent = language === 'en' ? (selectedArticle.contentEn || selectedArticle.content) : selectedArticle.content;
-                const { cleanHtml, toc } = generateTableOfContents(rawContent);
-                return (
-                  <>
-                    <TableOfContents toc={toc} />
-                    <div
-                      className={styles.articleFullContent}
-                      dangerouslySetInnerHTML={{ __html: cleanHtml }}
-                    />
-                  </>
-                );
-              })()}
-            </div>
+              <div className={styles.modalMetaRow}>
+                <span><Calendar size={15} /> {selectedArticle.date}</span>
 
-            <div className={styles.modalFooter}>
-              <Link to="/contact" className={styles.modalActionBtn} onClick={() => setSelectedArticle(null)}>
-                <BookOpen size={18} /> {t.news.modalCourseConsultBtn}
-              </Link>
+                <div className={styles.shareBar}>
+                  <span className={styles.shareLabel}><Share2 size={13} /> Chia sẻ:</span>
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`${styles.shareBtn} ${styles.shareFbBtn}`}
+                  >
+                    Facebook
+                  </a>
+                  <a
+                    href={`https://sp.zalo.me/share_inline?url=${encodeURIComponent(shareUrl)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`${styles.shareBtn} ${styles.shareZaloBtn}`}
+                  >
+                    Zalo
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className={`${styles.shareBtn} ${styles.shareCopyBtn}`}
+                  >
+                    {copiedLink ? <Check size={14} color="#22c55e" /> : <Copy size={14} />} {copiedLink ? 'Đã sao chép' : 'Sao chép Link'}
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.modalImageWrapper}>
+                <img
+                  src={selectedArticle.image}
+                  alt={language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
+                />
+              </div>
+
+              <div className={styles.modalBodyText}>
+                <p className={styles.leadExcerpt}>
+                  {language === 'en' ? (selectedArticle.excerptEn || selectedArticle.excerpt) : selectedArticle.excerpt}
+                </p>
+                {(() => {
+                  const rawContent = language === 'en' ? (selectedArticle.contentEn || selectedArticle.content) : selectedArticle.content;
+                  const { cleanHtml, toc } = generateTableOfContents(rawContent);
+                  return (
+                    <>
+                      <TableOfContents toc={toc} />
+                      <div
+                        className={styles.articleFullContent}
+                        dangerouslySetInnerHTML={{ __html: cleanHtml }}
+                      />
+                    </>
+                  );
+                })()}
+              </div>
+
+              <div className={styles.modalFooter}>
+                <Link to="/contact" className={styles.modalActionBtn} onClick={() => handleSelectArticle(null)}>
+                  <BookOpen size={18} /> {t.news.modalCourseConsultBtn}
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
