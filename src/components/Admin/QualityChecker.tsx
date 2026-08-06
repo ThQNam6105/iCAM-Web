@@ -21,12 +21,12 @@ export const QualityChecker: React.FC<QualityCheckerProps> = ({
   const hasHeadings = /<h[23][^>]*>/i.test(content);
 
   const checks = [
-    { label: 'Ảnh bìa bài viết hợp lệ', pass: Boolean(image && image.startsWith('http')) },
-    { label: 'Tiêu đề đầy đủ (>= 5 tự)', pass: Boolean(title && title.trim().length >= 5) },
-    { label: 'Tóm tắt bài viết (>= 10 tự)', pass: Boolean(excerpt && excerpt.trim().length >= 10) },
+    { label: 'Ảnh bìa chuẩn (khuyên dùng 1200 x 630 px, tỷ lệ 16:9)', pass: Boolean(image && (image.startsWith('http') || image.startsWith('data:image/'))) },
+    { label: 'Tiêu đề đầy đủ (>= 5 ký tự)', pass: Boolean(title && title.trim().length >= 5) },
+    { label: 'Tóm tắt bài viết (>= 10 ký tự)', pass: Boolean(excerpt && excerpt.trim().length >= 10) },
     { label: 'Độ dài nội dung (>= 50 từ)', pass: wordCount >= 50 },
     { label: 'Cấu trúc bài viết (H2/H3)', pass: hasHeadings },
-    { label: 'Mô tả tìm kiếm SEO (Meta Description)', pass: Boolean(metaDescription && metaDescription.trim().length >= 10) },
+    { label: 'Mô tả tìm kiếm SEO (Meta Description >= 10 ký tự)', pass: Boolean(metaDescription && metaDescription.trim().length >= 10) },
   ];
 
   const passedCount = checks.filter((c) => c.pass).length;
