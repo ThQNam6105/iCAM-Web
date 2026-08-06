@@ -106,16 +106,11 @@ export default async function handler(req, res) {
     const cleanSlug = slugify(rawSlug);
     let article = null;
 
-    // 1. Check static articles array first
-    if (cleanSlug) {
-      article = staticArticles.find((a) => a.slug === cleanSlug || a.slug.includes(cleanSlug) || cleanSlug.includes(a.slug));
-    }
-
-    // 2. Fetch from Supabase if not found in static articles
-    if (!article && (rawSlug || cleanSlug)) {
+    // 1. Fetch from Supabase Database with VALID anon key
+    if (rawSlug || cleanSlug) {
       try {
         const supabaseUrl = 'https://zzzoqazbembwstfvvqja.supabase.co';
-        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6em9xYXpiZW1id3N0ZnZ2cWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5MTcxOTUsImV4cCI6MjA2NDQ5MzE5NX0.8Q5tB0k3n_J3y0X_Vp0hJ517g5zJ2v3k_N5m5x_X0';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6em9xYXpiZW1id3N0ZnZ2cWphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU5NDY4ODksImV4cCI6MjEwMTUyMjg4OX0.tA59bmIc2cJtNPIjxkjVWCn-IRpDPS-wwQXaqc_owRM';
 
         const searchSlug = cleanSlug || slugify(rawSlug);
         const queryUrl = `${supabaseUrl}/rest/v1/news_posts?or=(slug.eq.${encodeURIComponent(rawSlug)},slug.eq.${encodeURIComponent(searchSlug)},slug.ilike.*${encodeURIComponent(searchSlug)}*)&select=*`;
@@ -138,9 +133,14 @@ export default async function handler(req, res) {
       }
     }
 
+    // 2. Check static articles array if not found in Supabase
+    if (!article && cleanSlug) {
+      article = staticArticles.find((a) => a.slug === cleanSlug || a.slug.includes(cleanSlug) || cleanSlug.includes(a.slug));
+    }
+
     // Default Fallback Values
     let title = 'Trung Tâm Anh Ngữ iCAM | Tiếng Anh Chuẩn Quốc Tế';
-    let description = 'Cập nhật tin tức, sự kiện và bí quyết học tiếng Anh mới nhất tại Trung Tâm Anh Ngữ iCAM.';
+    let description = 'Trung Tâm Anh Ngữ iCAM - Đào tạo tiếng Anh chuẩn quốc tế cho trẻ em, học sinh và người đi làm.';
     let image = `${domain}/og-default.jpg`;
     let canonicalUrl = rawSlug ? `${domain}/news/${rawSlug}` : `${domain}/news`;
 
@@ -165,6 +165,15 @@ export default async function handler(req, res) {
     }
     
     let html = fs.readFileSync(htmlPath, 'utf8');
+
+    // Remove any static title or meta tags to prevent duplication in crawlers
+    html = html
+      .replace(/<title>.*?<\/title>/gi, '')
+      .replace(/<meta\s+name=["']title["'].*?>/gi, '')
+      .replace(/<meta\s+name=["']description["'].*?>/gi, '')
+      .replace(/<link\s+rel=["']canonical["'].*?>/gi, '')
+      .replace(/<meta\s+property=["']og:.*?["'].*?>/gi, '')
+      .replace(/<meta\s+name=["']twitter:.*?["'].*?>/gi, '');
 
     // Prepare Open Graph Meta Tags Injection
     const ogTags = `
@@ -242,12 +251,7 @@ export default async function handler(req, res) {
     </script>
     `;
 
-    // Replace existing <title> tag or inject before </head>
-    if (html.includes('<title>')) {
-      html = html.replace(/<title>.*?<\/title>/i, ogTags);
-    } else {
-      html = html.replace('</head>', `${ogTags}\n</head>`);
-    }
+    html = html.replace('</head>', `${ogTags}\n</head>`);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
