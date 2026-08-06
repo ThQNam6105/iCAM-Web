@@ -169,17 +169,85 @@
 .coverPreviewWrapper {
   position: relative;
   width: 100%;
-  height: 160px;
-  border-radius: 10px;
+  height: 200px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 2px dashed rgba(245, 130, 32, 0.35);
   background: #09142b;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.coverPreviewWrapper:hover {
+  border-color: #F58220;
+}
+
+.coverPreviewWrapperIsDragging {
+  cursor: grabbing !important;
+  border-color: #F58220 !important;
+  box-shadow: 0 0 20px rgba(245, 130, 32, 0.3);
 }
 
 .coverPreviewImg {
   width: 100%;
   height: 100%;
-  transition: all 0.3s ease;
+  pointer-events: none;
+  transition: transform 0.05s ease-out;
+}
+
+.dragHelpBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #F58220;
+  border: 1px solid rgba(245, 130, 32, 0.35);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.zoomControlRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.zoomLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.zoomSlider {
+  flex: 1;
+  accent-color: #F58220;
+  cursor: pointer;
+}
+
+.zoomValue {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #F58220;
+  min-width: 42px;
+  text-align: right;
 }
 
 .alignBtnGrid {

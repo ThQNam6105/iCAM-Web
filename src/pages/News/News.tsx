@@ -160,7 +160,13 @@ export const News: React.FC = () => {
                   className={styles.featuredImage}
                   style={{
                     objectFit: featuredArticle.imageFit || 'cover',
-                    objectPosition: featuredArticle.imagePosition || 'center',
+                    objectPosition: featuredArticle.panX !== undefined && featuredArticle.panY !== undefined
+                      ? `${featuredArticle.panX}% ${featuredArticle.panY}%`
+                      : (featuredArticle.imagePosition || 'center'),
+                    transform: featuredArticle.imageZoom ? `scale(${featuredArticle.imageZoom / 100})` : undefined,
+                    transformOrigin: featuredArticle.panX !== undefined && featuredArticle.panY !== undefined
+                      ? `${featuredArticle.panX}% ${featuredArticle.panY}%`
+                      : 'center',
                   }}
                 />
                 <div className={styles.featuredTag}>
@@ -213,7 +219,13 @@ export const News: React.FC = () => {
                     className={styles.articleImage}
                     style={{
                       objectFit: article.imageFit || 'cover',
-                      objectPosition: article.imagePosition || 'center',
+                      objectPosition: article.panX !== undefined && article.panY !== undefined
+                        ? `${article.panX}% ${article.panY}%`
+                        : (article.imagePosition || 'center'),
+                      transform: article.imageZoom ? `scale(${article.imageZoom / 100})` : undefined,
+                      transformOrigin: article.panX !== undefined && article.panY !== undefined
+                        ? `${article.panX}% ${article.panY}%`
+                        : 'center',
                     }}
                   />
                   <div className={styles.articleCategoryBadge}>
@@ -341,7 +353,13 @@ export const News: React.FC = () => {
                   alt={language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
                   style={{
                     objectFit: selectedArticle.imageFit || 'cover',
-                    objectPosition: selectedArticle.imagePosition || 'center',
+                    objectPosition: selectedArticle.panX !== undefined && selectedArticle.panY !== undefined
+                      ? `${selectedArticle.panX}% ${selectedArticle.panY}%`
+                      : (selectedArticle.imagePosition || 'center'),
+                    transform: selectedArticle.imageZoom ? `scale(${selectedArticle.imageZoom / 100})` : undefined,
+                    transformOrigin: selectedArticle.panX !== undefined && selectedArticle.panY !== undefined
+                      ? `${selectedArticle.panX}% ${selectedArticle.panY}%`
+                      : 'center',
                   }}
                 />
               </div>
