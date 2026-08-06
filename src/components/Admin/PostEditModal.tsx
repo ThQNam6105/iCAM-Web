@@ -10,6 +10,7 @@ import {
   ZoomOut,
   RotateCcw,
   Move,
+  X,
 } from 'lucide-react';
 import {
   type DynamicNewsItem,
@@ -260,6 +261,14 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 className={styles.previewBtn}
               >
                 <Eye size={16} /> Xem Trước (Preview)
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className={styles.closeModalXBtn}
+                title="Đóng cửa sổ soạn thảo (Hủy bỏ)"
+              >
+                <X size={18} />
               </button>
             </div>
           </div>
@@ -518,10 +527,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             />
 
             <div className={styles.modalActions}>
-              <button type="button" onClick={onClose} className={styles.cancelBtn}>
-                Hủy Bỏ
-              </button>
-
               <button type="submit" className={styles.saveBtn}>
                 <Save size={16} /> {postToEdit ? 'Lưu Thay Đổi' : 'Lưu & Đăng Bài'}
               </button>
