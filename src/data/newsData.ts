@@ -21,6 +21,7 @@ export interface Article {
   imageZoom?: number;
   panX?: number;
   panY?: number;
+  excerptAlign?: 'left' | 'center' | 'right' | 'justify';
 }
 
 const placeholderImg = 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop';

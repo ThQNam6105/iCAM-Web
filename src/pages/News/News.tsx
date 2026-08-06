@@ -185,7 +185,10 @@ export const News: React.FC = () => {
                 <h2 className={styles.featuredTitle}>
                   {language === 'en' ? (featuredArticle.titleEn || featuredArticle.title) : featuredArticle.title}
                 </h2>
-                <p className={styles.featuredExcerpt}>
+                <p
+                  className={styles.featuredExcerpt}
+                  style={{ textAlign: featuredArticle.excerptAlign || 'left' }}
+                >
                   {language === 'en' ? (featuredArticle.excerptEn || featuredArticle.excerpt) : featuredArticle.excerpt}
                 </p>
 
@@ -242,7 +245,10 @@ export const News: React.FC = () => {
                     {language === 'en' ? (article.titleEn || article.title) : article.title}
                   </h3>
 
-                  <p className={styles.articleExcerpt}>
+                  <p
+                    className={styles.articleExcerpt}
+                    style={{ textAlign: article.excerptAlign || 'left' }}
+                  >
                     {language === 'en' ? (article.excerptEn || article.excerpt) : article.excerpt}
                   </p>
 
@@ -365,7 +371,10 @@ export const News: React.FC = () => {
               </div>
 
               <div className={styles.modalBodyText}>
-                <p className={styles.leadExcerpt}>
+                <p
+                  className={styles.leadExcerpt}
+                  style={{ textAlign: selectedArticle.excerptAlign || 'left' }}
+                >
                   {language === 'en' ? (selectedArticle.excerptEn || selectedArticle.excerpt) : selectedArticle.excerpt}
                 </p>
                 {(() => {

@@ -94,6 +94,46 @@
   justify-content: space-between;
 }
 
+.labelHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.excerptAlignGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.excerptAlignBtn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.excerptAlignBtn:hover {
+  color: #F58220;
+  background: rgba(245, 130, 32, 0.15);
+}
+
+.excerptAlignBtnActive {
+  background: #F58220 !important;
+  color: #ffffff !important;
+}
+
 .input,
 .select,
 .textarea {
