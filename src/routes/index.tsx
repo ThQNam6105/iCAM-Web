@@ -41,6 +41,7 @@ export const AppRouter: React.FC = () => {
           <Route index element={<Home />} />
           <Route path="curriculum" element={<Curriculum />} />
           <Route path="news" element={<News />} />
+          <Route path="news/:slug" element={<News />} />
           <Route path="faq" element={<FAQ />} />
           <Route path="careers" element={<Careers />} />
           <Route path="contact" element={<Contact />} />

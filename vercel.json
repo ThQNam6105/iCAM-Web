@@ -1,6 +1,21 @@
 {
   "rewrites": [
     {
+      "source": "/news/:slug",
+      "destination": "/api/og?slug=:slug"
+    },
+    {
+      "source": "/news",
+      "has": [
+        {
+          "type": "query",
+          "key": "slug",
+          "value": "(?<slug>.*)"
+        }
+      ],
+      "destination": "/api/og?slug=:slug"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

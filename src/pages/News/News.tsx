@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useParams } from 'react-router-dom';
 import {
   Sparkles,
   Calendar,
@@ -25,10 +25,11 @@ export const News: React.FC = () => {
   const { language, t } = useLanguage();
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+  const params = useParams<{ slug?: string }>();
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedArticle, setSelectedArticle] = useState<Article | DynamicNewsItem | null>(() => {
-    const urlSlug = new URLSearchParams(window.location.search).get('slug');
+    const urlSlug = params.slug || new URLSearchParams(window.location.search).get('slug');
     if (urlSlug) {
       const dynamic = getPublicNewsPosts();
       const allArts = dynamic.length > 0 ? dynamic : articlesData;
@@ -292,7 +293,7 @@ export const News: React.FC = () => {
       {/* ARTICLE READER MODAL */}
       {selectedArticle && (() => {
         const currentSlug = 'slug' in selectedArticle ? selectedArticle.slug : String(selectedArticle.id);
-        const shareUrl = `${window.location.origin}${window.location.pathname}?slug=${currentSlug}`;
+        const shareUrl = `${window.location.origin}/news/${currentSlug}`;
 
         const handleCopyLink = () => {
           navigator.clipboard.writeText(shareUrl);
