@@ -81,7 +81,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [lastAutosave, setLastAutosave] = useState<string | null>(null);
-  const [blockersCount, setBlockersCount] = useState(0);
 
   // Auto-generate slug when VI title changes (if user hasn't custom edited it)
   const handleTitleChange = (val: string) => {
@@ -355,17 +354,10 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <QualityChecker
               title={title}
-              titleEn={titleEn}
               excerpt={excerpt}
               content={content}
               image={image}
-              slug={slug}
-              metaTitle={metaTitle}
               metaDescription={metaDescription}
-              onFixMetaDescription={setMetaDescription}
-              onFixSlug={setSlug}
-              onFixContent={setContent}
-              onBlockersChange={setBlockersCount}
             />
 
             <div className={styles.modalActions}>
@@ -373,12 +365,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 Hủy Bỏ
               </button>
 
-              <button
-                type="submit"
-                className={styles.saveBtn}
-                disabled={blockersCount > 0 && status === 'published'}
-                title={blockersCount > 0 ? `Vui lòng xử lý ${blockersCount} Rào Cản Xuất Bản trước khi Đăng bài` : undefined}
-              >
+              <button type="submit" className={styles.saveBtn}>
                 <Save size={16} /> {postToEdit ? 'Lưu Thay Đổi' : 'Lưu & Đăng Bài'}
               </button>
             </div>
