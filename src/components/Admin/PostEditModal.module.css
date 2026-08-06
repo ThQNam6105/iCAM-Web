@@ -14,6 +14,7 @@
 }
 
 .modalContent {
+  position: relative;
   background: #132247;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -24,6 +25,37 @@
   padding: 2rem;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
   color: #ffffff;
+}
+
+.closeModalXBtn {
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 99;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+  margin-top: -0.5rem;
+  margin-right: -0.5rem;
+  flex-shrink: 0;
+}
+
+.closeModalXBtn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  transform: rotate(90deg) scale(1.05);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
 }
 
 .modalHeader {
@@ -46,28 +78,6 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-}
-
-.closeModalXBtn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #cbd5e1;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.25 ease;
-  flex-shrink: 0;
-}
-
-.closeModalXBtn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  color: #f87171;
-  border-color: #f87171;
-  transform: rotate(90deg);
 }
 
 .previewBtn {

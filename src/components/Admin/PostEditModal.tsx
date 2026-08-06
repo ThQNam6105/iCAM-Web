@@ -234,6 +234,15 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     <>
       <div className={styles.overlay}>
         <div className={styles.modalContent}>
+          <button
+            type="button"
+            onClick={onClose}
+            className={styles.closeModalXBtn}
+            title="Đóng cửa sổ soạn thảo (Hủy bỏ)"
+          >
+            <X size={20} />
+          </button>
+
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>
               {postToEdit ? 'Chỉnh Sửa Bài Viết' : 'Thêm Bài Viết Mới'}
@@ -261,14 +270,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 className={styles.previewBtn}
               >
                 <Eye size={16} /> Xem Trước (Preview)
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className={styles.closeModalXBtn}
-                title="Đóng cửa sổ soạn thảo (Hủy bỏ)"
-              >
-                <X size={18} />
               </button>
             </div>
           </div>
