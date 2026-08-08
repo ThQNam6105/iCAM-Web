@@ -67,17 +67,41 @@ export const Home: React.FC = () => {
   const [isTeacherPaused, setIsTeacherPaused] = useState(false);
   const [teachersToShow, setTeachersToShow] = useState(4);
 
+  // Mouse & Touch Drag State for Teachers Slider
+  const [isDraggingTeacher, setIsDraggingTeacher] = useState(false);
+  const [teacherDragStartX, setTeacherDragStartX] = useState(0);
+  const [teacherDragOffset, setTeacherDragOffset] = useState(0);
+  const teacherDragMovedRef = React.useRef(false);
+  const [teacherCursorPos, setTeacherCursorPos] = useState<{ x: number; y: number } | null>(null);
+  const [showTeacherCursorTooltip, setShowTeacherCursorTooltip] = useState(false);
+
   // State for Students Slider
   const [studentIndex, setStudentIndex] = useState(0);
   const [disableStudentTransition, setDisableStudentTransition] = useState(false);
   const [isStudentPaused, setIsStudentPaused] = useState(false);
   const [studentsToShow, setStudentsToShow] = useState(3);
 
+  // Mouse & Touch Drag State for Students Slider
+  const [isDraggingStudent, setIsDraggingStudent] = useState(false);
+  const [studentDragStartX, setStudentDragStartX] = useState(0);
+  const [studentDragOffset, setStudentDragOffset] = useState(0);
+  const studentDragMovedRef = React.useRef(false);
+  const [studentCursorPos, setStudentCursorPos] = useState<{ x: number; y: number } | null>(null);
+  const [showStudentCursorTooltip, setShowStudentCursorTooltip] = useState(false);
+
   // State for Parents Slider
   const [parentIndex, setParentIndex] = useState(0);
   const [disableParentTransition, setDisableParentTransition] = useState(false);
   const [isParentPaused, setIsParentPaused] = useState(false);
   const [parentsToShow, setParentsToShow] = useState(3);
+
+  // Mouse & Touch Drag State for Parents Slider
+  const [isDraggingParent, setIsDraggingParent] = useState(false);
+  const [parentDragStartX, setParentDragStartX] = useState(0);
+  const [parentDragOffset, setParentDragOffset] = useState(0);
+  const parentDragMovedRef = React.useRef(false);
+  const [parentCursorPos, setParentCursorPos] = useState<{ x: number; y: number } | null>(null);
+  const [showParentCursorTooltip, setShowParentCursorTooltip] = useState(false);
 
   // General States
   const [isTabActive, setIsTabActive] = useState(true);
@@ -302,6 +326,79 @@ export const Home: React.FC = () => {
     setTeacherIndex((prev) => prev - 1);
   };
 
+  // Drag Handlers for Teachers Slider
+  const handleMouseDownTeacher = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setIsDraggingTeacher(true);
+    setTeacherDragStartX(e.clientX);
+    setTeacherDragOffset(0);
+    teacherDragMovedRef.current = false;
+    setIsTeacherPaused(true);
+  };
+
+  useEffect(() => {
+    if (!isDraggingTeacher) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - teacherDragStartX;
+      if (Math.abs(deltaX) > 5) {
+        teacherDragMovedRef.current = true;
+      }
+      setTeacherDragOffset(deltaX);
+    };
+
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (e.button === 0 || e.buttons === 0) {
+        setIsDraggingTeacher(false);
+        setIsTeacherPaused(false);
+        setTeacherDragOffset((currentOffset) => {
+          if (currentOffset < -40) {
+            if (!disableTeacherTransition) setTeacherIndex((prev) => prev + 1);
+          } else if (currentOffset > 40) {
+            if (!disableTeacherTransition) setTeacherIndex((prev) => prev - 1);
+          }
+          return 0;
+        });
+      }
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDraggingTeacher, teacherDragStartX, disableTeacherTransition]);
+
+  const handleTouchStartTeacher = (e: React.TouchEvent) => {
+    setIsDraggingTeacher(true);
+    setTeacherDragStartX(e.touches[0].clientX);
+    setTeacherDragOffset(0);
+    teacherDragMovedRef.current = false;
+    setIsTeacherPaused(true);
+  };
+
+  const handleTouchMoveTeacher = (e: React.TouchEvent) => {
+    if (!isDraggingTeacher) return;
+    const deltaX = e.touches[0].clientX - teacherDragStartX;
+    if (Math.abs(deltaX) > 5) {
+      teacherDragMovedRef.current = true;
+    }
+    setTeacherDragOffset(deltaX);
+  };
+
+  const handleTouchEndTeacher = () => {
+    if (!isDraggingTeacher) return;
+    setIsDraggingTeacher(false);
+    setIsTeacherPaused(false);
+    if (teacherDragOffset < -40) {
+      nextTeacherSlide();
+    } else if (teacherDragOffset > 40) {
+      prevTeacherSlide();
+    }
+    setTeacherDragOffset(0);
+  };
+
   useEffect(() => {
     if (isTeacherPaused || disableTeacherTransition || !isTabActive) return;
     const timer = setInterval(() => {
@@ -362,6 +459,79 @@ export const Home: React.FC = () => {
     setStudentIndex((prev) => prev - 1);
   };
 
+  // Drag Handlers for Students Slider
+  const handleMouseDownStudent = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setIsDraggingStudent(true);
+    setStudentDragStartX(e.clientX);
+    setStudentDragOffset(0);
+    studentDragMovedRef.current = false;
+    setIsStudentPaused(true);
+  };
+
+  useEffect(() => {
+    if (!isDraggingStudent) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - studentDragStartX;
+      if (Math.abs(deltaX) > 5) {
+        studentDragMovedRef.current = true;
+      }
+      setStudentDragOffset(deltaX);
+    };
+
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (e.button === 0 || e.buttons === 0) {
+        setIsDraggingStudent(false);
+        setIsStudentPaused(false);
+        setStudentDragOffset((currentOffset) => {
+          if (currentOffset < -40) {
+            if (!disableStudentTransition) setStudentIndex((prev) => prev + 1);
+          } else if (currentOffset > 40) {
+            if (!disableStudentTransition) setStudentIndex((prev) => prev - 1);
+          }
+          return 0;
+        });
+      }
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDraggingStudent, studentDragStartX, disableStudentTransition]);
+
+  const handleTouchStartStudent = (e: React.TouchEvent) => {
+    setIsDraggingStudent(true);
+    setStudentDragStartX(e.touches[0].clientX);
+    setStudentDragOffset(0);
+    studentDragMovedRef.current = false;
+    setIsStudentPaused(true);
+  };
+
+  const handleTouchMoveStudent = (e: React.TouchEvent) => {
+    if (!isDraggingStudent) return;
+    const deltaX = e.touches[0].clientX - studentDragStartX;
+    if (Math.abs(deltaX) > 5) {
+      studentDragMovedRef.current = true;
+    }
+    setStudentDragOffset(deltaX);
+  };
+
+  const handleTouchEndStudent = () => {
+    if (!isDraggingStudent) return;
+    setIsDraggingStudent(false);
+    setIsStudentPaused(false);
+    if (studentDragOffset < -40) {
+      nextStudentSlide();
+    } else if (studentDragOffset > 40) {
+      prevStudentSlide();
+    }
+    setStudentDragOffset(0);
+  };
+
   useEffect(() => {
     if (isStudentPaused || disableStudentTransition || !isTabActive) return;
     const timer = setInterval(() => {
@@ -420,6 +590,79 @@ export const Home: React.FC = () => {
   const prevParentSlide = () => {
     if (disableParentTransition) return;
     setParentIndex((prev) => prev - 1);
+  };
+
+  // Drag Handlers for Parents Slider
+  const handleMouseDownParent = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setIsDraggingParent(true);
+    setParentDragStartX(e.clientX);
+    setParentDragOffset(0);
+    parentDragMovedRef.current = false;
+    setIsParentPaused(true);
+  };
+
+  useEffect(() => {
+    if (!isDraggingParent) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - parentDragStartX;
+      if (Math.abs(deltaX) > 5) {
+        parentDragMovedRef.current = true;
+      }
+      setParentDragOffset(deltaX);
+    };
+
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (e.button === 0 || e.buttons === 0) {
+        setIsDraggingParent(false);
+        setIsParentPaused(false);
+        setParentDragOffset((currentOffset) => {
+          if (currentOffset < -40) {
+            if (!disableParentTransition) setParentIndex((prev) => prev + 1);
+          } else if (currentOffset > 40) {
+            if (!disableParentTransition) setParentIndex((prev) => prev - 1);
+          }
+          return 0;
+        });
+      }
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDraggingParent, parentDragStartX, disableParentTransition]);
+
+  const handleTouchStartParent = (e: React.TouchEvent) => {
+    setIsDraggingParent(true);
+    setParentDragStartX(e.touches[0].clientX);
+    setParentDragOffset(0);
+    parentDragMovedRef.current = false;
+    setIsParentPaused(true);
+  };
+
+  const handleTouchMoveParent = (e: React.TouchEvent) => {
+    if (!isDraggingParent) return;
+    const deltaX = e.touches[0].clientX - parentDragStartX;
+    if (Math.abs(deltaX) > 5) {
+      parentDragMovedRef.current = true;
+    }
+    setParentDragOffset(deltaX);
+  };
+
+  const handleTouchEndParent = () => {
+    if (!isDraggingParent) return;
+    setIsDraggingParent(false);
+    setIsParentPaused(false);
+    if (parentDragOffset < -40) {
+      nextParentSlide();
+    } else if (parentDragOffset > 40) {
+      prevParentSlide();
+    }
+    setParentDragOffset(0);
   };
 
   useEffect(() => {
@@ -664,10 +907,38 @@ export const Home: React.FC = () => {
 
           {/* Teachers Slider Wrapper */}
           <div
-            className={styles.teachersSliderWrapper}
-            onMouseEnter={() => setIsTeacherPaused(true)}
-            onMouseLeave={() => setIsTeacherPaused(false)}
+            className={`${styles.teachersSliderWrapper} ${isDraggingTeacher ? styles.isDragging : ''}`}
+            onMouseEnter={() => {
+              setIsTeacherPaused(true);
+              setShowTeacherCursorTooltip(true);
+            }}
+            onMouseLeave={() => {
+              setIsTeacherPaused(false);
+              setShowTeacherCursorTooltip(false);
+            }}
+            onMouseMove={(e) => {
+              setTeacherCursorPos({ x: e.clientX, y: e.clientY });
+            }}
+            onMouseDown={handleMouseDownTeacher}
+            onTouchStart={handleTouchStartTeacher}
+            onTouchMove={handleTouchMoveTeacher}
+            onTouchEnd={handleTouchEndTeacher}
           >
+            {/* Floating Mouse Cursor Drag Tooltip */}
+            {showTeacherCursorTooltip && teacherCursorPos && (
+              <div
+                className={`${styles.cursorDragBadge} ${isDraggingTeacher ? styles.isDraggingBadge : ''}`}
+                style={{
+                  left: `${teacherCursorPos.x + 14}px`,
+                  top: `${teacherCursorPos.y + 18}px`,
+                }}
+              >
+                {isDraggingTeacher
+                  ? (language === 'en' ? 'Dragging...' : 'Đang kéo...')
+                  : (language === 'en' ? 'Hold & Drag' : 'Giữ và kéo')}
+              </div>
+            )}
+
             {/* Navigation Left Button */}
             <button onClick={prevTeacherSlide} className={styles.navBtn} aria-label="Previous Teacher">
               <ChevronLeft size={36} />
@@ -679,8 +950,8 @@ export const Home: React.FC = () => {
                 className={styles.teachersSliderTrack}
                 onTransitionEnd={handleTeacherTransitionEnd}
                 style={{
-                  transform: `translate3d(-${(teacherIndex + teachersToShow) * (100 / teachersToShow)}%, 0px, 0px)`,
-                  transition: disableTeacherTransition ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+                  transform: `translate3d(calc(-${(teacherIndex + teachersToShow) * (100 / teachersToShow)}% + ${teacherDragOffset}px), 0px, 0px)`,
+                  transition: disableTeacherTransition || isDraggingTeacher ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
                 }}
               >
                 {extendedTeachers.map((teacher, index) => (
@@ -692,7 +963,7 @@ export const Home: React.FC = () => {
                     <div className={styles.teacherCard}>
                       {/* Photo and hover overlay */}
                       <div className={styles.teacherImageContainer}>
-                        <img src={teacher.image} alt={teacher.name} className={styles.teacherImg} />
+                        <img src={teacher.image} alt={teacher.name} className={styles.teacherImg} draggable={false} />
                         
                         {/* Default Badge */}
                         <div className={styles.defaultBadge}>
@@ -771,10 +1042,38 @@ export const Home: React.FC = () => {
 
           {/* Students Slider Wrapper */}
           <div
-            className={styles.studentsSliderWrapper}
-            onMouseEnter={() => setIsStudentPaused(true)}
-            onMouseLeave={() => setIsStudentPaused(false)}
+            className={`${styles.studentsSliderWrapper} ${isDraggingStudent ? styles.isDragging : ''}`}
+            onMouseEnter={() => {
+              setIsStudentPaused(true);
+              setShowStudentCursorTooltip(true);
+            }}
+            onMouseLeave={() => {
+              setIsStudentPaused(false);
+              setShowStudentCursorTooltip(false);
+            }}
+            onMouseMove={(e) => {
+              setStudentCursorPos({ x: e.clientX, y: e.clientY });
+            }}
+            onMouseDown={handleMouseDownStudent}
+            onTouchStart={handleTouchStartStudent}
+            onTouchMove={handleTouchMoveStudent}
+            onTouchEnd={handleTouchEndStudent}
           >
+            {/* Floating Mouse Cursor Drag Tooltip */}
+            {showStudentCursorTooltip && studentCursorPos && (
+              <div
+                className={`${styles.cursorDragBadge} ${isDraggingStudent ? styles.isDraggingBadge : ''}`}
+                style={{
+                  left: `${studentCursorPos.x + 14}px`,
+                  top: `${studentCursorPos.y + 18}px`,
+                }}
+              >
+                {isDraggingStudent
+                  ? (language === 'en' ? 'Dragging...' : 'Đang kéo...')
+                  : (language === 'en' ? 'Hold & Drag' : 'Giữ và kéo')}
+              </div>
+            )}
+
             {/* Navigation Left Button */}
             <button onClick={prevStudentSlide} className={styles.navBtn} aria-label="Previous Student">
               <ChevronLeft size={36} />
@@ -786,8 +1085,8 @@ export const Home: React.FC = () => {
                 className={styles.studentsSliderTrack}
                 onTransitionEnd={handleStudentTransitionEnd}
                 style={{
-                  transform: `translate3d(-${(studentIndex + studentsToShow) * (100 / studentsToShow)}%, 0px, 0px)`,
-                  transition: disableStudentTransition ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+                  transform: `translate3d(calc(-${(studentIndex + studentsToShow) * (100 / studentsToShow)}% + ${studentDragOffset}px), 0px, 0px)`,
+                  transition: disableStudentTransition || isDraggingStudent ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
                 }}
               >
                 {extendedStudents.map((student, index) => (
@@ -799,7 +1098,7 @@ export const Home: React.FC = () => {
                     <div className={styles.studentCard}>
                       {/* Photo and hover overlay */}
                       <div className={styles.studentImageContainer}>
-                        <img src={student.image} alt={student.name} className={styles.studentImg} />
+                        <img src={student.image} alt={student.name} className={styles.studentImg} draggable={false} />
                         
                         {/* Default Badge */}
                         <div className={styles.defaultBadge}>
@@ -877,10 +1176,38 @@ export const Home: React.FC = () => {
 
           {/* Parents Slider Wrapper */}
           <div
-            className={styles.parentsSliderWrapper}
-            onMouseEnter={() => setIsParentPaused(true)}
-            onMouseLeave={() => setIsParentPaused(false)}
+            className={`${styles.parentsSliderWrapper} ${isDraggingParent ? styles.isDragging : ''}`}
+            onMouseEnter={() => {
+              setIsParentPaused(true);
+              setShowParentCursorTooltip(true);
+            }}
+            onMouseLeave={() => {
+              setIsParentPaused(false);
+              setShowParentCursorTooltip(false);
+            }}
+            onMouseMove={(e) => {
+              setParentCursorPos({ x: e.clientX, y: e.clientY });
+            }}
+            onMouseDown={handleMouseDownParent}
+            onTouchStart={handleTouchStartParent}
+            onTouchMove={handleTouchMoveParent}
+            onTouchEnd={handleTouchEndParent}
           >
+            {/* Floating Mouse Cursor Drag Tooltip */}
+            {showParentCursorTooltip && parentCursorPos && (
+              <div
+                className={`${styles.cursorDragBadge} ${isDraggingParent ? styles.isDraggingBadge : ''}`}
+                style={{
+                  left: `${parentCursorPos.x + 14}px`,
+                  top: `${parentCursorPos.y + 18}px`,
+                }}
+              >
+                {isDraggingParent
+                  ? (language === 'en' ? 'Dragging...' : 'Đang kéo...')
+                  : (language === 'en' ? 'Hold & Drag' : 'Giữ và kéo')}
+              </div>
+            )}
+
             {/* Navigation Left Button */}
             <button onClick={prevParentSlide} className={styles.navBtn} aria-label="Previous Parent">
               <ChevronLeft size={36} />
@@ -892,8 +1219,8 @@ export const Home: React.FC = () => {
                 className={styles.parentsSliderTrack}
                 onTransitionEnd={handleParentTransitionEnd}
                 style={{
-                  transform: `translate3d(-${(parentIndex + parentsToShow) * (100 / parentsToShow)}%, 0px, 0px)`,
-                  transition: disableParentTransition ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+                  transform: `translate3d(calc(-${(parentIndex + parentsToShow) * (100 / parentsToShow)}% + ${parentDragOffset}px), 0px, 0px)`,
+                  transition: disableParentTransition || isDraggingParent ? 'none' : 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
                 }}
               >
                 {extendedParents.map((parent, index) => (
@@ -905,7 +1232,7 @@ export const Home: React.FC = () => {
                     <div className={styles.parentCard}>
                       {/* Photo Container */}
                       <div className={styles.parentImageContainer}>
-                        <img src={parent.image} alt={parent.childName} className={styles.parentImg} />
+                        <img src={parent.image} alt={parent.childName} className={styles.parentImg} draggable={false} />
                         
                         {/* Companion Badge */}
                         <div className={styles.parentBadge}>

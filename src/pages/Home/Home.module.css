@@ -916,6 +916,13 @@
   width: 100%;
   gap: 1.5rem;
   margin-bottom: 4rem;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.teachersSliderWrapper.isDragging {
+  cursor: grabbing;
 }
 
 .teachersSliderContainer {
@@ -945,6 +952,13 @@
   width: 100%;
   gap: 1.5rem;
   margin-bottom: 4rem;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.studentsSliderWrapper.isDragging {
+  cursor: grabbing;
 }
 
 .studentsSliderContainer {
@@ -1017,6 +1031,13 @@
   width: 100%;
   gap: 1.5rem;
   position: relative;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.parentsSliderWrapper.isDragging {
+  cursor: grabbing;
 }
 
 .parentsSliderContainer {
