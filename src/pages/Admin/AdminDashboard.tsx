@@ -21,8 +21,10 @@ import {
   type DynamicNewsItem,
   type PostStatus
 } from '../../services/newsService';
+import { getCategories, fetchCategoriesFromSupabase } from '../../services/categoryService';
 import { PostEditModal } from '../../components/Admin/PostEditModal';
 import { PostPreviewModal } from '../../components/Admin/PostPreviewModal';
+import { CategoryManagerModal } from '../../components/Admin/CategoryManagerModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
 import styles from './AdminDashboard.module.css';
@@ -41,6 +43,7 @@ export const AdminDashboard: React.FC = () => {
   // Modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<DynamicNewsItem | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewPostData, setPreviewPostData] = useState<DynamicNewsItem | null>(null);
@@ -55,6 +58,7 @@ export const AdminDashboard: React.FC = () => {
     fetchPostsFromSupabase().then(() => {
       loadPosts();
     });
+    fetchCategoriesFromSupabase();
   }, []);
 
   const allRawPosts = useMemo(() => {
@@ -110,16 +114,26 @@ export const AdminDashboard: React.FC = () => {
           <p className={styles.pageSubtitle}>Quản lý, chỉnh sửa, xem trước và xuất bản tin tức iCANCAM</p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setEditingPost(null);
-            setIsEditModalOpen(true);
-          }}
-          className={styles.createBtn}
-        >
-          <Plus size={18} /> Thêm Bài Viết Mới
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={() => setIsCategoryModalOpen(true)}
+            className={styles.createBtn}
+            style={{ background: '#0d255f', border: '1px solid rgba(245, 130, 32, 0.4)' }}
+          >
+            <FolderTree size={18} /> Quản Lý Danh Mục
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingPost(null);
+              setIsEditModalOpen(true);
+            }}
+            className={styles.createBtn}
+          >
+            <Plus size={18} /> Thêm Bài Viết Mới
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -154,10 +168,15 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className={styles.statCard}>
+        <div
+          className={styles.statCard}
+          onClick={() => setIsCategoryModalOpen(true)}
+          style={{ cursor: 'pointer' }}
+          title="Nhấp để quản lý danh mục bài viết"
+        >
           <div>
-            <div className={styles.statValue}>{stats.categories}</div>
-            <div className={styles.statLabel}>Danh Mục Nổi Bật</div>
+            <div className={styles.statValue}>{getCategories().length}</div>
+            <div className={styles.statLabel}>Danh Mục Nổi Bật (Sửa)</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#8b5cf6' }}>
             <FolderTree size={24} />
@@ -185,9 +204,11 @@ export const AdminDashboard: React.FC = () => {
             className={styles.selectFilter}
           >
             <option value="all">Tất cả Danh mục</option>
-            <option value="events">Sự kiện nổi bật</option>
-            <option value="scholarship">Học bổng & Thành tích</option>
-            <option value="tips">Bí quyết Tiếng Anh</option>
+            {getCategories().map((cat) => (
+              <option key={cat.id} value={cat.id || cat.slug}>
+                {cat.nameVi}
+              </option>
+            ))}
           </select>
 
           <select
@@ -338,6 +359,13 @@ export const AdminDashboard: React.FC = () => {
           setIsPreviewOpen(false);
           setPreviewPostData(null);
         }}
+      />
+
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onCategoriesUpdated={loadPosts}
       />
 
       {/* Delete Confirmation Dialog */}

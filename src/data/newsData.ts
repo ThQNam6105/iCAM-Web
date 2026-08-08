@@ -4,7 +4,7 @@ import newsLimit from '../assets/news_limit.png';
 
 export interface Article {
   id: number | string;
-  category: 'events' | 'scholarship' | 'tips';
+  category: string;
   categoryLabel: string;
   categoryLabelEn?: string;
   date: string;

@@ -21,6 +21,7 @@ import {
   saveDraftAutosave,
   clearDraftAutosave
 } from '../../services/newsService';
+import { getCategories } from '../../services/categoryService';
 import { PostPreviewModal } from './PostPreviewModal';
 import { useToast } from '../Toast/Toast';
 import styles from './PostEditModal.module.css';
@@ -69,7 +70,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [titleEn, setTitleEn] = useState(postToEdit?.titleEn || '');
   const [slug, setSlug] = useState(postToEdit?.slug || (postToEdit?.title ? generateSlug(postToEdit.title) : ''));
   const [status, setStatus] = useState<PostStatus>(postToEdit?.status || 'draft');
-  const [category, setCategory] = useState<'events' | 'scholarship' | 'tips'>(postToEdit?.category || 'events');
+  const [category, setCategory] = useState<string>(postToEdit?.category || 'events');
   const [categoryLabel, setCategoryLabel] = useState(postToEdit?.categoryLabel || 'SỰ KIỆN NỔI BẬT');
   const [categoryLabelEn, setCategoryLabelEn] = useState(postToEdit?.categoryLabelEn || 'FEATURED EVENT');
   const [image, setImage] = useState(postToEdit?.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop');
@@ -304,24 +305,21 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 <select
                   value={category}
                   onChange={(e) => {
-                    const val = e.target.value as 'events' | 'scholarship' | 'tips';
+                    const val = e.target.value;
                     setCategory(val);
-                    if (val === 'events') {
-                      setCategoryLabel('SỰ KIỆN NỔI BẬT');
-                      setCategoryLabelEn('FEATURED EVENT');
-                    } else if (val === 'scholarship') {
-                      setCategoryLabel('HỌC BỔNG & THÀNH TÍCH');
-                      setCategoryLabelEn('SCHOLARSHIP & ACHIEVEMENTS');
-                    } else {
-                      setCategoryLabel('BÍ QUYẾT TIẾNG ANH');
-                      setCategoryLabelEn('ENGLISH TIPS');
+                    const found = getCategories().find((c) => c.id === val || c.slug === val);
+                    if (found) {
+                      setCategoryLabel(found.nameVi);
+                      setCategoryLabelEn(found.nameEn);
                     }
                   }}
                   className={styles.select}
                 >
-                  <option value="events">SỰ KIỆN NỔI BẬT</option>
-                  <option value="scholarship">HỌC BỔNG & THÀNH TÍCH</option>
-                  <option value="tips">BÍ QUYẾT TIẾNG ANH</option>
+                  {getCategories().map((cat) => (
+                    <option key={cat.id} value={cat.id || cat.slug}>
+                      {cat.nameVi}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

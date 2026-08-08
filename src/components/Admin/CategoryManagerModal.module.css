@@ -1,0 +1,388 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 1.5rem;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 980px;
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPopIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.75rem;
+  background: #0d255f;
+  color: #ffffff;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIcon {
+  color: #F58220;
+}
+
+.headerTitle h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
+
+.headerSubText {
+  margin: 2px 0 0 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.modalBody {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+.formCard,
+.listCard {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.formCardTitle,
+.listCardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: #F58220;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.15);
+}
+
+.colorPalette {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.colorDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.colorDot:hover {
+  transform: scale(1.15);
+}
+
+.selectedColorDot {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.customColorPicker {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 0.5rem;
+}
+
+.submitBtn {
+  flex: 1;
+  background: #F58220;
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.submitBtn:hover {
+  background: #e07110;
+}
+
+.cancelBtn {
+  background: #f1f5f9;
+  color: #64748b;
+  border: none;
+  padding: 0.65rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #e2e8f0;
+}
+
+.categoryGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.categoryItemCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.categoryItemCard:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.catColorBar {
+  width: 5px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.catInfo {
+  flex: 1;
+  padding-left: 0.5rem;
+}
+
+.catHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catNameVi {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.postCountBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #F58220;
+  background: rgba(245, 130, 32, 0.1);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+
+.catNameEn {
+  margin: 2px 0 0 0;
+  font-size: 0.76rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.catSlug {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.catItemActions {
+  display: flex;
+  gap: 6px;
+}
+
+.actionIconBtn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionIconBtn:hover {
+  background: #0d255f;
+  color: #ffffff;
+  border-color: #0d255f;
+}
+
+.deleteIconBtn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.deleteConfirmOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem;
+  z-index: 10;
+  border-radius: 10px;
+}
+
+.deleteConfirmOverlay p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.deleteConfirmBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.confirmDeleteBtn {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancelDeleteBtn {
+  background: #475569;
+  color: #ffffff;
+  border: none;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  .modalBody {
+    grid-template-columns: 1fr;
+  }
+}

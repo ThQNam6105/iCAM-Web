@@ -45,10 +45,14 @@ export const AdminSidebar: React.FC = () => {
           <span>Quản lý Bài viết & Dashboard</span>
         </NavLink>
 
-        <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Tính năng phát triển trong tương lai">
+        <NavLink
+          to="/admin"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+          title="Quản lý danh mục bài viết"
+        >
           <FolderTree size={18} />
           <span>Danh mục (Categories)</span>
-        </div>
+        </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Thư viện Media phát triển ở bản sau">
           <ImageIcon size={18} />

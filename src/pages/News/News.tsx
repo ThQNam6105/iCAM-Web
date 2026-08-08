@@ -17,6 +17,7 @@ import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 import { getPublicNewsPosts, fetchPostsFromSupabase, type DynamicNewsItem } from '../../services/newsService';
+import { getCategories, fetchCategoriesFromSupabase } from '../../services/categoryService';
 import { generateTableOfContents } from '../../utils/tocGenerator';
 import { TableOfContents } from '../../components/TableOfContents/TableOfContents';
 import { useToast } from '../../components/Toast/Toast';
@@ -53,6 +54,7 @@ export const News: React.FC = () => {
         setArticles(dynamic);
       }
     });
+    fetchCategoriesFromSupabase();
 
     const handleFocus = () => {
       fetchPostsFromSupabase().then(() => {
@@ -124,24 +126,15 @@ export const News: React.FC = () => {
             >
               {t.news.filterAll}
             </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'events' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('events')}
-            >
-              {t.news.filterEvents}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'scholarship' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('scholarship')}
-            >
-              {t.news.filterScholarship}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'tips' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('tips')}
-            >
-              {t.news.filterTips}
-            </button>
+            {getCategories().map((cat) => (
+              <button
+                key={cat.id}
+                className={`${styles.filterBtn} ${activeCategory === (cat.id || cat.slug) ? styles.activeFilter : ''}`}
+                onClick={() => setActiveCategory(cat.id || cat.slug)}
+              >
+                {language === 'en' ? cat.nameEn : cat.nameVi}
+              </button>
+            ))}
           </div>
         </div>
       </section>
