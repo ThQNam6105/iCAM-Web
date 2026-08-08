@@ -17,6 +17,8 @@ import { AdminLayout } from '../components/Admin/AdminLayout';
 import { ProtectedRoute } from '../components/Admin/ProtectedRoute';
 import { AdminCareers } from '../pages/Admin/AdminCareers';
 
+import { ProjectInfoBadge } from '../components/ProjectInfoBadge/ProjectInfoBadge';
+
 export const AppRouter: React.FC = () => {
   const base = import.meta.env.BASE_URL;
   const basename = base.endsWith('/') && base.length > 1 ? base.slice(0, -1) : base;
@@ -24,6 +26,7 @@ export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter basename={basename}>
       <ScrollToTop />
+      <ProjectInfoBadge />
       <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
