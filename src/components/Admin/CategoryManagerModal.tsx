@@ -188,17 +188,6 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                 />
               </div>
 
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>SEO Slug (Mã đường dẫn)</label>
-                <input
-                  type="text"
-                  placeholder="su-kien-noi-bat"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  className={styles.input}
-                />
-              </div>
-
               {/* Preset Palette */}
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Màu sắc nhận diện Badge</label>

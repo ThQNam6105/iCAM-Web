@@ -189,7 +189,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     const postData: Partial<DynamicNewsItem> = {
       title,
       titleEn: titleEn || title,
-      slug: slug || generateSlug(title),
+      slug: generateSlug(title),
       status,
       category,
       categoryLabel,
@@ -346,17 +346,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 className={styles.input}
               />
               {errors.titleEn && <span className={styles.errorText}>{errors.titleEn}</span>}
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>SEO Slug (Đường dẫn thân thiện)</label>
-              <input
-                type="text"
-                placeholder="chua-co-slug"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                className={styles.input}
-              />
             </div>
 
             <div className={styles.inputGroup}>
