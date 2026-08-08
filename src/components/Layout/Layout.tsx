@@ -6,6 +6,7 @@ import { User, LogOut, Menu, X, ChevronUp, MapPin, Phone, Mail, Clock } from 'lu
 import { useAppStore } from '../../store/useAppStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import styles from './Layout.module.css';
+import { ProjectInfoBadge } from '../ProjectInfoBadge/ProjectInfoBadge';
 
 export const Layout: React.FC = () => {
   const { user, logout } = useAppStore();
@@ -64,6 +65,9 @@ export const Layout: React.FC = () => {
               style={{ height: '64px', width: 'auto', display: 'block' }}
             />
           </a>
+
+          {/* Internship Project Info Badge */}
+          <ProjectInfoBadge />
 
           {/* Desktop Navigation Links */}
           <ul className={styles.navLinks}>
