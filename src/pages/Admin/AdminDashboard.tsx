@@ -11,7 +11,6 @@ import {
   Eye,
   Inbox
 } from 'lucide-react';
-import { useOutletContext } from 'react-router-dom';
 import {
   getAllNewsPosts,
   getFilteredNewsPosts,
@@ -27,12 +26,10 @@ import { PostEditModal } from '../../components/Admin/PostEditModal';
 import { PostPreviewModal } from '../../components/Admin/PostPreviewModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
-import { type AdminOutletContext } from '../../components/Admin/AdminLayout';
 import styles from './AdminDashboard.module.css';
 
 export const AdminDashboard: React.FC = () => {
   const { showToast } = useToast();
-  const outletContext = useOutletContext<AdminOutletContext>();
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -159,12 +156,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div
-          className={styles.statCard}
-          onClick={() => outletContext?.onOpenCategoryManager()}
-          style={{ cursor: 'pointer' }}
-          title="Nhấp để quản lý danh mục bài viết"
-        >
+        <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{getCategories().length}</div>
             <div className={styles.statLabel}>Danh Mục Nổi Bật</div>
