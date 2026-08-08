@@ -191,7 +191,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
       {showAdvanced && (
         <div className={styles.advancedBox}>
           <div className={styles.advancedNote}>
-            ⚠️ Các mục dưới đây là tùy chọn nâng cao. Hệ thống đã tự động cấu hình tối ưu 100%. Bạn chỉ nhập nếu cần ghi đè thủ công.
+            Bài viết đã được tối ưu, chỉ thay đổi các mục bên dưới nếu thực sự cần thiết!
           </div>
 
           <div className={styles.fieldGroup}>
