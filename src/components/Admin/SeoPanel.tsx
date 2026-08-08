@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
   Globe,
   Share2,
   MessageCircle,
@@ -92,20 +91,11 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
 
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.headerRow}>
-        <div className={styles.headerTitleGroup}>
-          <h4 className={styles.headerTitle}>
-            <Sparkles size={18} /> Trợ Lý Tự Động SEO & Phân Phối Mạng Xã Hội
-          </h4>
-        </div>
-      </div>
-
       {/* REAL-TIME AUTOMATIC SOCIAL PREVIEW PANEL */}
       <div className={styles.previewSection}>
         <div className={styles.previewHeader}>
           <span className={styles.previewTitle}>
-            👁️ Xem Trực Tiếp Giao Diện Phân Phối (Live Social & Search Preview)
+            Xem trước nội dung tổng quan
           </span>
 
           <div className={styles.previewTabs}>
