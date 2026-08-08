@@ -11,6 +11,7 @@ import {
   Eye,
   Inbox
 } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import {
   getAllNewsPosts,
   getFilteredNewsPosts,
@@ -24,13 +25,14 @@ import {
 import { getCategories, fetchCategoriesFromSupabase } from '../../services/categoryService';
 import { PostEditModal } from '../../components/Admin/PostEditModal';
 import { PostPreviewModal } from '../../components/Admin/PostPreviewModal';
-import { CategoryManagerModal } from '../../components/Admin/CategoryManagerModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
+import { type AdminOutletContext } from '../../components/Admin/AdminLayout';
 import styles from './AdminDashboard.module.css';
 
 export const AdminDashboard: React.FC = () => {
   const { showToast } = useToast();
+  const outletContext = useOutletContext<AdminOutletContext>();
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -43,7 +45,6 @@ export const AdminDashboard: React.FC = () => {
   // Modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<DynamicNewsItem | null>(null);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewPostData, setPreviewPostData] = useState<DynamicNewsItem | null>(null);
@@ -114,26 +115,16 @@ export const AdminDashboard: React.FC = () => {
           <p className={styles.pageSubtitle}>Quản lý, chỉnh sửa, xem trước và xuất bản tin tức iCANCAM</p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            type="button"
-            onClick={() => setIsCategoryModalOpen(true)}
-            className={styles.createBtn}
-            style={{ background: '#0d255f', border: '1px solid rgba(245, 130, 32, 0.4)' }}
-          >
-            <FolderTree size={18} /> Quản Lý Danh Mục
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setEditingPost(null);
-              setIsEditModalOpen(true);
-            }}
-            className={styles.createBtn}
-          >
-            <Plus size={18} /> Thêm Bài Viết Mới
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEditingPost(null);
+            setIsEditModalOpen(true);
+          }}
+          className={styles.createBtn}
+        >
+          <Plus size={18} /> Thêm Bài Viết Mới
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -170,13 +161,13 @@ export const AdminDashboard: React.FC = () => {
 
         <div
           className={styles.statCard}
-          onClick={() => setIsCategoryModalOpen(true)}
+          onClick={() => outletContext?.onOpenCategoryManager()}
           style={{ cursor: 'pointer' }}
           title="Nhấp để quản lý danh mục bài viết"
         >
           <div>
             <div className={styles.statValue}>{getCategories().length}</div>
-            <div className={styles.statLabel}>Danh Mục Nổi Bật (Sửa)</div>
+            <div className={styles.statLabel}>Danh Mục Nổi Bật</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#8b5cf6' }}>
             <FolderTree size={24} />
@@ -359,13 +350,6 @@ export const AdminDashboard: React.FC = () => {
           setIsPreviewOpen(false);
           setPreviewPostData(null);
         }}
-      />
-
-      {/* Category Manager Modal */}
-      <CategoryManagerModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        onCategoriesUpdated={loadPosts}
       />
 
       {/* Delete Confirmation Dialog */}

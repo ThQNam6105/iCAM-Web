@@ -15,7 +15,11 @@ import footerLogo from '../../assets/footer-logo.jpg';
 import { authService } from '../../services/authService';
 import styles from './AdminSidebar.module.css';
 
-export const AdminSidebar: React.FC = () => {
+interface AdminSidebarProps {
+  onOpenCategoryManager?: () => void;
+}
+
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onOpenCategoryManager }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -45,14 +49,15 @@ export const AdminSidebar: React.FC = () => {
           <span>Quản lý Bài viết & Dashboard</span>
         </NavLink>
 
-        <NavLink
-          to="/admin"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-          title="Quản lý danh mục bài viết"
+        <button
+          type="button"
+          onClick={onOpenCategoryManager}
+          className={styles.navItemBtn}
+          title="Bấm để mở trình Quản lý danh mục bài viết"
         >
           <FolderTree size={18} />
           <span>Danh mục (Categories)</span>
-        </NavLink>
+        </button>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Thư viện Media phát triển ở bản sau">
           <ImageIcon size={18} />
@@ -95,13 +100,14 @@ export const AdminSidebar: React.FC = () => {
       <div className={styles.userFooter}>
         <div className={styles.userInfo}>
           <div className={styles.avatar}>A</div>
-          <div>
-            <div className={styles.userName}>iCANCAM Admin</div>
-            <div className={styles.userRole}>Super Administrator</div>
+          <div className={styles.userDetails}>
+            <span className={styles.userName}>Administrator</span>
+            <span className={styles.userRole}>Super Admin</span>
           </div>
         </div>
-        <button type="button" onClick={handleLogout} className={styles.logoutBtn} title="Đăng xuất">
-          <LogOut size={18} />
+
+        <button onClick={handleLogout} className={styles.logoutBtn} title="Đăng xuất">
+          <LogOut size={16} />
         </button>
       </div>
     </aside>
