@@ -28,9 +28,9 @@ interface SeoPanelProps {
   noIndex?: boolean;
   noFollow?: boolean;
 
-  onChangeSlug: (val: string) => void;
-  onChangeMetaTitle: (val: string) => void;
-  onChangeMetaDescription: (val: string) => void;
+  onChangeSlug?: (val: string) => void;
+  onChangeMetaTitle?: (val: string) => void;
+  onChangeMetaDescription?: (val: string) => void;
   onChangeOgTitle?: (val: string) => void;
   onChangeOgDescription?: (val: string) => void;
   onChangeOgImage?: (val: string) => void;
@@ -54,9 +54,6 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
   noIndex = false,
   noFollow = false,
 
-  onChangeSlug,
-  onChangeMetaTitle,
-  onChangeMetaDescription,
   onChangeOgTitle,
   onChangeOgDescription,
   onChangeOgImage,
@@ -95,22 +92,6 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
     coverImage?.trim() ||
     'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop';
 
-  // Title & Description length indicators
-  const titleLen = autoTitle.length;
-  const descLen = autoDescription.length;
-
-  const getTitleStatus = () => {
-    if (titleLen >= 45 && titleLen <= 65) return { text: 'Đạt chuẩn Google (45–65 tự)', class: styles.countGood };
-    if (titleLen > 0 && titleLen < 45) return { text: 'Nên dài hơn (45–65 tự)', class: styles.countWarn };
-    return { text: 'Quá dài (Nên dưới 65 tự)', class: styles.countBad };
-  };
-
-  const getDescStatus = () => {
-    if (descLen >= 120 && descLen <= 165) return { text: 'Đạt chuẩn Google (120–165 tự)', class: styles.countGood };
-    if (descLen > 0 && descLen < 120) return { text: 'Nên viết chi tiết hơn', class: styles.countWarn };
-    return { text: 'Nên rút gọn dưới 165 tự', class: styles.countBad };
-  };
-
   // Automatic Quality Health Checks
   const checks = [
     { label: 'Tiêu đề bài viết rõ ràng', pass: articleTitle.trim().length >= 10 },
@@ -140,55 +121,6 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           }`}
         >
           <ShieldCheck size={14} /> Điểm Đọc & SEO: {healthScore}%
-        </div>
-      </div>
-
-      {/* Editor Main Fields (Convention over configuration) */}
-      <div className={styles.editorFieldsGrid}>
-        <div className={styles.fieldGroup}>
-          <div className={styles.labelRow}>
-            <label className={styles.label}>Tùy chỉnh Tiêu đề Google (SEO Title)</label>
-            <span className={`${styles.charBadge} ${getTitleStatus().class}`}>
-              {titleLen} tự — {getTitleStatus().text}
-            </span>
-          </div>
-          <input
-            type="text"
-            value={metaTitle}
-            onChange={(e) => onChangeMetaTitle(e.target.value)}
-            placeholder={articleTitle || 'Tự động sử dụng Tiêu đề bài viết...'}
-            className={styles.input}
-          />
-        </div>
-
-        <div className={styles.fieldGroup}>
-          <div className={styles.labelRow}>
-            <label className={styles.label}>Tùy chỉnh Mô tả Tìm kiếm (SEO Description)</label>
-            <span className={`${styles.charBadge} ${getDescStatus().class}`}>
-              {descLen} tự — {getDescStatus().text}
-            </span>
-          </div>
-          <textarea
-            rows={2}
-            value={metaDescription}
-            onChange={(e) => onChangeMetaDescription(e.target.value)}
-            placeholder={articleExcerpt || 'Tự động trích xuất từ đoạn tóm tắt bài viết...'}
-            className={styles.textarea}
-          />
-        </div>
-
-        <div className={styles.fieldGroup}>
-          <label className={styles.label}>Đường dẫn tĩnh thân thiện (URL Slug)</label>
-          <div className={styles.slugInputWrapper}>
-            <span className={styles.slugPrefix}>https://{domain}/news/</span>
-            <input
-              type="text"
-              value={slug}
-              onChange={(e) => onChangeSlug(e.target.value)}
-              placeholder="duong-dan-bai-viet"
-              className={styles.slugInput}
-            />
-          </div>
         </div>
       </div>
 
