@@ -6,9 +6,7 @@ import {
   MessageCircle,
   ChevronDown,
   ChevronRight,
-  ShieldCheck,
   ExternalLink,
-  CheckCircle2,
   Sliders,
 } from 'lucide-react';
 import styles from './SeoPanel.module.css';
@@ -92,35 +90,14 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
     coverImage?.trim() ||
     'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop';
 
-  // Automatic Quality Health Checks
-  const checks = [
-    { label: 'Tiêu đề bài viết rõ ràng', pass: articleTitle.trim().length >= 10 },
-    { label: 'Có đoạn tóm tắt chất lượng', pass: articleExcerpt.trim().length >= 20 },
-    { label: 'Hình ảnh bìa minh họa chuẩn 16:9', pass: Boolean(coverImage && coverImage.startsWith('http')) },
-    { label: 'Đường dẫn Slug chuẩn SEO', pass: Boolean(slug && slug.length >= 3) },
-  ];
-  const passedCount = checks.filter((c) => c.pass).length;
-  const healthScore = Math.round((passedCount / checks.length) * 100);
-
   return (
     <div className={styles.container}>
-      {/* Header with Health Score & Auto Badge */}
+      {/* Header */}
       <div className={styles.headerRow}>
         <div className={styles.headerTitleGroup}>
           <h4 className={styles.headerTitle}>
             <Sparkles size={18} /> Trợ Lý Tự Động SEO & Phân Phối Mạng Xã Hội
           </h4>
-          <span className={styles.autoTag}>
-            <CheckCircle2 size={12} /> Auto-Generated Open Graph & Schema
-          </span>
-        </div>
-
-        <div
-          className={`${styles.healthBadge} ${
-            healthScore >= 75 ? styles.healthGreen : healthScore >= 50 ? styles.healthOrange : styles.healthRed
-          }`}
-        >
-          <ShieldCheck size={14} /> Điểm Đọc & SEO: {healthScore}%
         </div>
       </div>
 
