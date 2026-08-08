@@ -51,6 +51,9 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
   noIndex = false,
   noFollow = false,
 
+  onChangeSlug,
+  onChangeMetaTitle,
+  onChangeMetaDescription,
   onChangeOgTitle,
   onChangeOgDescription,
   onChangeOgImage,
@@ -173,14 +176,14 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
         </div>
       </div>
 
-      {/* ADVANCED SEO ACCORDION (Collapsed by default for enterprise usage) */}
+      {/* ADVANCED SEO ACCORDION (Collapsed by default) */}
       <button
         type="button"
         onClick={() => setShowAdvanced(!showAdvanced)}
         className={styles.accordionToggle}
       >
         <span className={styles.accordionToggleText}>
-          <Sliders size={15} /> Advanced SEO (Cấu hình nâng cao - Dành cho chuyên gia)
+          <Sliders size={15} /> Tùy chỉnh - nâng cao
         </span>
         {showAdvanced ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </button>
@@ -189,6 +192,42 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
         <div className={styles.advancedBox}>
           <div className={styles.advancedNote}>
             ⚠️ Các mục dưới đây là tùy chọn nâng cao. Hệ thống đã tự động cấu hình tối ưu 100%. Bạn chỉ nhập nếu cần ghi đè thủ công.
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Tùy chỉnh Tiêu đề Google (SEO Title)</label>
+            <input
+              type="text"
+              value={metaTitle}
+              onChange={(e) => onChangeMetaTitle?.(e.target.value)}
+              placeholder={articleTitle || 'Tự động sử dụng Tiêu đề bài viết...'}
+              className={styles.input}
+            />
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Tùy chỉnh Mô tả Tìm kiếm (SEO Description)</label>
+            <textarea
+              rows={2}
+              value={metaDescription}
+              onChange={(e) => onChangeMetaDescription?.(e.target.value)}
+              placeholder={articleExcerpt || 'Tự động trích xuất từ đoạn tóm tắt bài viết...'}
+              className={styles.textarea}
+            />
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Đường dẫn tĩnh thân thiện (URL Slug)</label>
+            <div className={styles.slugInputWrapper}>
+              <span className={styles.slugPrefix}>https://{domain}/news/</span>
+              <input
+                type="text"
+                value={slug}
+                onChange={(e) => onChangeSlug?.(e.target.value)}
+                placeholder="duong-dan-bai-viet"
+                className={styles.slugInput}
+              />
+            </div>
           </div>
 
           <div className={styles.fieldGroup}>
