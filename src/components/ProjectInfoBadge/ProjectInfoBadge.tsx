@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Info, ExternalLink, X } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 import styles from './ProjectInfoBadge.module.css';
 
 export const ProjectInfoBadge: React.FC = () => {
+  const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(true);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -46,7 +48,7 @@ export const ProjectInfoBadge: React.FC = () => {
         className={`${styles.infoIconBtn} ${isOpen ? styles.activeBtn : ''}`}
         onMouseEnter={handleInteraction}
         onTouchStart={handleInteraction}
-        aria-label="Thông tin dự án"
+        aria-label={language === 'en' ? 'Project info' : 'Thông tin dự án'}
       >
         <Info size={20} className={styles.infoIcon} />
         <span className={styles.iconPulse} />
@@ -63,18 +65,28 @@ export const ProjectInfoBadge: React.FC = () => {
             type="button"
             className={styles.closeBtn}
             onClick={handleClose}
-            aria-label="Đóng"
+            aria-label={language === 'en' ? 'Close' : 'Đóng'}
           >
             <X size={14} />
           </button>
 
           <div className={styles.popupHeader}>
             <Info size={16} className={styles.popupHeaderIcon} />
-            <span className={styles.popupHeaderTitle}>THÔNG TIN DỰ ÁN</span>
+            <span className={styles.popupHeaderTitle}>
+              {language === 'en' ? 'PROJECT INFO' : 'THÔNG TIN DỰ ÁN'}
+            </span>
           </div>
 
           <p className={styles.popupText}>
-            Đây là dự án thực tập của <strong>Thiều Nam da goat</strong> cho trung tâm ngoại ngữ iCANCAM. Trang web chính chủ của trung tâm ngoại ngữ iCANCAM là{' '}
+            {language === 'en' ? (
+              <>
+                This is an internship project by <strong>Thieu Nam da goat</strong> for iCANCAM English Center. The official website of iCANCAM English Center is{' '}
+              </>
+            ) : (
+              <>
+                Đây là dự án thực tập của <strong>Thiều Nam da goat</strong> cho trung tâm ngoại ngữ iCANCAM. Trang web chính chủ của trung tâm ngoại ngữ iCANCAM là{' '}
+              </>
+            )}
             <a
               href="https://ngoaingucam.vn/"
               target="_blank"

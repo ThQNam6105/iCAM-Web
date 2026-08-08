@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { articlesData } from '../../data/newsData';
@@ -939,11 +938,6 @@ export const Home: React.FC = () => {
               </div>
             )}
 
-            {/* Navigation Left Button */}
-            <button onClick={prevTeacherSlide} className={styles.navBtn} aria-label="Previous Teacher">
-              <ChevronLeft size={36} />
-            </button>
-
             {/* Viewport */}
             <div className={styles.teachersSliderContainer}>
               <div
@@ -1021,11 +1015,6 @@ export const Home: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Navigation Right Button */}
-            <button onClick={nextTeacherSlide} className={styles.navBtn} aria-label="Next Teacher">
-              <ChevronRight size={36} />
-            </button>
           </div>
         </div>
       </section>
@@ -1073,11 +1062,6 @@ export const Home: React.FC = () => {
                   : (language === 'en' ? 'Hold & Drag' : 'Giữ và kéo')}
               </div>
             )}
-
-            {/* Navigation Left Button */}
-            <button onClick={prevStudentSlide} className={styles.navBtn} aria-label="Previous Student">
-              <ChevronLeft size={36} />
-            </button>
 
             {/* Viewport */}
             <div className={styles.studentsSliderContainer}>
@@ -1155,11 +1139,6 @@ export const Home: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Navigation Right Button */}
-            <button onClick={nextStudentSlide} className={styles.navBtn} aria-label="Next Student">
-              <ChevronRight size={36} />
-            </button>
           </div>
         </div>
       </section>
@@ -1208,11 +1187,6 @@ export const Home: React.FC = () => {
               </div>
             )}
 
-            {/* Navigation Left Button */}
-            <button onClick={prevParentSlide} className={styles.navBtn} aria-label="Previous Parent">
-              <ChevronLeft size={36} />
-            </button>
-
             {/* Viewport */}
             <div className={styles.parentsSliderContainer}>
               <div
@@ -1255,11 +1229,6 @@ export const Home: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Navigation Right Button */}
-            <button onClick={nextParentSlide} className={styles.navBtn} aria-label="Next Parent">
-              <ChevronRight size={36} />
-            </button>
           </div>
         </div>
       </section>
