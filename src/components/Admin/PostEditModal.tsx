@@ -35,7 +35,6 @@ interface PostEditModalProps {
 
 import { RichTextEditor } from './RichTextEditor';
 import { SeoPanel } from './SeoPanel';
-import { QualityChecker } from './QualityChecker';
 import { RevisionHistoryModal } from './RevisionHistoryModal';
 import { createPostRevision, getPostRevisions, type PostRevision } from '../../services/revisionService';
 
@@ -523,14 +522,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               onChangeCanonicalUrlOverride={setCanonicalUrl}
               onChangeNoIndex={setNoIndex}
               onChangeNoFollow={setNoFollow}
-            />
-
-            <QualityChecker
-              title={title}
-              excerpt={excerpt}
-              content={content}
-              image={image}
-              metaDescription={metaDescription}
             />
 
             <div className={styles.modalActions}>
