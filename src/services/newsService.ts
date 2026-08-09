@@ -119,6 +119,25 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
     }
 
+    // Migrate legacy 'events' / 'SỰ KIỆN NỔI BẬT' posts to 'su-kien' / 'SỰ KIỆN'
+    let migrated = false;
+    posts = posts.map((p) => {
+      if (p.category === 'events' || p.categoryLabel === 'SỰ KIỆN NỔI BẬT') {
+        migrated = true;
+        return {
+          ...p,
+          category: 'su-kien',
+          categoryLabel: 'SỰ KIỆN',
+          categoryLabelEn: 'EVENTS',
+        };
+      }
+      return p;
+    });
+
+    if (migrated) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+    }
+
     return posts;
   } catch (error) {
     console.error('Error reading news posts:', error);

@@ -262,7 +262,26 @@ export const AdminDashboard: React.FC = () => {
                     <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>/{post.slug}</div>
                   </td>
                   <td>
-                    <span className={styles.badgeCategory}>{post.categoryLabel}</span>
+                    {(() => {
+                      const allCats = getCategories();
+                      const matchedCat = allCats.find(
+                        (c) =>
+                          c.id === post.category ||
+                          c.slug === post.category ||
+                          c.nameVi === post.categoryLabel
+                      );
+                      const displayLabel = matchedCat ? matchedCat.nameVi : (post.categoryLabel === 'SỰ KIỆN NỔI BẬT' ? 'SỰ KIỆN' : post.categoryLabel);
+                      const displayColor = matchedCat?.color || '#F58220';
+
+                      return (
+                        <span
+                          className={styles.badgeCategory}
+                          style={{ backgroundColor: displayColor }}
+                        >
+                          {displayLabel}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td>
                     <span
