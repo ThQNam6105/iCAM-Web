@@ -275,3 +275,13 @@ a {
   }
 }
 
+/* Fix text-align: justify word stretching on the last line */
+p, div, span, article, section, h1, h2, h3, h4, h5, h6 {
+  text-align-last: left;
+}
+
+[style*="text-align: justify"],
+[style*="text-align:justify"] {
+  text-align-last: left !important;
+}
+
