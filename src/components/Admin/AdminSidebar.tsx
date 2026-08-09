@@ -15,11 +15,7 @@ import footerLogo from '../../assets/footer-logo.jpg';
 import { authService } from '../../services/authService';
 import styles from './AdminSidebar.module.css';
 
-interface AdminSidebarProps {
-  onOpenCategoryManager?: () => void;
-}
-
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onOpenCategoryManager }) => {
+export const AdminSidebar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -49,15 +45,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onOpenCategoryManage
           <span>Quản lý Bài viết & Dashboard</span>
         </NavLink>
 
-        <button
-          type="button"
-          onClick={onOpenCategoryManager}
-          className={styles.navItemBtn}
-          title="Bấm để mở trình Quản lý danh mục bài viết"
+        <NavLink
+          to="/admin/categories"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <FolderTree size={18} />
           <span>Danh mục (Categories)</span>
-        </button>
+        </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Thư viện Media phát triển ở bản sau">
           <ImageIcon size={18} />
