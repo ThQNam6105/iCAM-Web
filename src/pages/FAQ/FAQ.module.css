@@ -76,7 +76,8 @@
   letter-spacing: -0.02em;
   margin-bottom: 1.25rem;
   color: #ffffff !important;
-  text-wrap: balance;
+  text-wrap: wrap;
+  text-align: center;
   max-width: 100%;
 }
 
