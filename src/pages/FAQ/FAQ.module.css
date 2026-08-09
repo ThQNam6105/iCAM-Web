@@ -77,14 +77,14 @@
   margin-bottom: 1.25rem;
   color: #ffffff !important;
   text-wrap: balance;
-  max-width: 850px;
+  max-width: 100%;
 }
 
 .heroSubtitle {
   font-size: 1.1rem;
   line-height: 1.7;
   color: #cbd5e1 !important;
-  max-width: 780px;
+  max-width: 840px;
   margin: 0 auto 2.5rem auto;
   text-wrap: balance;
 }
