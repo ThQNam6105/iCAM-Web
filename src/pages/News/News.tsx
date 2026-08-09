@@ -8,6 +8,7 @@ import {
   X,
   Send,
   BookOpen,
+  Inbox,
   Share2,
   Copy,
   Check,
@@ -16,7 +17,7 @@ import styles from './News.module.css';
 import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
-import { getPublicNewsPosts, fetchPostsFromSupabase, type DynamicNewsItem } from '../../services/newsService';
+import { getPublicNewsPosts, fetchPostsFromSupabase, generateSlug, type DynamicNewsItem } from '../../services/newsService';
 import { getCategories, fetchCategoriesFromSupabase } from '../../services/categoryService';
 import { generateTableOfContents } from '../../utils/tocGenerator';
 import { TableOfContents } from '../../components/TableOfContents/TableOfContents';
@@ -81,12 +82,44 @@ export const News: React.FC = () => {
     }
   };
 
+  const isCategoryMatch = (articleCat?: string, activeCatIdOrSlug?: string) => {
+    if (!articleCat || !activeCatIdOrSlug) return false;
+    if (activeCatIdOrSlug === 'all') return true;
+
+    const artNorm = articleCat.toLowerCase().trim();
+    const activeNorm = activeCatIdOrSlug.toLowerCase().trim();
+
+    if (artNorm === activeNorm) return true;
+    if (generateSlug(artNorm) === generateSlug(activeNorm)) return true;
+
+    const allCats = getCategories();
+    const activeCatObj = allCats.find(
+      (c) => c.id.toLowerCase() === activeNorm || c.slug.toLowerCase() === activeNorm
+    );
+
+    if (activeCatObj) {
+      const catId = activeCatObj.id.toLowerCase();
+      const catSlug = activeCatObj.slug.toLowerCase();
+      const catViSlug = generateSlug(activeCatObj.nameVi);
+      const catEnSlug = generateSlug(activeCatObj.nameEn);
+
+      return (
+        artNorm === catId ||
+        artNorm === catSlug ||
+        generateSlug(artNorm) === catViSlug ||
+        generateSlug(artNorm) === catEnSlug
+      );
+    }
+
+    return false;
+  };
+
   const filteredArticles = activeCategory === 'all'
     ? articles
-    : articles.filter(art => art.category === activeCategory);
+    : articles.filter(art => isCategoryMatch(art.category, activeCategory));
 
-  const featuredArticle = filteredArticles[0] || articlesData[0];
-  const remainingArticles = filteredArticles.length > 1 ? filteredArticles.slice(1) : filteredArticles;
+  const featuredArticle = filteredArticles.length > 0 ? filteredArticles[0] : null;
+  const remainingArticles = filteredArticles.length > 1 ? filteredArticles.slice(1) : [];
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,50 +236,69 @@ export const News: React.FC = () => {
             <h2 className={styles.sectionGridTitle}>{t.news.gridTitle}</h2>
           </div>
 
-          <div className={styles.articlesGrid}>
-            {remainingArticles.map(article => (
-              <div key={article.id} className={styles.articleCard} onClick={() => handleSelectArticle(article)}>
-                <div className={styles.articleImageWrapper}>
-                  <img
-                    src={article.image}
-                    alt={language === 'en' ? (article.titleEn || article.title) : article.title}
-                    className={styles.articleImage}
-                    style={{
-                      objectFit: article.imageFit || 'cover',
-                      objectPosition: article.panX !== undefined && article.panY !== undefined
-                        ? `${article.panX}% ${article.panY}%`
-                        : (article.imagePosition || 'center'),
-                      transform: article.imageZoom ? `scale(${article.imageZoom / 100})` : undefined,
-                      transformOrigin: article.panX !== undefined && article.panY !== undefined
-                        ? `${article.panX}% ${article.panY}%`
-                        : 'center',
-                    }}
-                  />
-                  <div className={styles.articleCategoryBadge}>
-                    {language === 'en' ? (article.categoryLabelEn || article.categoryLabel) : article.categoryLabel}
+          {filteredArticles.length === 0 ? (
+            <div className={styles.emptyCategoryCard}>
+              <Inbox size={48} className={styles.emptyIcon} />
+              <h3>{language === 'en' ? 'No articles in this category yet' : 'Chưa có bài viết nào thuộc danh mục này'}</h3>
+              <p>
+                {language === 'en'
+                  ? 'New articles will be published soon. Please check back later or explore all news.'
+                  : 'Các bài viết mới sẽ được cập nhật sớm. Bạn có thể xem tất cả bài viết khác của iCANCAM.'}
+              </p>
+              <button
+                type="button"
+                className={styles.resetCategoryBtn}
+                onClick={() => setActiveCategory('all')}
+              >
+                {language === 'en' ? 'View All News' : 'Xem Tất Cả Bài Viết'}
+              </button>
+            </div>
+          ) : (
+            <div className={styles.articlesGrid}>
+              {remainingArticles.map(article => (
+                <div key={article.id} className={styles.articleCard} onClick={() => handleSelectArticle(article)}>
+                  <div className={styles.articleImageWrapper}>
+                    <img
+                      src={article.image}
+                      alt={language === 'en' ? (article.titleEn || article.title) : article.title}
+                      className={styles.articleImage}
+                      style={{
+                        objectFit: article.imageFit || 'cover',
+                        objectPosition: article.panX !== undefined && article.panY !== undefined
+                          ? `${article.panX}% ${article.panY}%`
+                          : (article.imagePosition || 'center'),
+                        transform: article.imageZoom ? `scale(${article.imageZoom / 100})` : undefined,
+                        transformOrigin: article.panX !== undefined && article.panY !== undefined
+                          ? `${article.panX}% ${article.panY}%`
+                          : 'center',
+                      }}
+                    />
+                    <div className={styles.articleCategoryBadge}>
+                      {language === 'en' ? (article.categoryLabelEn || article.categoryLabel) : article.categoryLabel}
+                    </div>
+                  </div>
+
+                  <div className={styles.articleBody}>
+                    <span className={styles.articleDate}>
+                      <Calendar size={14} /> {article.date}
+                    </span>
+
+                    <h3 className={styles.articleTitle}>
+                      {language === 'en' ? (article.titleEn || article.title) : article.title}
+                    </h3>
+
+                    <p className={styles.articleExcerpt}>
+                      {language === 'en' ? (article.excerptEn || article.excerpt) : article.excerpt}
+                    </p>
+
+                    <div className={styles.articleReadMoreLink}>
+                      {t.news.readCardBtn} <ChevronRight size={16} />
+                    </div>
                   </div>
                 </div>
-
-                <div className={styles.articleBody}>
-                  <span className={styles.articleDate}>
-                    <Calendar size={14} /> {article.date}
-                  </span>
-
-                  <h3 className={styles.articleTitle}>
-                    {language === 'en' ? (article.titleEn || article.title) : article.title}
-                  </h3>
-
-                  <p className={styles.articleExcerpt}>
-                    {language === 'en' ? (article.excerptEn || article.excerpt) : article.excerpt}
-                  </p>
-
-                  <div className={styles.articleReadMoreLink}>
-                    {t.news.readCardBtn} <ChevronRight size={16} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
