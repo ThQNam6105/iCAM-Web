@@ -1,5 +1,6 @@
 import { articlesData, type Article } from '../data/newsData';
 import { supabase } from './supabaseClient';
+import { getCategories } from './categoryService';
 
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v3';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
@@ -97,28 +98,53 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
 export const getAllNewsPosts = (): DynamicNewsItem[] => {
   try {
     const customPostsRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    let posts: DynamicNewsItem[] = [];
     if (customPostsRaw) {
-      return JSON.parse(customPostsRaw);
+      posts = JSON.parse(customPostsRaw);
+    } else {
+      // Seed default articles into localStorage so all of them are editable & deletable
+      posts = articlesData.map((post) => ({
+        ...post,
+        id: `default_${post.id}`,
+        slug: generateSlug(post.title),
+        status: 'published',
+        author: 'iCANCAM Editor',
+        tags: ['Anh ngữ', 'Giáo dục'],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        publishedAt: post.date,
+        featured: true,
+        readingTime: '3 phút đọc',
+        isCustom: true,
+      }));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
     }
 
-    // Seed default articles into localStorage so all of them are editable & deletable
-    const initialPosts: DynamicNewsItem[] = articlesData.map((post) => ({
-      ...post,
-      id: `default_${post.id}`,
-      slug: generateSlug(post.title),
-      status: 'published',
-      author: 'iCANCAM Editor',
-      tags: ['Anh ngữ', 'Giáo dục'],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      publishedAt: post.date,
-      featured: true,
-      readingTime: '3 phút đọc',
-      isCustom: true,
-    }));
+    // Sanitize category assignments: if a post has a category that was deleted, map to first active category
+    const activeCats = getCategories();
+    if (activeCats.length > 0) {
+      let modified = false;
+      const sanitized = posts.map((p) => {
+        const catExists = activeCats.some(c => c.id === p.category || c.slug === p.category || generateSlug(c.nameVi) === generateSlug(p.category || ''));
+        if (!catExists) {
+          modified = true;
+          return {
+            ...p,
+            category: activeCats[0].id || activeCats[0].slug,
+            categoryLabel: activeCats[0].nameVi,
+            categoryLabelEn: activeCats[0].nameEn,
+          };
+        }
+        return p;
+      });
 
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initialPosts));
-    return initialPosts;
+      if (modified) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sanitized));
+        return sanitized;
+      }
+    }
+
+    return posts;
   } catch (error) {
     console.error('Error reading news posts:', error);
     return [];

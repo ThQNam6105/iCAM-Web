@@ -65,13 +65,23 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const getInitialCategory = () => {
+    const cats = getCategories();
+    if (cats.length === 0) {
+      return { id: 'news', slug: 'news', nameVi: 'TIN TỨC', nameEn: 'NEWS' };
+    }
+    const found = cats.find((c) => c.id === postToEdit?.category || c.slug === postToEdit?.category);
+    return found || cats[0];
+  };
+
+  const initialCat = getInitialCategory();
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [titleEn, setTitleEn] = useState(postToEdit?.titleEn || '');
   const [slug, setSlug] = useState(postToEdit?.slug || (postToEdit?.title ? generateSlug(postToEdit.title) : ''));
   const [status, setStatus] = useState<PostStatus>(postToEdit?.status || 'draft');
-  const [category, setCategory] = useState<string>(postToEdit?.category || 'events');
-  const [categoryLabel, setCategoryLabel] = useState(postToEdit?.categoryLabel || 'SỰ KIỆN NỔI BẬT');
-  const [categoryLabelEn, setCategoryLabelEn] = useState(postToEdit?.categoryLabelEn || 'FEATURED EVENT');
+  const [category, setCategory] = useState<string>(initialCat.id || initialCat.slug);
+  const [categoryLabel, setCategoryLabel] = useState<string>(initialCat.nameVi);
+  const [categoryLabelEn, setCategoryLabelEn] = useState<string>(initialCat.nameEn);
   const [image, setImage] = useState(postToEdit?.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop');
   const [imageZoom, setImageZoom] = useState<number>(postToEdit?.imageZoom ?? 100);
   const [panX, setPanX] = useState<number>(postToEdit?.panX ?? 50);
@@ -156,9 +166,10 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [revisions] = useState<PostRevision[]>(() =>
     postToEdit?.id ? getPostRevisions(postToEdit.id) : []
   );
-
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [lastAutosave, setLastAutosave] = useState<string | null>(null);
+
+
 
   // Auto-generate slug when VI title changes (if user hasn't custom edited it)
   const handleTitleChange = (val: string) => {
@@ -185,14 +196,19 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const cats = getCategories();
+    const matchedCat = cats.find((c) => c.id === category || c.slug === category);
+    const finalLabelVi = matchedCat ? matchedCat.nameVi : categoryLabel;
+    const finalLabelEn = matchedCat ? matchedCat.nameEn : (categoryLabelEn || finalLabelVi);
+
     const postData: Partial<DynamicNewsItem> = {
       title,
       titleEn: titleEn || title,
       slug: generateSlug(title),
       status,
       category,
-      categoryLabel,
-      categoryLabelEn: categoryLabelEn || categoryLabel,
+      categoryLabel: finalLabelVi,
+      categoryLabelEn: finalLabelEn,
       image: image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
       imageZoom,
       panX,
