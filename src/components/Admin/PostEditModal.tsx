@@ -67,11 +67,22 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
   const getInitialCategory = () => {
     const cats = getCategories();
-    if (cats.length === 0) {
-      return { id: 'news', slug: 'news', nameVi: 'TIN TỨC', nameEn: 'NEWS' };
+    if (postToEdit?.category) {
+      const found = cats.find(
+        (c) =>
+          c.id === postToEdit.category ||
+          c.slug === postToEdit.category ||
+          generateSlug(c.nameVi) === generateSlug(postToEdit.category)
+      );
+      if (found) return found;
+      return {
+        id: postToEdit.category,
+        slug: generateSlug(postToEdit.category),
+        nameVi: postToEdit.categoryLabel || postToEdit.category.toUpperCase(),
+        nameEn: postToEdit.categoryLabelEn || postToEdit.categoryLabel || postToEdit.category.toUpperCase(),
+      };
     }
-    const found = cats.find((c) => c.id === postToEdit?.category || c.slug === postToEdit?.category);
-    return found || cats[0];
+    return cats[0] || { id: 'news', slug: 'news', nameVi: 'TIN TỨC', nameEn: 'NEWS' };
   };
 
   const initialCat = getInitialCategory();
@@ -335,6 +346,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       {cat.nameVi}
                     </option>
                   ))}
+                  {!getCategories().some((c) => c.id === category || c.slug === category) && (
+                    <option value={category}>{categoryLabel || category.toUpperCase()}</option>
+                  )}
                 </select>
               </div>
             </div>

@@ -1,6 +1,5 @@
 import { articlesData, type Article } from '../data/newsData';
 import { supabase } from './supabaseClient';
-import { getCategories } from './categoryService';
 
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v3';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
@@ -118,30 +117,6 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
         isCustom: true,
       }));
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
-    }
-
-    // Sanitize category assignments: if a post has a category that was deleted, map to first active category
-    const activeCats = getCategories();
-    if (activeCats.length > 0) {
-      let modified = false;
-      const sanitized = posts.map((p) => {
-        const catExists = activeCats.some(c => c.id === p.category || c.slug === p.category || generateSlug(c.nameVi) === generateSlug(p.category || ''));
-        if (!catExists) {
-          modified = true;
-          return {
-            ...p,
-            category: activeCats[0].id || activeCats[0].slug,
-            categoryLabel: activeCats[0].nameVi,
-            categoryLabelEn: activeCats[0].nameEn,
-          };
-        }
-        return p;
-      });
-
-      if (modified) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sanitized));
-        return sanitized;
-      }
     }
 
     return posts;

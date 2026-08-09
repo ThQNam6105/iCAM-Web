@@ -54,6 +54,16 @@ export const DEFAULT_CATEGORIES: CategoryItem[] = [
     description: 'Thông báo lịch học, khai giảng và cập nhật chính thức từ trung tâm',
     order: 4,
   },
+  {
+    id: 'careers',
+    slug: 'tuyen-dung',
+    nameVi: 'TUYỂN DỤNG',
+    nameEn: 'RECRUITMENT',
+    color: '#3b82f6',
+    icon: 'Briefcase',
+    description: 'Tin tức tuyển dụng giáo viên và nhân sự tại trung tâm iCANCAM',
+    order: 5,
+  },
 ];
 
 // Initialize and get all categories
