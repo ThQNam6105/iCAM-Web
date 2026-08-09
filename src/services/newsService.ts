@@ -57,6 +57,8 @@ export const calculateReadingTime = (content: string): string => {
 export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
   try {
     const { data, error } = await supabase.from('news_posts').select('*').order('created_at', { ascending: false });
+    const localPosts = getAllNewsPosts();
+
     if (!error && data && data.length > 0) {
       const postsFromDb: DynamicNewsItem[] = data.map((item) => ({
         id: item.id,
@@ -84,8 +86,31 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
         updatedAt: item.updated_at,
       }));
 
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
-      return postsFromDb;
+      // Smart merge: Local edits win if local updatedAt is newer or equal
+      const mergedPostsMap = new Map<string, DynamicNewsItem>();
+      postsFromDb.forEach((dbPost) => {
+        mergedPostsMap.set(String(dbPost.id), dbPost);
+      });
+
+      localPosts.forEach((localPost) => {
+        const key = String(localPost.id).replace('default_', '');
+        const dbPost = mergedPostsMap.get(key) || mergedPostsMap.get(String(localPost.id));
+
+        const localTime = new Date(localPost.updatedAt || 0).getTime();
+        const dbTime = dbPost ? new Date(dbPost.updatedAt || 0).getTime() : 0;
+
+        if (!dbPost || localTime >= dbTime) {
+          mergedPostsMap.set(key, { ...localPost, id: dbPost ? dbPost.id : localPost.id });
+          if (dbPost && localTime > dbTime) {
+            // Push local edit back to Supabase
+            syncPostToSupabase(localPost);
+          }
+        }
+      });
+
+      const finalPosts = Array.from(mergedPostsMap.values());
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalPosts));
+      return finalPosts;
     }
   } catch (err) {
     console.warn('Supabase table not created yet or offline, using local storage cache:', err);
@@ -104,7 +129,7 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
       // Seed default articles into localStorage so all of them are editable & deletable
       posts = articlesData.map((post) => ({
         ...post,
-        id: `default_${post.id}`,
+        id: post.id,
         slug: generateSlug(post.title),
         status: 'published',
         author: 'iCANCAM Editor',
@@ -116,25 +141,6 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
         readingTime: '3 phút đọc',
         isCustom: true,
       }));
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
-    }
-
-    // Migrate legacy 'events' / 'SỰ KIỆN NỔI BẬT' posts to 'su-kien' / 'SỰ KIỆN'
-    let migrated = false;
-    posts = posts.map((p) => {
-      if (p.category === 'events' || p.categoryLabel === 'SỰ KIỆN NỔI BẬT') {
-        migrated = true;
-        return {
-          ...p,
-          category: 'su-kien',
-          categoryLabel: 'SỰ KIỆN',
-          categoryLabelEn: 'EVENTS',
-        };
-      }
-      return p;
-    });
-
-    if (migrated) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
     }
 
@@ -195,8 +201,11 @@ export const getFilteredNewsPosts = (options: PostFilterOptions): DynamicNewsIte
 // Helper to sync single post to Supabase
 const syncPostToSupabase = async (post: DynamicNewsItem) => {
   try {
-    await supabase.from('news_posts').upsert({
-      id: String(post.id),
+    const rawId = String(post.id).replace('default_', '');
+    const dbId = !isNaN(Number(rawId)) ? Number(rawId) : rawId;
+
+    const { error } = await supabase.from('news_posts').upsert({
+      id: dbId,
       title: post.title,
       title_en: post.titleEn,
       slug: post.slug,
@@ -224,6 +233,9 @@ const syncPostToSupabase = async (post: DynamicNewsItem) => {
       created_at: post.createdAt,
       updated_at: post.updatedAt,
     });
+    if (error) {
+      console.warn('Supabase upsert error:', error.message);
+    }
   } catch (err) {
     console.warn('Supabase sync warning:', err);
   }
