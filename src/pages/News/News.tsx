@@ -232,8 +232,20 @@ export const News: React.FC = () => {
       <section className={styles.articlesGridSection}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionCategoryTag}>{t.news.gridTag}</span>
-            <h2 className={styles.sectionGridTitle}>{t.news.gridTitle}</h2>
+            <span className={styles.sectionCategoryTag}>
+              {activeCategory === 'all'
+                ? t.news.gridTag
+                : `${language === 'en' ? 'CATEGORY' : 'DANH MỤC'}: ${
+                    getCategories().find((c) => c.id === activeCategory || c.slug === activeCategory)?.nameVi || activeCategory
+                  }`}
+            </span>
+            <h2 className={styles.sectionGridTitle}>
+              {activeCategory === 'all'
+                ? t.news.gridTitle
+                : (language === 'en'
+                    ? `Articles in ${getCategories().find((c) => c.id === activeCategory || c.slug === activeCategory)?.nameEn || activeCategory}`
+                    : `Tin Tức & Bài Viết - ${getCategories().find((c) => c.id === activeCategory || c.slug === activeCategory)?.nameVi || activeCategory}`)}
+            </h2>
           </div>
 
           {filteredArticles.length === 0 ? (
