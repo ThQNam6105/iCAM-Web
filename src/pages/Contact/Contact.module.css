@@ -70,15 +70,20 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.1rem, 4.2vw, 3.4rem);
+  font-size: clamp(2rem, 3.8vw, 3.2rem);
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
   margin-bottom: 1.25rem;
   color: #ffffff !important;
-  text-wrap: wrap;
   text-align: center;
   max-width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .heroTitle {
+    white-space: nowrap;
+  }
 }
 
 .heroSubtitle {
