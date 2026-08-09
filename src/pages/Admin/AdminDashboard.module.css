@@ -190,13 +190,15 @@
 }
 
 .badgeCategory {
-  background: rgba(245, 130, 32, 0.15);
-  color: #F58220;
-  padding: 0.3rem 0.75rem;
+  background: #F58220;
+  color: #ffffff !important;
+  padding: 0.35rem 0.85rem;
   border-radius: 9999px;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 800;
   display: inline-block;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .statusBadge {

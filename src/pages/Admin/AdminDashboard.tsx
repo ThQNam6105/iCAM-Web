@@ -276,9 +276,9 @@ export const AdminDashboard: React.FC = () => {
                       return (
                         <span
                           className={styles.badgeCategory}
-                          style={{ backgroundColor: displayColor }}
+                          style={{ backgroundColor: displayColor, color: '#ffffff' }}
                         >
-                          {displayLabel}
+                          {displayLabel || 'TIN TỨC'}
                         </span>
                       );
                     })()}
