@@ -98,9 +98,10 @@
   font-size: 1.05rem;
   line-height: 1.7;
   color: #94a3b8;
-  max-width: 840px;
+  max-width: 900px;
   margin: 0 auto 2.5rem auto;
-  text-wrap: balance;
+  text-align: center;
+  text-wrap: pretty;
 }
 
 .heroActions {
@@ -234,8 +235,9 @@
   font-size: 1.05rem;
   color: #64748b;
   line-height: 1.65;
-  text-wrap: balance;
-  max-width: 840px;
+  text-wrap: pretty;
+  text-align: center;
+  max-width: 900px;
 }
 
 /* ==========================================

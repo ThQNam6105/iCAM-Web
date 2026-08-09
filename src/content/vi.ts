@@ -56,7 +56,7 @@ export const vi = {
     heroTitlePrefix: 'Mô\u00A0Hình\u00A0Giáo\u00A0Dục Tiếng\u00A0Anh ',
     heroTitleHighlight: 'Thế\u00A0Kỷ\u00A021',
     heroTagline: 'Tự\u00A0tin giao\u00A0tiếp • Học\u00A0tập độc\u00A0lập • Làm\u00A0chủ ngôn\u00A0ngữ',
-    heroDescription: 'iCANCAM tiên phong áp dụng mô hình giáo dục hiện đại, kết hợp phương pháp 4Ls và LETI giúp học sinh không chỉ học tiếng\u00A0Anh mà còn chủ động làm chủ và tự\u00A0học suốt đời.',
+    heroDescription: 'iCANCAM tiên phong áp dụng mô hình giáo dục hiện đại, kết hợp phương pháp 4Ls\u00A0và\u00A0LETI giúp học sinh không chỉ học tiếng\u00A0Anh mà còn chủ động làm chủ và tự\u00A0học suốt đời.',
     exploreMethodBtn: 'Khám Phá Phương Pháp',
     registerBtn: 'Đăng Ký Tư Vấn',
     missionTag: 'SỨ MỆNH CỦA iCANCAM',

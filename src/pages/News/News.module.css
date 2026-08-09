@@ -84,9 +84,10 @@
   font-size: 1.1rem;
   line-height: 1.7;
   color: #cbd5e1 !important;
-  max-width: 840px;
+  max-width: 900px;
   margin: 0 auto 2.5rem auto;
-  text-wrap: balance;
+  text-align: center;
+  text-wrap: pretty;
 }
 
 /* Category Filter Bar */
