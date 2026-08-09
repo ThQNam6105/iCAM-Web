@@ -55,6 +55,9 @@ export const Layout: React.FC = () => {
 
   return (
     <div className={styles.layout}>
+      {/* Fixed Internship Project Info Badge */}
+      <ProjectInfoBadge />
+
       <header className={styles.header}>
         <nav className={styles.navContainer}>
           {/* Logo */}
@@ -65,9 +68,6 @@ export const Layout: React.FC = () => {
               style={{ height: '64px', width: 'auto', display: 'block' }}
             />
           </a>
-
-          {/* Internship Project Info Badge */}
-          <ProjectInfoBadge />
 
           {/* Desktop Navigation Links */}
           <ul className={styles.navLinks}>
