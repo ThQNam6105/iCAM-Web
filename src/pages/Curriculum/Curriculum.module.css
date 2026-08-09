@@ -42,7 +42,7 @@
 .heroContainer {
   position: relative;
   z-index: 2;
-  max-width: 960px;
+  max-width: 1150px;
   width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -70,7 +70,7 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+  font-size: clamp(2.1rem, 4.2vw, 3.4rem);
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
