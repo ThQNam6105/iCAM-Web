@@ -265,54 +265,56 @@ export const AdminCategories: React.FC = () => {
         </div>
 
         {/* Right Column: Category List Grid */}
-        <div className={styles.card}>
+        <div className={`${styles.card} ${styles.listCard}`}>
           <h3 className={styles.cardTitle}>
             <Tag size={18} /> Danh Sách Danh Mục Hiện Có ({categories.length})
           </h3>
 
-          <div className={styles.categoryListGrid}>
-            {categories.map((cat) => {
-              const assignedPostCount = allPosts.filter(
-                (p) => p.category === cat.id || p.category === cat.slug
-              ).length;
+          <div className={styles.categoryScrollArea}>
+            <div className={styles.categoryListGrid}>
+              {categories.map((cat) => {
+                const assignedPostCount = allPosts.filter(
+                  (p) => p.category === cat.id || p.category === cat.slug
+                ).length;
 
-              return (
-                <div key={cat.id} className={styles.categoryItemCard}>
-                  <div className={styles.catColorBar} style={{ backgroundColor: cat.color || '#F58220' }} />
-                  <div>
-                    <div className={styles.catHeader}>
-                      <h4 className={styles.catNameVi}>{cat.nameVi}</h4>
-                      <span className={styles.postCountBadge}>
-                        <FileText size={12} /> {assignedPostCount} bài
-                      </span>
+                return (
+                  <div key={cat.id} className={styles.categoryItemCard}>
+                    <div className={styles.catColorBar} style={{ backgroundColor: cat.color || '#F58220' }} />
+                    <div>
+                      <div className={styles.catHeader}>
+                        <h4 className={styles.catNameVi}>{cat.nameVi}</h4>
+                        <span className={styles.postCountBadge}>
+                          <FileText size={12} /> {assignedPostCount} bài
+                        </span>
+                      </div>
+                      <p className={styles.catNameEn}>EN: {cat.nameEn}</p>
+                      <span className={styles.catSlug}>slug: /{cat.slug}</span>
                     </div>
-                    <p className={styles.catNameEn}>EN: {cat.nameEn}</p>
-                    <span className={styles.catSlug}>slug: /{cat.slug}</span>
-                  </div>
 
-                  <div className={styles.catFooter}>
-                    <div className={styles.catItemActions}>
-                      <button
-                        type="button"
-                        onClick={() => handleStartEdit(cat)}
-                        className={styles.actionIconBtn}
-                        title="Chỉnh sửa thông tin danh mục"
-                      >
-                        <Edit2 size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteCandidateId(cat.id)}
-                        className={`${styles.actionIconBtn} ${styles.deleteIconBtn}`}
-                        title="Xóa danh mục này"
-                      >
-                        <Trash2 size={15} />
-                      </button>
+                    <div className={styles.catFooter}>
+                      <div className={styles.catItemActions}>
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(cat)}
+                          className={styles.actionIconBtn}
+                          title="Chỉnh sửa thông tin danh mục"
+                        >
+                          <Edit2 size={15} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteCandidateId(cat.id)}
+                          className={`${styles.actionIconBtn} ${styles.deleteIconBtn}`}
+                          title="Xóa danh mục này"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
