@@ -18,7 +18,7 @@ import { articlesData, type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 import { getPublicNewsPosts, fetchPostsFromSupabase, generateSlug, type DynamicNewsItem } from '../../services/newsService';
-import { getCategories, fetchCategoriesFromSupabase } from '../../services/categoryService';
+import { getCategories, fetchCategoriesFromSupabase, getCategoryColor, getCategoryDisplayLabel } from '../../services/categoryService';
 import { generateTableOfContents } from '../../utils/tocGenerator';
 import { TableOfContents } from '../../components/TableOfContents/TableOfContents';
 import { useToast } from '../../components/Toast/Toast';
@@ -196,8 +196,11 @@ export const News: React.FC = () => {
                       : 'center',
                   }}
                 />
-                <div className={styles.featuredTag}>
-                  {language === 'en' ? (featuredArticle.categoryLabelEn || featuredArticle.categoryLabel) : featuredArticle.categoryLabel}
+                <div
+                  className={styles.featuredTag}
+                  style={{ backgroundColor: getCategoryColor(featuredArticle.category, featuredArticle.categoryLabel) }}
+                >
+                  {getCategoryDisplayLabel(featuredArticle.category, featuredArticle.categoryLabel, featuredArticle.categoryLabelEn, language)}
                 </div>
               </div>
 
@@ -285,8 +288,11 @@ export const News: React.FC = () => {
                           : 'center',
                       }}
                     />
-                    <div className={styles.articleCategoryBadge}>
-                      {language === 'en' ? (article.categoryLabelEn || article.categoryLabel) : article.categoryLabel}
+                    <div
+                      className={styles.articleCategoryBadge}
+                      style={{ backgroundColor: getCategoryColor(article.category, article.categoryLabel) }}
+                    >
+                      {getCategoryDisplayLabel(article.category, article.categoryLabel, article.categoryLabelEn, language)}
                     </div>
                   </div>
 
@@ -421,8 +427,11 @@ export const News: React.FC = () => {
                 <X size={24} />
               </button>
 
-              <div className={styles.modalCategoryBadge}>
-                {language === 'en' ? (selectedArticle.categoryLabelEn || selectedArticle.categoryLabel) : selectedArticle.categoryLabel}
+              <div
+                className={styles.modalCategoryBadge}
+                style={{ backgroundColor: getCategoryColor(selectedArticle.category, selectedArticle.categoryLabel) }}
+              >
+                {getCategoryDisplayLabel(selectedArticle.category, selectedArticle.categoryLabel, selectedArticle.categoryLabelEn, language)}
               </div>
 
               <h2 className={styles.modalTitle}>

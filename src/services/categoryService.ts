@@ -156,3 +156,48 @@ export const deleteCategory = async (categoryId: string): Promise<CategoryItem[]
 
   return updatedList;
 };
+
+// Helper to get dynamic category color
+export const getCategoryColor = (catId?: string, label?: string): string => {
+  const cats = getCategories();
+  if (!catId && !label) return '#F58220';
+  const normCat = (catId || '').toLowerCase().trim();
+  const normLabel = (label || '').toLowerCase().trim();
+
+  const found = cats.find(
+    (c) =>
+      c.id.toLowerCase() === normCat ||
+      c.slug.toLowerCase() === normCat ||
+      c.nameVi.toLowerCase() === normCat ||
+      c.nameVi.toLowerCase() === normLabel ||
+      c.nameEn.toLowerCase() === normLabel
+  );
+  return found?.color || '#F58220';
+};
+
+// Helper to get dynamic category label
+export const getCategoryDisplayLabel = (
+  catId?: string,
+  savedLabel?: string,
+  savedLabelEn?: string,
+  lang: 'vi' | 'en' = 'vi'
+): string => {
+  const cats = getCategories();
+  const normCat = (catId || '').toLowerCase().trim();
+  const normLabel = (savedLabel || '').toLowerCase().trim();
+
+  const found = cats.find(
+    (c) =>
+      c.id.toLowerCase() === normCat ||
+      c.slug.toLowerCase() === normCat ||
+      c.nameVi.toLowerCase() === normCat ||
+      c.nameVi.toLowerCase() === normLabel
+  );
+
+  if (found) {
+    return lang === 'en' ? (found.nameEn || found.nameVi) : found.nameVi;
+  }
+
+  if (lang === 'en' && savedLabelEn) return savedLabelEn;
+  return savedLabel || catId || 'TIN TỨC';
+};

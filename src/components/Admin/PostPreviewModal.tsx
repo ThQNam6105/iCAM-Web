@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Monitor, Tablet, Smartphone, X } from 'lucide-react';
 import { type DynamicNewsItem } from '../../services/newsService';
+import { getCategoryColor } from '../../services/categoryService';
 import styles from './PostPreviewModal.module.css';
 
 interface PostPreviewModalProps {
@@ -50,7 +51,12 @@ export const PostPreviewModal: React.FC<PostPreviewModalProps> = ({ isOpen, post
         <div className={`${styles.previewCard} ${styles[device]}`}>
           {post.image && <img src={post.image} alt={post.title || 'Preview'} className={styles.previewImage} />}
           <div className={styles.previewBody}>
-            <span className={styles.badge}>{post.categoryLabel || 'TIN TỨC'}</span>
+            <span
+              className={styles.badge}
+              style={{ backgroundColor: getCategoryColor(post.category, post.categoryLabel) }}
+            >
+              {post.categoryLabel || 'TIN TỨC'}
+            </span>
             <h1 className={styles.title}>{post.title || 'Chưa có tiêu đề bài viết'}</h1>
             <div className={styles.meta}>
               <span>Tác giả: {post.author || 'iCANCAM Editor'}</span>
