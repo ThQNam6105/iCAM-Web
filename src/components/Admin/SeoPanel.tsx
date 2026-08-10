@@ -206,7 +206,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Tùy chỉnh Mô tả Tìm kiếm (SEO Description)</label>
+            <label className={styles.label}>Tùy chỉnh Mô tả Tìm kiếm</label>
             <textarea
               rows={2}
               value={metaDescription}
@@ -217,7 +217,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Đường dẫn tĩnh thân thiện (URL Slug)</label>
+            <label className={styles.label}>Đường dẫn tĩnh thân thiện</label>
             <div className={styles.slugInputWrapper}>
               <span className={styles.slugPrefix}>https://{domain}/news/</span>
               <input
@@ -231,7 +231,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Canonical URL Override (Đường dẫn gốc ghi đè)</label>
+            <label className={styles.label}>Đường dẫn gốc ghi đè (Canonical URL)</label>
             <input
               type="url"
               value={canonicalUrlOverride || ''}
@@ -242,7 +242,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Open Graph Title Override (Tiêu đề chia sẻ Facebook/Zalo)</label>
+            <label className={styles.label}>Tiêu đề chia sẻ Facebook/Zalo</label>
             <input
               type="text"
               value={ogTitle || ''}
@@ -253,7 +253,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Open Graph Description Override (Mô tả chia sẻ)</label>
+            <label className={styles.label}>Mô tả chia sẻ</label>
             <textarea
               rows={2}
               value={ogDescription || ''}
@@ -264,7 +264,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Open Graph Image Override (Ảnh chia sẻ thủ công)</label>
+            <label className={styles.label}>Ảnh chia sẻ thủ công</label>
             <input
               type="url"
               value={ogImage || ''}
@@ -282,7 +282,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
                 onChange={(e) => onChangeNoIndex?.(e.target.checked)}
                 className={styles.checkbox}
               />
-              <span>Noindex (Yêu cầu Google không lập chỉ mục bài đọc này)</span>
+              <span>Yêu cầu Google không lập chỉ mục bài viết này (Noindex)</span>
             </label>
 
             <label className={styles.checkboxLabel}>
@@ -292,7 +292,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
                 onChange={(e) => onChangeNoFollow?.(e.target.checked)}
                 className={styles.checkbox}
               />
-              <span>Nofollow (Không cho phép Robot tìm kiếm theo dõi liên kết trong bài)</span>
+              <span>Không cho phép Robot theo dõi liên kết trong bài (Nofollow)</span>
             </label>
           </div>
         </div>

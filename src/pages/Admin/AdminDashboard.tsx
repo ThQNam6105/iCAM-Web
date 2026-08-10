@@ -244,7 +244,7 @@ export const AdminDashboard: React.FC = () => {
             <thead>
               <tr>
                 <th>Hình ảnh</th>
-                <th>Tiêu đề & Slug</th>
+                <th>Tiêu đề</th>
                 <th>Danh mục</th>
                 <th>Trạng thái</th>
                 <th>Ngày cập nhật</th>

@@ -50,7 +50,7 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <FolderTree size={18} />
-          <span>Danh mục (Categories)</span>
+          <span>Danh mục</span>
         </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Thư viện Media phát triển ở bản sau">
@@ -59,12 +59,12 @@ export const AdminSidebar: React.FC = () => {
         </div>
 
         <span className={styles.navSectionTitle} style={{ marginTop: '1rem' }}>
-          Đào Tạo & Tuyển Sinh (Sắp ra mắt)
+          Đào Tạo & Tuyển Sinh
         </span>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <GraduationCap size={18} />
-          <span>Khóa Học (Courses)</span>
+          <span>Khóa Học</span>
         </div>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
@@ -74,7 +74,7 @@ export const AdminSidebar: React.FC = () => {
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <HelpCircle size={18} />
-          <span>Hỏi Đáp (FAQ)</span>
+          <span>Hỏi Đáp</span>
         </div>
 
         <NavLink
@@ -82,7 +82,7 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <Briefcase size={18} />
-          <span>Tuyển Dụng (Careers)</span>
+          <span>Tuyển Dụng</span>
         </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
