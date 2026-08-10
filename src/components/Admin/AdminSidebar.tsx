@@ -53,10 +53,13 @@ export const AdminSidebar: React.FC = () => {
           <span>Danh mục</span>
         </NavLink>
 
-        <div className={`${styles.navItem} ${styles.disabledNavItem}`} title="Thư viện Media phát triển ở bản sau">
+        <NavLink
+          to="/admin/media"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+        >
           <ImageIcon size={18} />
-          <span>Media Library</span>
-        </div>
+          <span>Thư viện Media</span>
+        </NavLink>
 
         <span className={styles.navSectionTitle} style={{ marginTop: '1rem' }}>
           Đào Tạo & Tuyển Sinh

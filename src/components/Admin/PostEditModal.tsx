@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Move,
   X,
+  FolderTree,
 } from 'lucide-react';
 import {
   type DynamicNewsItem,
@@ -23,6 +24,7 @@ import {
 } from '../../services/newsService';
 import { getCategories } from '../../services/categoryService';
 import { PostPreviewModal } from './PostPreviewModal';
+import { MediaSelectorModal } from './MediaSelectorModal';
 import { useToast } from '../Toast/Toast';
 import styles from './PostEditModal.module.css';
 
@@ -178,6 +180,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     postToEdit?.id ? getPostRevisions(postToEdit.id) : []
   );
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
   const [lastAutosave, setLastAutosave] = useState<string | null>(null);
 
 
@@ -402,11 +405,20 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 />
                 <button
                   type="button"
+                  onClick={() => setIsMediaSelectorOpen(true)}
+                  className={styles.uploadPlaceholderBtn}
+                  style={{ background: '#F58220', color: '#ffffff' }}
+                  title="Chọn hoặc tải ảnh lên từ Thư viện Media"
+                >
+                  <FolderTree size={16} /> Thư Viện Media
+                </button>
+                <button
+                  type="button"
                   onClick={() => coverImageInputRef.current?.click()}
                   className={styles.uploadPlaceholderBtn}
                   title="Chọn ảnh từ máy tính / điện thoại"
                 >
-                  <Upload size={16} /> Tải ảnh từ máy
+                  <Upload size={16} /> Tải trực tiếp
                 </button>
               </div>
               {errors.image && <span className={styles.errorText}>{errors.image}</span>}
@@ -591,6 +603,21 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
           showToast(`Đã khôi phục phiên bản v${rev.versionNumber}!`, 'success');
         }}
         onClose={() => setIsRevisionOpen(false)}
+      />
+
+      <MediaSelectorModal
+        isOpen={isMediaSelectorOpen}
+        onClose={() => setIsMediaSelectorOpen(false)}
+        filterType="image"
+        onSelect={(assets) => {
+          if (assets.length > 0) {
+            const chosen = assets[0];
+            setImage(chosen.public_url);
+            if (chosen.focal_x !== undefined) setPanX(Math.round(chosen.focal_x * 100));
+            if (chosen.focal_y !== undefined) setPanY(Math.round(chosen.focal_y * 100));
+            showToast('Đã chọn ảnh bìa từ Thư viện Media! ✓', 'success');
+          }
+        }}
       />
     </>
   );
