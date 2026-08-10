@@ -149,7 +149,7 @@ export const AdminDashboard: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.drafts}</div>
-            <div className={styles.statLabel}>Bản Nháp (Drafts)</div>
+            <div className={styles.statLabel}>Bản Nháp</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#F58220' }}>
             <Clock size={24} />
@@ -200,9 +200,9 @@ export const AdminDashboard: React.FC = () => {
             className={styles.selectFilter}
           >
             <option value="all">Tất cả Trạng thái</option>
-            <option value="published">Đã xuất bản (Published)</option>
-            <option value="draft">Bản nháp (Draft)</option>
-            <option value="archived">Lưu trữ (Archived)</option>
+            <option value="published">Đã xuất bản</option>
+            <option value="draft">Bản nháp</option>
+            <option value="archived">Lưu trữ</option>
           </select>
 
           <select

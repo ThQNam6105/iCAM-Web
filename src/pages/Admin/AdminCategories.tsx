@@ -194,7 +194,9 @@ export const AdminCategories: React.FC = () => {
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tên Tiếng Việt *</label>
+              <label className={styles.label}>
+                Tên Tiếng Việt <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="text"
                 placeholder="Ví dụ: SỰ KIỆN NỔI BẬT"

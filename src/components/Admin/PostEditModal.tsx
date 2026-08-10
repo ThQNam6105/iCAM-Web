@@ -354,7 +354,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tiêu đề bài viết (Tiếng Việt) *</label>
+              <label className={styles.label}>
+                Tiêu đề bài viết (Tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="text"
                 placeholder="Nhập tiêu đề Tiếng Việt..."
@@ -366,7 +368,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tiêu đề bài viết (Tiếng Anh) *</label>
+              <label className={styles.label}>
+                Tiêu đề bài viết (Tiếng Anh) <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="text"
                 placeholder="English title..."
@@ -378,7 +382,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Hình ảnh bìa bài viết (URL hoặc Tải từ máy tính) *</label>
+              <label className={styles.label}>
+                Hình ảnh bìa bài viết (URL hoặc Tải từ máy tính) <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="file"
                 ref={coverImageInputRef}
@@ -488,7 +494,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tóm tắt bài viết (Tiếng Việt) *</label>
+              <label className={styles.label}>
+                Tóm tắt bài viết (Tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <textarea
                 rows={2}
                 placeholder="Tóm tắt nội dung bài viết..."
@@ -511,7 +519,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Nội dung chi tiết bài viết (Tiếng Việt) *</label>
+              <label className={styles.label}>
+                Nội dung chi tiết bài viết (Tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <RichTextEditor
                 value={content}
                 onChange={setContent}

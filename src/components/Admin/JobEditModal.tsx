@@ -80,7 +80,9 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
 
         <form onSubmit={handleSubmit} className={styles.formGrid}>
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Chức danh công việc (Tiêu đề vị trí) *</label>
+            <label className={styles.label}>
+              Chức danh công việc (Tiêu đề vị trí) <span style={{ color: '#ef4444' }}>*</span>
+            </label>
             <input
               type="text"
               required
@@ -93,7 +95,9 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
 
           <div className={styles.rowTwo}>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Phòng ban *</label>
+              <label className={styles.label}>
+                Phòng ban <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
@@ -107,7 +111,9 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Loại hình công việc *</label>
+              <label className={styles.label}>
+                Loại hình công việc <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as JobType)}
@@ -122,7 +128,9 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
 
           <div className={styles.rowTwo}>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Mức lương dự kiến *</label>
+              <label className={styles.label}>
+                Mức lương dự kiến <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="text"
                 required
@@ -134,7 +142,9 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Hạn nộp hồ sơ *</label>
+              <label className={styles.label}>
+                Hạn nộp hồ sơ <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="text"
                 required
@@ -148,7 +158,9 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
 
           <div className={styles.rowTwo}>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Địa điểm làm việc *</label>
+              <label className={styles.label}>
+                Địa điểm làm việc <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
                 type="text"
                 required

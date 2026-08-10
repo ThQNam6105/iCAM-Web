@@ -124,7 +124,7 @@ export const AdminCareers: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statVal}>{stats.openCount}</div>
-            <div className={styles.statLabel}>Đang Tuyển (Open)</div>
+            <div className={styles.statLabel}>Đang Tuyển</div>
           </div>
           <CheckCircle size={28} color="#22c55e" />
         </div>
@@ -132,7 +132,7 @@ export const AdminCareers: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statVal}>{stats.closedCount}</div>
-            <div className={styles.statLabel}>Đã Đóng (Closed)</div>
+            <div className={styles.statLabel}>Đã Đóng</div>
           </div>
           <Clock size={28} color="#ef4444" />
         </div>
@@ -177,9 +177,9 @@ export const AdminCareers: React.FC = () => {
           className={styles.selectFilter}
         >
           <option value="all">Tất cả Trạng Thái</option>
-          <option value="open">Đang Tuyển (Open)</option>
-          <option value="closed">Đã Đóng (Closed)</option>
-          <option value="draft">Bản Nháp (Draft)</option>
+          <option value="open">Đang Tuyển</option>
+          <option value="closed">Đã Đóng</option>
+          <option value="draft">Bản Nháp</option>
         </select>
       </div>
 

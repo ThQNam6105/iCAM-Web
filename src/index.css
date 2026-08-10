@@ -148,6 +148,11 @@ a {
   transition: var(--transition-fast);
 }
 
+.brand-name {
+  color: #F58220;
+  font: inherit;
+}
+
 /* Utilities */
 .glass {
   background: var(--glass-bg);
