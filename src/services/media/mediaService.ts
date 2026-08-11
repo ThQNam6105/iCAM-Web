@@ -63,6 +63,29 @@ export class MediaService {
   }
 
   /**
+   * Download files in a folder to local machine
+   */
+  async downloadFolderFiles(folderName: string, items: MediaItem[]): Promise<void> {
+    if (items.length === 0) return;
+    for (const item of items) {
+      try {
+        const response = await fetch(item.public_url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = item.original_filename || `${folderName}_file`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Error downloading file:', item.original_filename, err);
+      }
+    }
+  }
+
+  /**
    * Main Upload Flow: Validate -> Hash -> Check Duplicate -> Sanitize SVG -> Dimensions -> Store -> Save Metadata
    */
   async uploadMedia(file: File, options: UploadOptions = {}): Promise<UploadResult> {
