@@ -376,7 +376,7 @@ export const AdminMediaLibrary: React.FC = () => {
             </div>
           </div>
 
-          {/* Root Folders Section */}
+            {/* Root Folders Section */}
           <div className={styles.folderSection}>
             <div className={styles.folderSectionHeader}>
               {/* TOP LEFT BUTTON */}
@@ -396,26 +396,30 @@ export const AdminMediaLibrary: React.FC = () => {
                     >
                       <Download size={15} /> Tải Xuống
                     </button>
-                    <button
-                      type="button"
-                      onClick={(e) => handleOpenEditFolderModal(selectedFolder, e)}
-                      className={styles.actionPillBtn}
-                      title="Đổi tên & sửa màu thư mục"
-                    >
-                      <Edit2 size={15} /> Đổi Tên
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setDeleteFolderCandidate(selectedFolder);
-                      }}
-                      className={styles.actionPillBtn}
-                      style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.3)' }}
-                      title="Xóa thư mục"
-                    >
-                      <Trash2 size={15} /> Xóa
-                    </button>
+                    {selectedFolder.id !== 'root' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => handleOpenEditFolderModal(selectedFolder, e)}
+                          className={styles.actionPillBtn}
+                          title="Đổi tên & sửa màu thư mục"
+                        >
+                          <Edit2 size={15} /> Đổi Tên
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteFolderCandidate(selectedFolder);
+                          }}
+                          className={styles.actionPillBtn}
+                          style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                          title="Xóa thư mục"
+                        >
+                          <Trash2 size={15} /> Xóa
+                        </button>
+                      </>
+                    )}
                   </>
                 )}
               </div>
@@ -423,55 +427,72 @@ export const AdminMediaLibrary: React.FC = () => {
 
             {/* Folders Grid Cards */}
             <div className={styles.folderGrid}>
-              {folders.map((folder) => {
-                const isSelected = selectedFolder?.id === folder.id;
-                return (
-                  <div
-                    key={folder.id}
-                    className={`${styles.folderCard} ${isSelected ? styles.folderCardActive : ''}`}
-                    onClick={() => setSelectedFolder(folder)}
-                    onDoubleClick={() => {
-                      setCurrentFolder(folder);
-                      setPage(1);
-                    }}
-                  >
-                    <div className={styles.folderInfo}>
-                      <div className={styles.folderIcon}>
-                        <Folder color={folder.color || '#F58220'} size={24} />
-                      </div>
-                      <div>
-                        <div className={styles.folderName} title={folder.name}>
-                          {folder.name}
-                        </div>
-                        <div className={styles.folderCount}>{folder.item_count || 0} tệp</div>
-                      </div>
-                    </div>
+              {(() => {
+                const uncategorizedCount = items.filter((i) => !i.folder_id && i.status !== 'archived').length;
+                const rootFolder: MediaFolder = {
+                  id: 'root',
+                  name: 'Thư mục gốc',
+                  slug: 'root',
+                  color: '#94a3b8',
+                  item_count: uncategorizedCount,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                };
+                const displayFolders = [rootFolder, ...folders];
 
-                    <div className={styles.folderActions}>
-                      <button
-                        type="button"
-                        onClick={(e) => handleOpenEditFolderModal(folder, e)}
-                        className={styles.folderActionBtn}
-                        title="Đổi tên"
-                      >
-                        <Edit2 size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteFolderCandidate(folder);
-                        }}
-                        className={styles.folderActionBtn}
-                        style={{ color: '#f87171' }}
-                        title="Xóa"
-                      >
-                        <Trash2 size={13} />
-                      </button>
+                return displayFolders.map((folder) => {
+                  const isSelected = selectedFolder?.id === folder.id;
+                  const isRoot = folder.id === 'root';
+                  return (
+                    <div
+                      key={folder.id}
+                      className={`${styles.folderCard} ${isSelected ? styles.folderCardActive : ''}`}
+                      onClick={() => setSelectedFolder(folder)}
+                      onDoubleClick={() => {
+                        setCurrentFolder(folder);
+                        setPage(1);
+                      }}
+                    >
+                      <div className={styles.folderInfo}>
+                        <div className={styles.folderIcon}>
+                          <Folder color={folder.color || '#F58220'} size={24} />
+                        </div>
+                        <div>
+                          <div className={styles.folderName} title={folder.name}>
+                            {folder.name}
+                          </div>
+                          <div className={styles.folderCount}>{folder.item_count || 0} tệp</div>
+                        </div>
+                      </div>
+
+                      {!isRoot && (
+                        <div className={styles.folderActions}>
+                          <button
+                            type="button"
+                            onClick={(e) => handleOpenEditFolderModal(folder, e)}
+                            className={styles.folderActionBtn}
+                            title="Đổi tên"
+                          >
+                            <Edit2 size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteFolderCandidate(folder);
+                            }}
+                            className={styles.folderActionBtn}
+                            style={{ color: '#f87171' }}
+                            title="Xóa"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
           </div>
         </>
@@ -547,21 +568,25 @@ export const AdminMediaLibrary: React.FC = () => {
               >
                 <Download size={16} /> Tải Xuống Thư Mục
               </button>
-              <button
-                type="button"
-                onClick={() => handleOpenEditFolderModal(currentFolder)}
-                className={styles.actionPillBtn}
-              >
-                <Edit2 size={16} /> Chỉnh Sửa Thư Mục
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeleteFolderCandidate(currentFolder)}
-                className={styles.actionPillBtn}
-                style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}
-              >
-                <Trash2 size={16} /> Xóa Thư Mục
-              </button>
+              {currentFolder.id !== 'root' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditFolderModal(currentFolder)}
+                    className={styles.actionPillBtn}
+                  >
+                    <Edit2 size={16} /> Chỉnh Sửa Thư Mục
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteFolderCandidate(currentFolder)}
+                    className={styles.actionPillBtn}
+                    style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}
+                  >
+                    <Trash2 size={16} /> Xóa Thư Mục
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
