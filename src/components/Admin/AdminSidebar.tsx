@@ -58,7 +58,7 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <ImageIcon size={18} />
-          <span>Thư viện Media</span>
+          <span>Thư viện hệ thống</span>
         </NavLink>
 
         <span className={styles.navSectionTitle} style={{ marginTop: '1rem' }}>

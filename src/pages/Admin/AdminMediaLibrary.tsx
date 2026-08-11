@@ -349,10 +349,10 @@ export const AdminMediaLibrary: React.FC = () => {
           <div className={styles.pageHeader}>
             <div>
               <h1 className={styles.pageTitle}>
-                <FolderOpen color="#F58220" size={28} /> Thư Viện Media CMS (Digital Asset Management)
+                <FolderOpen color="#F58220" size={28} /> Thư viện hệ thống
               </h1>
               <p className={styles.pageSubtitle}>
-                Quản lý thư mục theo mô hình Windows Explorer, phân loại và lưu trữ tài nguyên truyền thông iCANCAM
+                Quản lý thư mục và tài nguyên hệ thống
               </p>
             </div>
           </div>
@@ -386,7 +386,7 @@ export const AdminMediaLibrary: React.FC = () => {
 
               {/* TOP RIGHT BUTTONS */}
               <div className={styles.folderRightActions}>
-                {selectedFolder ? (
+                {selectedFolder && (
                   <>
                     <button
                       type="button"
@@ -417,8 +417,6 @@ export const AdminMediaLibrary: React.FC = () => {
                       <Trash2 size={15} /> Xóa
                     </button>
                   </>
-                ) : (
-                  <span style={{ fontSize: '0.82rem', color: '#64748b' }}>Nhấp chọn 1 thư mục để thao tác Sửa / Xóa / Tải về</span>
                 )}
               </div>
             </div>

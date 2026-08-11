@@ -28,7 +28,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   onClose,
   allowMultiple = false,
   filterType = 'all',
-  title = 'Chọn Tài Nguyên từ Thư Viện Media',
+  title = 'Chọn Tài Nguyên từ Thư Viện Hệ Thống',
 }) => {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library');
