@@ -1,10 +1,11 @@
 import { supabase } from '../supabaseClient';
-import type { MediaItem, MediaUsage, MediaFilter, EntityType } from '../../types/media';
+import type { MediaItem, MediaUsage, MediaFolder, MediaFilter, EntityType } from '../../types/media';
 
 const PUBLIC_BUCKET = 'cms-public-media';
 const PRIVATE_BUCKET = 'cms-private-media';
 const LOCAL_STORAGE_KEY = 'ican_cms_media_items_v2';
 const LOCAL_USAGE_KEY = 'ican_cms_media_usages_v2';
+const LOCAL_FOLDER_KEY = 'ican_cms_media_folders_v2';
 
 // In-memory / Persistence fallback for initial table bootstrap
 const getStoredItems = (): MediaItem[] => {
@@ -43,7 +44,151 @@ const saveStoredUsages = (usages: MediaUsage[]) => {
   }
 };
 
+const getStoredFolders = (): MediaFolder[] => {
+  try {
+    const raw = localStorage.getItem(LOCAL_FOLDER_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // Ignore
+  }
+  return DEFAULT_INITIAL_FOLDERS;
+};
+
+const saveStoredFolders = (folders: MediaFolder[]) => {
+  try {
+    localStorage.setItem(LOCAL_FOLDER_KEY, JSON.stringify(folders));
+  } catch {
+    // Ignore
+  }
+};
+
 export class MediaRepository {
+  /**
+   * Fetch all folders with item count
+   */
+  async getFolders(): Promise<MediaFolder[]> {
+    let folders = getStoredFolders();
+    try {
+      const { data, error } = await supabase.from('media_folders').select('*').order('created_at', { ascending: true });
+      if (!error && data && data.length > 0) {
+        folders = data as MediaFolder[];
+        saveStoredFolders(folders);
+      }
+    } catch {
+      // Fallback
+    }
+
+    const items = getStoredItems();
+    return folders.map((f) => {
+      const count = items.filter((i) => i.folder_id === f.id && i.status !== 'archived').length;
+      return { ...f, item_count: count };
+    });
+  }
+
+  /**
+   * Create a new media folder
+   */
+  async createFolder(name: string, color = '#F58220', parentId?: string | null): Promise<MediaFolder> {
+    const folders = getStoredFolders();
+    const now = new Date().toISOString();
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const newFolder: MediaFolder = {
+      id: `folder_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+      name,
+      slug,
+      color,
+      parent_id: parentId || null,
+      created_at: now,
+      updated_at: now,
+      item_count: 0,
+    };
+
+    folders.push(newFolder);
+    saveStoredFolders(folders);
+
+    try {
+      await supabase.from('media_folders').insert(newFolder);
+    } catch {
+      // Ignore
+    }
+
+    return newFolder;
+  }
+
+  /**
+   * Rename an existing media folder
+   */
+  async renameFolder(id: string, newName: string, newColor?: string): Promise<MediaFolder> {
+    const folders = getStoredFolders();
+    const folder = folders.find((f) => f.id === id);
+    if (!folder) {
+      throw new Error(`Folder with ID ${id} not found.`);
+    }
+
+    folder.name = newName;
+    folder.slug = newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    if (newColor) folder.color = newColor;
+    folder.updated_at = new Date().toISOString();
+
+    saveStoredFolders(folders);
+
+    try {
+      await supabase.from('media_folders').update(folder).eq('id', id);
+    } catch {
+      // Ignore
+    }
+
+    return folder;
+  }
+
+  /**
+   * Delete a media folder (unassigns contained items back to root)
+   */
+  async deleteFolder(id: string): Promise<void> {
+    const folders = getStoredFolders();
+    const filteredFolders = folders.filter((f) => f.id !== id);
+    saveStoredFolders(filteredFolders);
+
+    // Unassign folder_id from items in this folder
+    const items = getStoredItems();
+    let updated = false;
+    items.forEach((item) => {
+      if (item.folder_id === id) {
+        item.folder_id = null;
+        updated = true;
+      }
+    });
+    if (updated) saveStoredItems(items);
+
+    try {
+      await supabase.from('media_folders').delete().eq('id', id);
+      await supabase.from('media_items').update({ folder_id: null }).eq('folder_id', id);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Move one or multiple media assets to a specified folder
+   */
+  async moveItemsToFolder(itemIds: string[], folderId: string | null): Promise<void> {
+    const items = getStoredItems();
+    const now = new Date().toISOString();
+    items.forEach((item) => {
+      if (itemIds.includes(item.id)) {
+        item.folder_id = folderId;
+        item.updated_at = now;
+      }
+    });
+    saveStoredItems(items);
+
+    try {
+      await supabase.from('media_items').update({ folder_id: folderId }).in('id', itemIds);
+    } catch {
+      // Ignore
+    }
+  }
+
   /**
    * Search for an existing asset by SHA-256 content hash (Deduplication)
    */
@@ -133,7 +278,7 @@ export class MediaRepository {
   }
 
   /**
-   * Fetch media assets with filtering, debounced search, tags, and pagination
+   * Fetch media assets with filtering, debounced search, tags, folders, and pagination
    */
   async getMediaItems(filter: MediaFilter = {}): Promise<{ items: MediaItem[]; total: number }> {
     let items = getStoredItems();
@@ -183,6 +328,14 @@ export class MediaRepository {
 
     if (filter.categoryTag && filter.categoryTag !== 'all') {
       items = items.filter((i) => i.tags?.includes(filter.categoryTag!));
+    }
+
+    if (filter.folderId && filter.folderId !== 'all') {
+      if (filter.folderId === 'root') {
+        items = items.filter((i) => !i.folder_id);
+      } else {
+        items = items.filter((i) => i.folder_id === filter.folderId);
+      }
     }
 
     if (filter.usageStatus && filter.usageStatus !== 'all') {
@@ -242,7 +395,7 @@ export class MediaRepository {
   }
 
   /**
-   * Register or update a media usage (e.g. News article referencing image)
+   * Register or update a media usage
    */
   async registerUsage(
     mediaId: string,
@@ -333,7 +486,34 @@ export class MediaRepository {
 
 export const mediaRepository = new MediaRepository();
 
-// Pre-populated default seed media assets for instant rich DAM experience
+const DEFAULT_INITIAL_FOLDERS: MediaFolder[] = [
+  {
+    id: 'folder_news',
+    name: 'Bài Viết Tin Tức',
+    slug: 'bai-viet-tin-tuc',
+    color: '#F58220',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+  {
+    id: 'folder_teachers',
+    name: 'Đội Ngũ Giáo Viên',
+    slug: 'doi-ngu-giao-vien',
+    color: '#3b82f6',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+  {
+    id: 'folder_homepage',
+    name: 'Banner Trang Chủ',
+    slug: 'banner-trang-chu',
+    color: '#10b981',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+];
+
+// Pre-populated default seed media assets
 const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
   {
     id: 'asset_hero_banner',
@@ -352,6 +532,7 @@ const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
     focal_x: 0.5,
     focal_y: 0.5,
     tags: ['banner', 'classroom', 'facilities'],
+    folder_id: 'folder_homepage',
     created_at: '2026-08-01T10:00:00Z',
     updated_at: '2026-08-01T10:00:00Z',
     usage_count: 2,
@@ -373,6 +554,7 @@ const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
     focal_x: 0.5,
     focal_y: 0.35,
     tags: ['teachers', 'staff'],
+    folder_id: 'folder_teachers',
     created_at: '2026-08-02T11:00:00Z',
     updated_at: '2026-08-02T11:00:00Z',
     usage_count: 1,
@@ -394,6 +576,7 @@ const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
     focal_x: 0.5,
     focal_y: 0.5,
     tags: ['news', 'events', 'students'],
+    folder_id: 'folder_news',
     created_at: '2026-08-05T09:30:00Z',
     updated_at: '2026-08-05T09:30:00Z',
     usage_count: 1,
@@ -413,6 +596,7 @@ const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
     default_alt_en: 'iCANCAM Curriculum Brochure 2026',
     default_caption: 'Bản mềm PDF tổng quan lộ trình 4Ls + LETI',
     tags: ['courses', 'brochure'],
+    folder_id: null,
     created_at: '2026-08-06T14:00:00Z',
     updated_at: '2026-08-06T14:00:00Z',
     usage_count: 1,

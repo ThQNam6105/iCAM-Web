@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   FolderTree,
   Upload,
@@ -18,13 +18,19 @@ import {
   Save,
   Tag,
   ShieldAlert,
+  FolderPlus,
+  Folder,
+  FolderOpen,
+  FolderInput,
 } from 'lucide-react';
-import type { MediaItem, MediaUsage, MediaFilter } from '../../types/media';
+import type { MediaItem, MediaUsage, MediaFolder, MediaFilter } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
 import { ImageCropperModal } from '../../components/Admin/ImageCropperModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
 import styles from './AdminMediaLibrary.module.css';
+
+const COLOR_OPTIONS = ['#F58220', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
 
 export const AdminMediaLibrary: React.FC = () => {
   const { showToast } = useToast();
@@ -37,6 +43,10 @@ export const AdminMediaLibrary: React.FC = () => {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = useState(1);
+
+  // Folders state
+  const [folders, setFolders] = useState<MediaFolder[]>([]);
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('all');
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +67,14 @@ export const AdminMediaLibrary: React.FC = () => {
   const [editAltEn, setEditAltEn] = useState('');
   const [editCaption, setEditCaption] = useState('');
   const [editTagsStr, setEditTagsStr] = useState('');
+  const [editFolderId, setEditFolderId] = useState<string | null>(null);
+
+  // Folder Modals state
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [editingFolder, setEditingFolder] = useState<MediaFolder | null>(null);
+  const [folderNameInput, setFolderNameInput] = useState('');
+  const [folderColorInput, setFolderColorInput] = useState('#F58220');
+  const [deleteFolderCandidate, setDeleteFolderCandidate] = useState<MediaFolder | null>(null);
 
   // Modals state
   const [isCropperOpen, setIsCropperOpen] = useState(false);
@@ -79,10 +97,16 @@ export const AdminMediaLibrary: React.FC = () => {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  const refreshMediaList = async () => {
+  const refreshFolders = useCallback(async () => {
+    const fList = await mediaService.getFolders();
+    setFolders(fList);
+  }, []);
+
+  const refreshMediaList = useCallback(async () => {
     const filter: MediaFilter = {
       searchQuery: debouncedSearch,
       fileType,
+      folderId: selectedFolderId,
       usageStatus,
       sortBy,
       page,
@@ -91,18 +115,23 @@ export const AdminMediaLibrary: React.FC = () => {
     const res = await mediaService.getMediaItems(filter);
     setItems(res.items);
     setTotalItems(res.total);
-  };
+    await refreshFolders();
+  }, [debouncedSearch, fileType, selectedFolderId, usageStatus, sortBy, page, refreshFolders]);
 
   useEffect(() => {
     let isMounted = true;
     const filter: MediaFilter = {
       searchQuery: debouncedSearch,
       fileType,
+      folderId: selectedFolderId,
       usageStatus,
       sortBy,
       page,
       limit: 24,
     };
+    mediaService.getFolders().then((f) => {
+      if (isMounted) setFolders(f);
+    });
     mediaService.getMediaItems(filter).then((res) => {
       if (isMounted) {
         setItems(res.items);
@@ -112,7 +141,7 @@ export const AdminMediaLibrary: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [debouncedSearch, fileType, usageStatus, sortBy, page]);
+  }, [debouncedSearch, fileType, selectedFolderId, usageStatus, sortBy, page]);
 
   // Load Drawer details
   const handleOpenDrawer = async (item: MediaItem) => {
@@ -121,6 +150,7 @@ export const AdminMediaLibrary: React.FC = () => {
     setEditAltEn(item.default_alt_en || '');
     setEditCaption(item.default_caption || '');
     setEditTagsStr((item.tags || []).join(', '));
+    setEditFolderId(item.folder_id || null);
 
     const usages = await mediaService.getMediaUsages(item.id);
     setActiveAssetUsages(usages);
@@ -139,6 +169,7 @@ export const AdminMediaLibrary: React.FC = () => {
       default_alt_en: editAltEn,
       default_caption: editCaption,
       tags: tagsArray,
+      folder_id: editFolderId,
     });
 
     setActiveDrawerAsset(updated);
@@ -146,11 +177,69 @@ export const AdminMediaLibrary: React.FC = () => {
     await refreshMediaList();
   };
 
+  // Folder CRUD handlers
+  const handleOpenCreateFolderModal = () => {
+    setEditingFolder(null);
+    setFolderNameInput('');
+    setFolderColorInput('#F58220');
+    setIsFolderModalOpen(true);
+  };
+
+  const handleOpenEditFolderModal = (folder: MediaFolder, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingFolder(folder);
+    setFolderNameInput(folder.name);
+    setFolderColorInput(folder.color || '#F58220');
+    setIsFolderModalOpen(true);
+  };
+
+  const handleSaveFolder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!folderNameInput.trim()) {
+      showToast('Vui lòng nhập tên thư mục!', 'error');
+      return;
+    }
+
+    if (editingFolder) {
+      await mediaService.renameFolder(editingFolder.id, folderNameInput.trim(), folderColorInput);
+      showToast(`Đã đổi tên thư mục thành "${folderNameInput.trim()}"! ✓`, 'success');
+    } else {
+      await mediaService.createFolder(folderNameInput.trim(), folderColorInput);
+      showToast(`Đã tạo thư mục mới "${folderNameInput.trim()}"! ✓`, 'success');
+    }
+
+    setIsFolderModalOpen(false);
+    await refreshMediaList();
+  };
+
+  const handleConfirmDeleteFolder = async () => {
+    if (!deleteFolderCandidate) return;
+
+    await mediaService.deleteFolder(deleteFolderCandidate.id);
+    showToast(`Đã xóa thư mục "${deleteFolderCandidate.name}". Các tệp bên trong đã được chuyển về Thư mục Gốc.`, 'info');
+
+    if (selectedFolderId === deleteFolderCandidate.id) {
+      setSelectedFolderId('all');
+    }
+    setDeleteFolderCandidate(null);
+    await refreshMediaList();
+  };
+
+  const handleMoveSelectedToFolder = async (targetFolderId: string | null) => {
+    if (selectedIds.length === 0) return;
+
+    await mediaService.moveItemsToFolder(selectedIds, targetFolderId);
+    showToast(`Đã chuyển ${selectedIds.length} tệp vào thư mục! ✓`, 'success');
+    setSelectedIds([]);
+    await refreshMediaList();
+  };
+
   // Upload handler with SHA-256 Duplicate detection
   const handleUploadFiles = async (files: FileList | File[]) => {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const res = await mediaService.uploadMedia(file);
+      const targetFolder = selectedFolderId !== 'all' && selectedFolderId !== 'root' ? selectedFolderId : null;
+      const res = await mediaService.uploadMedia(file, { folderId: targetFolder });
 
       if (res.isDuplicate && res.existingAsset) {
         setDuplicateWarning({ file, existingAsset: res.existingAsset });
@@ -247,7 +336,7 @@ export const AdminMediaLibrary: React.FC = () => {
             <FolderTree color="#F58220" size={28} /> Thư Viện Media CMS (Digital Asset Management)
           </h1>
           <p className={styles.pageSubtitle}>
-            Hệ thống quản lý, tối ưu SEO ảnh, cắt cúp và theo dõi sử dụng tài nguyên truyền thông tập trung iCANCAM
+            Hệ thống quản lý thư mục, tối ưu SEO ảnh, cắt cúp và theo dõi sử dụng tài nguyên truyền thông tập trung iCANCAM
           </p>
         </div>
 
@@ -260,6 +349,15 @@ export const AdminMediaLibrary: React.FC = () => {
             onChange={(e) => e.target.files && handleUploadFiles(e.target.files)}
             style={{ display: 'none' }}
           />
+
+          <button
+            type="button"
+            onClick={handleOpenCreateFolderModal}
+            className={styles.createFolderBtn}
+            style={{ padding: '0.75rem 1.25rem', fontSize: '0.9rem' }}
+          >
+            <FolderPlus size={18} /> Tạo Thư Mục Mới
+          </button>
 
           <button
             type="button"
@@ -283,6 +381,14 @@ export const AdminMediaLibrary: React.FC = () => {
 
         <div className={styles.statCard}>
           <div>
+            <div className={styles.statValue}>{folders.length}</div>
+            <div className={styles.statLabel}>Thư Mục Phân Loại</div>
+          </div>
+          <Folder size={28} color="#8b5cf6" />
+        </div>
+
+        <div className={styles.statCard}>
+          <div>
             <div className={styles.statValue}>{totalSizeMB.toFixed(1)} MB</div>
             <div className={styles.statLabel}>Dung Lượng Sử Dụng</div>
           </div>
@@ -297,6 +403,108 @@ export const AdminMediaLibrary: React.FC = () => {
             <div className={styles.statLabel}>Tài Nguyên Đang Dùng</div>
           </div>
           <Clock size={28} color="#10b981" />
+        </div>
+      </div>
+
+      {/* Folder Management Section */}
+      <div className={styles.folderSection}>
+        <div className={styles.folderSectionHeader}>
+          <div className={styles.folderSectionTitle}>
+            <FolderOpen color="#F58220" size={20} /> Danh Sách Thư Mục Quản Lý Media
+          </div>
+          <button type="button" onClick={handleOpenCreateFolderModal} className={styles.createFolderBtn}>
+            <FolderPlus size={15} /> + Thư Mục Mới
+          </button>
+        </div>
+
+        <div className={styles.folderGrid}>
+          {/* All items option */}
+          <div
+            className={`${styles.folderCard} ${selectedFolderId === 'all' ? styles.folderCardActive : ''}`}
+            onClick={() => {
+              setSelectedFolderId('all');
+              setPage(1);
+            }}
+          >
+            <div className={styles.folderInfo}>
+              <div className={styles.folderIcon}>
+                <FolderOpen color="#F58220" size={20} />
+              </div>
+              <div>
+                <div className={styles.folderName}>Tất Cả Tệp</div>
+                <div className={styles.folderCount}>{totalItems} tệp</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Root Uncategorized option */}
+          <div
+            className={`${styles.folderCard} ${selectedFolderId === 'root' ? styles.folderCardActive : ''}`}
+            onClick={() => {
+              setSelectedFolderId('root');
+              setPage(1);
+            }}
+          >
+            <div className={styles.folderInfo}>
+              <div className={styles.folderIcon}>
+                <Folder color="#94a3b8" size={20} />
+              </div>
+              <div>
+                <div className={styles.folderName}>Thư Mục Gốc</div>
+                <div className={styles.folderCount}>Chưa phân mục</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Custom folders list */}
+          {folders.map((folder) => {
+            const isSelected = selectedFolderId === folder.id;
+            return (
+              <div
+                key={folder.id}
+                className={`${styles.folderCard} ${isSelected ? styles.folderCardActive : ''}`}
+                onClick={() => {
+                  setSelectedFolderId(folder.id);
+                  setPage(1);
+                }}
+              >
+                <div className={styles.folderInfo}>
+                  <div className={styles.folderIcon}>
+                    <Folder color={folder.color || '#F58220'} size={20} />
+                  </div>
+                  <div>
+                    <div className={styles.folderName} title={folder.name}>
+                      {folder.name}
+                    </div>
+                    <div className={styles.folderCount}>{folder.item_count || 0} tệp</div>
+                  </div>
+                </div>
+
+                <div className={styles.folderActions}>
+                  <button
+                    type="button"
+                    onClick={(e) => handleOpenEditFolderModal(folder, e)}
+                    className={styles.folderActionBtn}
+                    title="Đổi tên / sửa màu"
+                  >
+                    <Edit2 size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteFolderCandidate(folder);
+                    }}
+                    className={styles.folderActionBtn}
+                    style={{ color: '#f87171' }}
+                    title="Xóa thư mục"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -416,6 +624,27 @@ export const AdminMediaLibrary: React.FC = () => {
             </span>
 
             <div className={styles.bulkActions}>
+              <select
+                onChange={(e) => {
+                  const targetFolder = e.target.value === 'root' ? null : e.target.value;
+                  handleMoveSelectedToFolder(targetFolder);
+                  e.target.value = '';
+                }}
+                defaultValue=""
+                className={styles.selectFilter}
+                style={{ background: 'rgba(9, 26, 54, 0.8)' }}
+              >
+                <option value="" disabled>
+                  📁 Chuyển vào Thư Mục...
+                </option>
+                <option value="root">📁 Chuyển về Thư mục Gốc</option>
+                {folders.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    📁 {f.name}
+                  </option>
+                ))}
+              </select>
+
               <button type="button" onClick={handleBulkArchive} className={styles.bulkBtn}>
                 <Archive size={15} /> Lưu Trữ
               </button>
@@ -430,6 +659,7 @@ export const AdminMediaLibrary: React.FC = () => {
           {items.map((item) => {
             const isSelected = selectedIds.includes(item.id);
             const isPdf = item.mime_type.includes('pdf');
+            const itemFolder = folders.find((f) => f.id === item.folder_id);
 
             return (
               <div
@@ -470,6 +700,11 @@ export const AdminMediaLibrary: React.FC = () => {
                   </div>
 
                   <div>
+                    {itemFolder && (
+                      <span className={styles.tagPill} style={{ background: 'rgba(245, 130, 32, 0.2)', color: '#F58220' }}>
+                        📁 {itemFolder.name}
+                      </span>
+                    )}
                     {(item.tags || []).map((tag) => (
                       <span key={tag} className={styles.tagPill}>
                         #{tag}
@@ -496,6 +731,7 @@ export const AdminMediaLibrary: React.FC = () => {
                 </th>
                 <th>Hình xem trước</th>
                 <th>Tên Tệp Media</th>
+                <th>Thư Mục</th>
                 <th>Định Dạng</th>
                 <th>Kích Thước</th>
                 <th>Dung Lượng</th>
@@ -508,6 +744,7 @@ export const AdminMediaLibrary: React.FC = () => {
               {items.map((item) => {
                 const isSelected = selectedIds.includes(item.id);
                 const isPdf = item.mime_type.includes('pdf');
+                const itemFolder = folders.find((f) => f.id === item.folder_id);
 
                 return (
                   <tr key={item.id} className={styles.tableRow}>
@@ -533,6 +770,15 @@ export const AdminMediaLibrary: React.FC = () => {
                       <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
                         {(item.tags || []).map((t) => `#${t}`).join(' ')}
                       </div>
+                    </td>
+                    <td>
+                      {itemFolder ? (
+                        <span style={{ fontSize: '0.82rem', color: itemFolder.color || '#F58220', fontWeight: 600 }}>
+                          📁 {itemFolder.name}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>Gốc</span>
+                      )}
                     </td>
                     <td>{item.mime_type.split('/')[1]?.toUpperCase()}</td>
                     <td>{item.width ? `${item.width}x${item.height}px` : 'PDF'}</td>
@@ -667,6 +913,25 @@ export const AdminMediaLibrary: React.FC = () => {
                 </div>
               </div>
 
+              {/* Folder Selector */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>
+                  <FolderInput size={15} /> Thư mục lưu trữ:
+                </label>
+                <select
+                  value={editFolderId || ''}
+                  onChange={(e) => setEditFolderId(e.target.value ? e.target.value : null)}
+                  className={styles.input}
+                >
+                  <option value="">📁 Thư mục Gốc (Uncategorized)</option>
+                  {folders.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      📁 {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Edit SEO Alt & Caption Form */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Default Alt Text (Tiếng Việt) *</label>
@@ -773,6 +1038,75 @@ export const AdminMediaLibrary: React.FC = () => {
           handleOpenDrawer(newAsset);
           await refreshMediaList();
         }}
+      />
+
+      {/* Folder Creation / Editing Modal */}
+      {isFolderModalOpen && (
+        <div className={styles.drawerOverlay} onClick={() => setIsFolderModalOpen(false)}>
+          <div
+            className={styles.drawer}
+            style={{ position: 'relative', margin: 'auto', maxWidth: '450px', height: 'auto', borderRadius: '20px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.drawerHeader}>
+              <h3 className={styles.drawerTitle}>
+                <FolderPlus size={20} color="#F58220" /> {editingFolder ? 'Đổi Tên Thư Mục' : 'Tạo Thư Mục Media Mới'}
+              </h3>
+              <button type="button" onClick={() => setIsFolderModalOpen(false)} className={styles.closeBtn}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveFolder} className={styles.drawerBody}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Tên Thư Mục *</label>
+                <input
+                  type="text"
+                  value={folderNameInput}
+                  onChange={(e) => setFolderNameInput(e.target.value)}
+                  className={styles.input}
+                  placeholder="VD: Bài Viết Khai Giảng, Ảnh Giáo Viên..."
+                  autoFocus
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Màu Nhận Diện Thư Mục</label>
+                <div className={styles.colorPickerRow}>
+                  {COLOR_OPTIONS.map((c) => (
+                    <div
+                      key={c}
+                      className={`${styles.colorOption} ${folderColorInput === c ? styles.colorOptionSelected : ''}`}
+                      style={{ background: c }}
+                      onClick={() => setFolderColorInput(c)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.drawerFooter} style={{ padding: '1rem 0 0 0', border: 'none', background: 'transparent' }}>
+                <button type="button" onClick={() => setIsFolderModalOpen(false)} className={styles.resetBtn}>
+                  Hủy Bỏ
+                </button>
+                <button type="submit" className={styles.uploadTriggerBtn}>
+                  <Save size={16} /> {editingFolder ? 'Lưu Đổi Tên' : 'Tạo Thư Mục'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Folder Confirm Modal */}
+      <ConfirmModal
+        isOpen={Boolean(deleteFolderCandidate)}
+        title="Xác Nhận Xóa Thư Mục"
+        message={`Bạn có chắc chắn muốn xóa thư mục "${deleteFolderCandidate?.name}"? Các tệp truyền thông bên trong sẽ được chuyển về Thư mục Gốc an toàn mà không bị mất.`}
+        confirmLabel="Xóa Thư Mục"
+        cancelLabel="Hủy Bỏ"
+        onConfirm={handleConfirmDeleteFolder}
+        onCancel={() => setDeleteFolderCandidate(null)}
       />
 
       {/* Duplicate Asset Warning Modal */}

@@ -8,7 +8,7 @@ import {
   FileText,
   Plus,
 } from 'lucide-react';
-import type { MediaItem } from '../../types/media';
+import type { MediaItem, MediaFolder } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
 import { useToast } from '../Toast/Toast';
 import styles from './MediaSelectorModal.module.css';
@@ -34,6 +34,8 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   const [activeTab, setActiveTab] = useState<'library' | 'upload'>('library');
   const [items, setItems] = useState<MediaItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [folders, setFolders] = useState<MediaFolder[]>([]);
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('all');
   const [selectedFileType, setSelectedFileType] = useState<string>(filterType);
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -44,6 +46,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     const res = await mediaService.getMediaItems({
       searchQuery,
       fileType: selectedFileType,
+      folderId: selectedFolderId,
       limit: 100,
     });
     setItems(res.items);
@@ -52,9 +55,13 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   useEffect(() => {
     let isMounted = true;
     if (isOpen) {
+      mediaService.getFolders().then((f) => {
+        if (isMounted) setFolders(f);
+      });
       mediaService.getMediaItems({
         searchQuery,
         fileType: selectedFileType,
+        folderId: selectedFolderId,
         limit: 100,
       }).then((res) => {
         if (isMounted) setItems(res.items);
@@ -63,7 +70,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [isOpen, searchQuery, selectedFileType]);
+  }, [isOpen, searchQuery, selectedFileType, selectedFolderId]);
 
   if (!isOpen) return null;
 
@@ -162,6 +169,20 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                   className={styles.searchInput}
                 />
               </div>
+
+              <select
+                value={selectedFolderId}
+                onChange={(e) => setSelectedFolderId(e.target.value)}
+                className={styles.selectFilter}
+              >
+                <option value="all">Tất cả Thư mục</option>
+                <option value="root">📁 Thư mục gốc</option>
+                {folders.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    📁 {f.name} ({f.item_count || 0})
+                  </option>
+                ))}
+              </select>
 
               <select
                 value={selectedFileType}

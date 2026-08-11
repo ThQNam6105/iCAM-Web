@@ -5,10 +5,11 @@ import {
   sanitizeSvgContent,
   getImageDimensions,
 } from './mediaUploadService';
-import type { MediaItem, MediaFilter, MediaUsage, EntityType } from '../../types/media';
+import type { MediaItem, MediaFilter, MediaUsage, MediaFolder, EntityType } from '../../types/media';
 
 export interface UploadOptions {
   tags?: string[];
+  folderId?: string | null;
   defaultAltVi?: string;
   defaultAltEn?: string;
   defaultCaption?: string;
@@ -26,6 +27,41 @@ export interface UploadResult {
 }
 
 export class MediaService {
+  /**
+   * Fetch all folders
+   */
+  async getFolders(): Promise<MediaFolder[]> {
+    return mediaRepository.getFolders();
+  }
+
+  /**
+   * Create a new folder
+   */
+  async createFolder(name: string, color?: string, parentId?: string | null): Promise<MediaFolder> {
+    return mediaRepository.createFolder(name, color, parentId);
+  }
+
+  /**
+   * Rename a folder
+   */
+  async renameFolder(id: string, newName: string, newColor?: string): Promise<MediaFolder> {
+    return mediaRepository.renameFolder(id, newName, newColor);
+  }
+
+  /**
+   * Delete a folder
+   */
+  async deleteFolder(id: string): Promise<void> {
+    return mediaRepository.deleteFolder(id);
+  }
+
+  /**
+   * Move items to a folder
+   */
+  async moveItemsToFolder(itemIds: string[], folderId: string | null): Promise<void> {
+    return mediaRepository.moveItemsToFolder(itemIds, folderId);
+  }
+
   /**
    * Main Upload Flow: Validate -> Hash -> Check Duplicate -> Sanitize SVG -> Dimensions -> Store -> Save Metadata
    */
@@ -94,6 +130,7 @@ export class MediaService {
       focal_x: 0.5,
       focal_y: 0.5,
       tags: options.tags || ['uncategorized'],
+      folder_id: options.folderId || null,
       created_at: now,
       updated_at: now,
     };
@@ -115,7 +152,7 @@ export class MediaService {
   }
 
   /**
-   * Update asset metadata (Alt texts, Caption, Focal Point, Tags)
+   * Update asset metadata (Alt texts, Caption, Focal Point, Tags, Folder)
    */
   async updateMediaMetadata(id: string, updates: Partial<MediaItem>): Promise<MediaItem> {
     const { items } = await mediaRepository.getMediaItems({ limit: 1000, usageStatus: 'all' });

@@ -1,6 +1,17 @@
 export type MediaStatus = 'active' | 'archived' | 'processing' | 'failed';
 export type EntityType = 'news' | 'careers' | 'homepage' | 'courses' | 'teachers' | 'faq' | 'settings';
 
+export interface MediaFolder {
+  id: string;
+  name: string;
+  slug: string;
+  parent_id?: string | null;
+  color?: string;
+  item_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface MediaItem {
   id: string;
   original_filename: string;
@@ -20,6 +31,7 @@ export interface MediaItem {
   focal_x?: number; // Normalized 0.0 to 1.0
   focal_y?: number; // Normalized 0.0 to 1.0
   tags?: string[];
+  folder_id?: string | null;
   created_by?: string;
   created_at: string;
   updated_at: string;
@@ -62,6 +74,7 @@ export interface MediaFilter {
   searchQuery?: string;
   fileType?: string; // 'all' | 'image' | 'svg' | 'gif' | 'pdf'
   categoryTag?: string; // 'all' | tag name
+  folderId?: string | null; // 'all' | 'root' | folder_id
   usageStatus?: 'all' | 'used' | 'unused' | 'archived';
   sortBy?: 'newest' | 'oldest' | 'name-asc' | 'name-desc' | 'size-desc' | 'size-asc';
   page?: number;
