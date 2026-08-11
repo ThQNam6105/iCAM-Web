@@ -384,10 +384,6 @@ export const AdminMediaLibrary: React.FC = () => {
                 <FolderPlus size={18} /> + Thư Mục Mới
               </button>
 
-              <div className={styles.folderSectionTitle}>
-                <FolderOpen color="#F58220" size={20} /> Danh Sách Thư Mục Quản Lý Media
-              </div>
-
               {/* TOP RIGHT BUTTONS */}
               <div className={styles.folderRightActions}>
                 {selectedFolder ? (
