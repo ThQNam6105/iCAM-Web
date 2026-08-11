@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Crop, ZoomIn, RotateCcw, Save, X, Move, Target } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Crop, ZoomIn, ZoomOut, RotateCcw, Save, X, Move } from 'lucide-react';
 import type { MediaItem } from '../../types/media';
 import styles from './ImageCropperModal.module.css';
 
@@ -19,32 +19,93 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   onClose,
 }) => {
   const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>('16:9');
-  const [zoom, setZoom] = useState(100);
-  const [rotation, setRotation] = useState(0);
-  const [focalX, setFocalX] = useState(asset?.focal_x ?? 0.5);
-  const [focalY, setFocalY] = useState(asset?.focal_y ?? 0.5);
-  const [isFocalMode, setIsFocalMode] = useState(false);
+  const [zoom, setZoom] = useState<number>(100);
+  const [panX, setPanX] = useState<number>(Math.round((asset?.focal_x ?? 0.5) * 100));
+  const [panY, setPanY] = useState<number>(Math.round((asset?.focal_y ?? 0.5) * 100));
+  const [prevAssetId, setPrevAssetId] = useState<string | null>(null);
 
-  const canvasAreaRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef<{ x: number; y: number; startPanX: number; startPanY: number }>({
+    x: 0,
+    y: 0,
+    startPanX: 50,
+    startPanY: 50,
+  });
+  const previewBoxRef = useRef<HTMLDivElement>(null);
+
+  if (asset && asset.id !== prevAssetId) {
+    setPrevAssetId(asset.id);
+    setPanX(Math.round((asset.focal_x ?? 0.5) * 100));
+    setPanY(Math.round((asset.focal_y ?? 0.5) * 100));
+    setZoom(100);
+  }
+
+  const handleDragStart = (clientX: number, clientY: number) => {
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: clientX,
+      y: clientY,
+      startPanX: panX,
+      startPanY: panY,
+    };
+  };
+
+  const handleDragMove = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!isDragging || !previewBoxRef.current) return;
+      const rect = previewBoxRef.current.getBoundingClientRect();
+      const deltaX = clientX - dragStartRef.current.x;
+      const deltaY = clientY - dragStartRef.current.y;
+
+      const sensitivity = (zoom / 100) * 0.8;
+      const newPanX = Math.min(
+        100,
+        Math.max(0, dragStartRef.current.startPanX - (deltaX / rect.width) * 100 * sensitivity)
+      );
+      const newPanY = Math.min(
+        100,
+        Math.max(0, dragStartRef.current.startPanY - (deltaY / rect.height) * 100 * sensitivity)
+      );
+
+      setPanX(Math.round(newPanX));
+      setPanY(Math.round(newPanY));
+    },
+    [isDragging, zoom]
+  );
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    const onGlobalMouseMove = (e: MouseEvent) => handleDragMove(e.clientX, e.clientY);
+    const onGlobalMouseUp = () => handleDragEnd();
+    const onGlobalTouchMove = (e: TouchEvent) => {
+      if (e.touches[0]) handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onGlobalTouchEnd = () => handleDragEnd();
+
+    if (isDragging) {
+      window.addEventListener('mousemove', onGlobalMouseMove);
+      window.addEventListener('mouseup', onGlobalMouseUp);
+      window.addEventListener('touchmove', onGlobalTouchMove);
+      window.addEventListener('touchend', onGlobalTouchEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', onGlobalMouseMove);
+      window.removeEventListener('mouseup', onGlobalMouseUp);
+      window.removeEventListener('touchmove', onGlobalTouchMove);
+      window.removeEventListener('touchend', onGlobalTouchEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   if (!isOpen || !asset) return null;
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isFocalMode || !canvasAreaRef.current) return;
-    const rect = canvasAreaRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-    setFocalX(Math.min(1, Math.max(0, Number(x.toFixed(2)))));
-    setFocalY(Math.min(1, Math.max(0, Number(y.toFixed(2)))));
-  };
-
   const handleReset = () => {
     setZoom(100);
-    setRotation(0);
-    setFocalX(0.5);
-    setFocalY(0.5);
+    setPanX(50);
+    setPanY(50);
     setAspectRatio('16:9');
-    setIsFocalMode(false);
   };
 
   const handleApplyCrop = async () => {
@@ -69,23 +130,38 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
       canvas.width = targetW;
       canvas.height = targetH;
 
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate((rotation * Math.PI) / 180);
-      ctx.scale(zoom / 100, zoom / 100);
+      const naturalAspect = img.naturalWidth / img.naturalHeight;
+      const targetAspect = targetW / targetH;
 
-      // Draw relative to focal point
-      const drawX = -targetW / 2;
-      const drawY = -targetH / 2;
-      ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, drawX, drawY, targetW, targetH);
-      ctx.restore();
+      let srcW = img.naturalWidth;
+      let srcH = img.naturalHeight;
+
+      if (naturalAspect > targetAspect) {
+        srcW = Math.round(img.naturalHeight * targetAspect);
+      } else {
+        srcH = Math.round(img.naturalWidth / targetAspect);
+      }
+
+      const zoomFactor = Math.max(1, zoom / 100);
+      srcW = Math.round(srcW / zoomFactor);
+      srcH = Math.round(srcH / zoomFactor);
+
+      const maxSrcX = img.naturalWidth - srcW;
+      const maxSrcY = img.naturalHeight - srcH;
+
+      const srcX = Math.max(0, Math.min(maxSrcX, Math.round(maxSrcX * (panX / 100))));
+      const srcY = Math.max(0, Math.min(maxSrcY, Math.round(maxSrcY * (panY / 100))));
+
+      ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, targetW, targetH);
 
       canvas.toBlob((blob) => {
         if (blob) {
           const nameParts = asset.original_filename.split('.');
           const ext = nameParts.pop();
           const croppedName = `${nameParts.join('.')}_crop_${aspectRatio.replace(':', 'x')}.${ext}`;
-          onSave(blob, croppedName, focalX, focalY);
+          const normalizedFocalX = Number((panX / 100).toFixed(2));
+          const normalizedFocalY = Number((panY / 100).toFixed(2));
+          onSave(blob, croppedName, normalizedFocalX, normalizedFocalY);
         }
       }, asset.mime_type || 'image/jpeg', 0.92);
     };
@@ -97,7 +173,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>
-            <Crop size={20} color="#F58220" /> Chỉnh Sửa Tỉ Lệ & Tâm Điểm Ảnh (Crop & Focal Point)
+            <Crop size={20} color="#F58220" /> Cắt Ảnh & Điều Chỉnh Tâm Điểm Hiển Thị
           </h3>
           <button type="button" onClick={onClose} className={styles.closeBtn}>
             <X size={20} />
@@ -118,88 +194,82 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 {ratio === 'free' ? 'Tự do' : ratio}
               </button>
             ))}
-
-            <button
-              type="button"
-              className={`${styles.ratioBtn} ${isFocalMode ? styles.ratioBtnActive : ''}`}
-              onClick={() => setIsFocalMode(!isFocalMode)}
-              style={{ marginLeft: 'auto' }}
-              title="Bật tính năng chọn tâm điểm hiển thị (Focal Point)"
-            >
-              <Target size={15} /> {isFocalMode ? 'Đang chọn Tâm Điểm' : 'Đặt Tâm Điểm (Focal Point)'}
-            </button>
           </div>
 
-          {/* Interactive Canvas Area */}
+          {/* Interactive Drag & Zoom Canvas (Matching Cover Image Cropper) */}
           <div
-            ref={canvasAreaRef}
-            onClick={handleCanvasClick}
-            className={styles.cropCanvasArea}
-            title={isFocalMode ? 'Nhấp chuột vào ảnh để đặt vị trí Tâm điểm' : 'Xem trước hiệu ứng cắt cúp'}
+            ref={previewBoxRef}
+            onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
+            onTouchStart={(e) => e.touches[0] && handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
+            onWheel={(e) => {
+              e.preventDefault();
+              setZoom((prev) => Math.min(300, Math.max(100, prev + (e.deltaY < 0 ? 10 : -10))));
+            }}
+            className={`${styles.cropCanvasArea} ${isDragging ? styles.cropCanvasAreaDragging : ''}`}
+            title="Nhấn giữ & kéo chuột để di chuyển ảnh (Lăn chuột để Zoom)"
           >
             <img
               src={asset.public_url}
               alt="Crop preview"
               className={styles.previewImg}
               style={{
-                transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
-                objectPosition: `${focalX * 100}% ${focalY * 100}%`,
+                objectFit: 'cover',
+                objectPosition: `${panX}% ${panY}%`,
+                transform: `scale(${zoom / 100})`,
+                transformOrigin: `${panX}% ${panY}%`,
               }}
             />
-
-            {/* Focal Point Indicator Indicator */}
-            <div
-              className={styles.focalPointDot}
-              style={{
-                left: `${focalX * 100}%`,
-                top: `${focalY * 100}%`,
-              }}
-              title={`Focal Point: (${Math.round(focalX * 100)}%, ${Math.round(focalY * 100)}%)`}
-            >
-              <div className={styles.focalPointDotInner} />
+            <div className={styles.dragHelpBadge}>
+              <Move size={13} /> Nhấn giữ & Kéo chuột di chuyển | Zoom: {zoom}%
             </div>
           </div>
 
-          {/* Controls Sliders */}
-          <div className={styles.controlsGrid}>
-            <div className={styles.controlGroup}>
-              <div className={styles.controlLabel}>
-                <span><ZoomIn size={14} /> Phóng to (Zoom):</span>
-                <span>{zoom}%</span>
-              </div>
-              <input
-                type="range"
-                min="100"
-                max="300"
-                step="5"
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                className={styles.slider}
-              />
-            </div>
-
-            <div className={styles.controlGroup}>
-              <div className={styles.controlLabel}>
-                <span><Move size={14} /> Xoay hình (Rotation):</span>
-                <span>{rotation}°</span>
-              </div>
-              <input
-                type="range"
-                min="-180"
-                max="180"
-                step="5"
-                value={rotation}
-                onChange={(e) => setRotation(Number(e.target.value))}
-                className={styles.slider}
-              />
-            </div>
+          {/* Zoom Slider Controls (Matching Cover Image Cropper) */}
+          <div className={styles.zoomControlRow}>
+            <span className={styles.zoomLabel}>
+              <ZoomIn size={14} /> Phóng To / Thu Nhỏ:
+            </span>
+            <button
+              type="button"
+              onClick={() => setZoom((z) => Math.max(100, z - 10))}
+              className={styles.alignBtn}
+              title="Thu nhỏ 10%"
+            >
+              <ZoomOut size={13} />
+            </button>
+            <input
+              type="range"
+              min="100"
+              max="300"
+              step="5"
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className={styles.zoomSlider}
+            />
+            <button
+              type="button"
+              onClick={() => setZoom((z) => Math.min(300, z + 10))}
+              className={styles.alignBtn}
+              title="Phóng to 10%"
+            >
+              <ZoomIn size={13} />
+            </button>
+            <span className={styles.zoomValue}>{zoom}%</span>
+            <button
+              type="button"
+              onClick={handleReset}
+              className={styles.alignBtn}
+              title="Đặt lại Mặc Định"
+            >
+              <RotateCcw size={13} /> Đặt lại
+            </button>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className={styles.actionRow}>
           <button type="button" onClick={handleReset} className={styles.resetBtn}>
-            <RotateCcw size={16} /> Đặt lại
+            <RotateCcw size={16} /> Đặt lại mặc định
           </button>
 
           <div className={styles.saveGroup}>
