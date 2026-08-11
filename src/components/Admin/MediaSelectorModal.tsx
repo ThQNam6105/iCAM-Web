@@ -7,6 +7,8 @@ import {
   X,
   FileText,
   Plus,
+  ArrowLeft,
+  Folder,
 } from 'lucide-react';
 import type { MediaItem, MediaFolder } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
@@ -35,8 +37,15 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   const [items, setItems] = useState<MediaItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [folders, setFolders] = useState<MediaFolder[]>([]);
-  const [selectedFolderId, setSelectedFolderId] = useState<string>('all');
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [prevFilterType, setPrevFilterType] = useState(filterType);
   const [selectedFileType, setSelectedFileType] = useState<string>(filterType);
+
+  if (filterType !== prevFilterType) {
+    setPrevFilterType(filterType);
+    setSelectedFileType(filterType);
+  }
+
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadTargetFolderId, setUploadTargetFolderId] = useState<string>('');
@@ -44,6 +53,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshMediaList = async () => {
+    if (!selectedFolderId) return;
     const res = await mediaService.getMediaItems({
       searchQuery,
       fileType: selectedFileType,
@@ -52,6 +62,17 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     });
     setItems(res.items);
   };
+
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    if (!isOpen) {
+      setSelectedFolderId(null);
+      setSelectedAssetIds([]);
+      setSearchQuery('');
+    }
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -64,11 +85,12 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
           }
         }
       });
+      // Fetch items list for folder counts and asset grid
       mediaService.getMediaItems({
-        searchQuery,
-        fileType: selectedFileType,
-        folderId: selectedFolderId,
-        limit: 100,
+        searchQuery: selectedFolderId ? searchQuery : '',
+        fileType: selectedFolderId ? selectedFileType : 'all',
+        folderId: selectedFolderId || 'all',
+        limit: 200,
       }).then((res) => {
         if (isMounted) setItems(res.items);
       });
@@ -83,7 +105,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   const handleToggleSelect = (item: MediaItem) => {
     if (allowMultiple) {
       setSelectedAssetIds((prev) =>
-        prev.includes(item.id) ? prev.filter((id) => id !== id) : [...prev, item.id]
+        prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id]
       );
     } else {
       setSelectedAssetIds([item.id]);
@@ -102,10 +124,10 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const targetFolder = uploadTargetFolderId || (selectedFolderId !== 'all' && selectedFolderId !== 'root' ? selectedFolderId : folders[0]?.id);
+    const targetFolder = uploadTargetFolderId || (selectedFolderId && selectedFolderId !== 'all' ? selectedFolderId : (folders[0]?.id || 'root'));
 
     if (!targetFolder) {
-      showToast('Vui lòng chọn hoặc tạo một Thư mục trước khi tải tệp lên!', 'error');
+      showToast('Vui lòng chọn một Thư mục lưu trữ trước khi tải tệp lên!', 'error');
       return;
     }
 
@@ -136,6 +158,10 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     }
   };
 
+  const currentFolderName = selectedFolderId === 'root'
+    ? 'Thư mục gốc'
+    : (folders.find((f) => f.id === selectedFolderId)?.name || 'Thư mục');
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -156,7 +182,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
             className={`${styles.tabBtn} ${activeTab === 'library' ? styles.tabBtnActive : ''}`}
             onClick={() => setActiveTab('library')}
           >
-            <FolderTree size={16} /> Thư Viện Đã Có ({items.length})
+            <FolderTree size={16} /> Thư Viện Hệ Thống
           </button>
 
           <button
@@ -169,105 +195,155 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
         </div>
 
         {activeTab === 'library' ? (
-          <>
-            {/* Toolbar */}
-            <div className={styles.toolbar}>
-              <div className={styles.searchBox}>
-                <Search size={16} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm theo tên file, alt text, tag..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={styles.searchInput}
-                />
-              </div>
-
-              <select
-                value={selectedFolderId}
-                onChange={(e) => setSelectedFolderId(e.target.value)}
-                className={styles.selectFilter}
-              >
-                <option value="all">Tất cả Thư mục</option>
-                <option value="root">📁 Thư mục gốc</option>
-                {folders.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    📁 {f.name} ({f.item_count || 0})
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={selectedFileType}
-                onChange={(e) => setSelectedFileType(e.target.value)}
-                className={styles.selectFilter}
-              >
-                <option value="all">Tất cả định dạng</option>
-                <option value="image">Hình ảnh (JPG, PNG, WEBP)</option>
-                <option value="svg">Vector SVG</option>
-                <option value="gif">Ảnh động GIF</option>
-                <option value="pdf">Tài liệu PDF</option>
-              </select>
-            </div>
-
-            {/* Assets Grid */}
+          !selectedFolderId ? (
+            /* LEVEL 1: FOLDER DIRECTORY SELECTION */
             <div className={styles.modalBody}>
-              <div className={styles.grid}>
-                {items.map((item) => {
-                  const isSelected = selectedAssetIds.includes(item.id);
-                  const isPdf = item.mime_type.includes('pdf');
+              <h4 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+                📁 Bước 1: Vui lòng chọn một Thư Mục để duyệt tài nguyên hệ thống:
+              </h4>
 
+              <div className={styles.folderGrid}>
+                {/* Root Folder Card */}
+                {(() => {
+                  const rootCount = items.filter((i) => !i.folder_id && i.status !== 'archived').length;
                   return (
                     <div
-                      key={item.id}
-                      onClick={() => handleToggleSelect(item)}
-                      className={`${styles.assetCard} ${isSelected ? styles.assetCardSelected : ''}`}
+                      className={styles.folderCard}
+                      onClick={() => setSelectedFolderId('root')}
                     >
-                      <div className={styles.thumbWrapper}>
-                        {isPdf ? (
-                          <FileText size={40} color="#F58220" />
-                        ) : (
-                          <img src={item.public_url} alt={item.default_alt_vi || item.original_filename} className={styles.thumbImg} />
-                        )}
-                        {isSelected && (
-                          <div className={styles.checkBadge}>
-                            <Check size={16} />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className={styles.assetDetails}>
-                        <div className={styles.filename} title={item.original_filename}>
-                          {item.original_filename}
-                        </div>
-                        <div className={styles.metaSub}>
-                          {(item.file_size / 1024).toFixed(0)} KB • {item.width ? `${item.width}x${item.height}` : 'PDF'}
-                        </div>
+                      <Folder color="#94a3b8" size={32} />
+                      <div>
+                        <div className={styles.folderName}>Thư mục gốc</div>
+                        <div className={styles.folderCount}>{rootCount} tệp</div>
                       </div>
                     </div>
                   );
-                })}
+                })()}
+
+                {/* Custom Folders */}
+                {folders.map((f) => (
+                  <div
+                    key={f.id}
+                    className={styles.folderCard}
+                    onClick={() => setSelectedFolderId(f.id)}
+                  >
+                    <Folder color={f.color || '#F58220'} size={32} />
+                    <div>
+                      <div className={styles.folderName}>{f.name}</div>
+                      <div className={styles.folderCount}>{f.item_count || 0} tệp</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+          ) : (
+            /* LEVEL 2: ASSET SELECTION INSIDE SELECTED FOLDER */
+            <>
+              {/* Toolbar */}
+              <div className={styles.toolbar}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFolderId(null);
+                    setSelectedAssetIds([]);
+                  }}
+                  className={styles.backBtn}
+                >
+                  <ArrowLeft size={16} /> Đổi Thư Mục
+                </button>
 
-            {/* Footer */}
-            <div className={styles.modalFooter}>
-              <span className={styles.selectedCount}>
-                Đã chọn: <strong>{selectedAssetIds.length}</strong> tệp
-              </span>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#F58220', whiteSpace: 'nowrap' }}>
+                  📁 {currentFolderName}
+                </div>
 
-              <button
-                type="button"
-                disabled={selectedAssetIds.length === 0}
-                onClick={handleConfirmSelection}
-                className={styles.confirmBtn}
-              >
-                <Check size={18} /> Sử Dụng Tệp Đã Chọn
-              </button>
-            </div>
-          </>
+                <div className={styles.searchBox}>
+                  <Search size={16} className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm file..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                </div>
+
+                <select
+                  value={selectedFileType}
+                  onChange={(e) => setSelectedFileType(e.target.value)}
+                  className={styles.selectFilter}
+                >
+                  <option value="all">Tất cả định dạng</option>
+                  <option value="image">Hình ảnh (JPG, PNG, WEBP)</option>
+                  <option value="svg">Vector SVG</option>
+                  <option value="gif">Ảnh động GIF</option>
+                  <option value="pdf">Tài liệu PDF / Word</option>
+                </select>
+              </div>
+
+              {/* Assets Grid */}
+              <div className={styles.modalBody}>
+                <div className={styles.grid}>
+                  {items
+                    .filter((item) => {
+                      if (selectedFolderId === 'root') return !item.folder_id;
+                      return item.folder_id === selectedFolderId;
+                    })
+                    .map((item) => {
+                      const isSelected = selectedAssetIds.includes(item.id);
+                      const isDoc = item.mime_type.includes('pdf') || item.mime_type.includes('word') || item.original_filename.endsWith('.docx') || item.original_filename.endsWith('.doc');
+
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => handleToggleSelect(item)}
+                          className={`${styles.assetCard} ${isSelected ? styles.assetCardSelected : ''}`}
+                        >
+                          <div className={styles.thumbWrapper}>
+                            {isDoc ? (
+                              <FileText size={40} color="#F58220" />
+                            ) : (
+                              <img src={item.public_url} alt={item.default_alt_vi || item.original_filename} className={styles.thumbImg} />
+                            )}
+                            {isSelected && (
+                              <div className={styles.checkBadge}>
+                                <Check size={16} />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className={styles.assetDetails}>
+                            <div className={styles.filename} title={item.original_filename}>
+                              {item.original_filename}
+                            </div>
+                            <div className={styles.metaSub}>
+                              {(item.file_size / 1024).toFixed(0)} KB • {item.width ? `${item.width}x${item.height}` : 'Doc'}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className={styles.modalFooter}>
+                <span className={styles.selectedCount}>
+                  Đã chọn: <strong>{selectedAssetIds.length}</strong> tệp
+                </span>
+
+                <button
+                  type="button"
+                  disabled={selectedAssetIds.length === 0}
+                  onClick={handleConfirmSelection}
+                  className={styles.confirmBtn}
+                >
+                  <Check size={18} /> Sử Dụng Tệp Đã Chọn
+                </button>
+              </div>
+            </>
+          )
         ) : (
-          /* Direct Upload Tab */
+          /* Direct Upload Tab into System Library */
           <div className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div style={{ background: '#091a36', padding: '1.25rem', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', maxWidth: '500px', margin: '0 auto', width: '100%' }}>
               <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -279,6 +355,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                 className={styles.selectFilter}
                 style={{ width: '100%' }}
               >
+                <option value="root">📁 Thư mục gốc</option>
                 {folders.map((f) => (
                   <option key={f.id} value={f.id}>
                     📁 {f.name}
@@ -291,7 +368,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
               type="file"
               ref={fileInputRef}
               multiple={allowMultiple}
-              accept="image/*,.pdf,.svg"
+              accept="image/*,video/*,.pdf,.svg,.docx,.doc"
               onChange={handleDirectFileUpload}
               style={{ display: 'none' }}
             />
@@ -299,10 +376,10 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
             <div className={styles.dropzone} onClick={() => fileInputRef.current?.click()}>
               <Upload size={48} className={styles.uploadIcon} />
               <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                {isUploading ? 'Đang tải lên và xử lý...' : 'Bấm vào đây để chọn tệp từ máy tính'}
+                {isUploading ? 'Đang tải lên và xử lý...' : 'Bấm vào đây để tải tệp mới vào Thư viện hệ thống'}
               </div>
               <div style={{ fontSize: '0.88rem', color: '#94a3b8' }}>
-                Hỗ trợ PNG, JPG, WEBP, SVG, GIF, PDF (Tối đa 10MB/tệp • Bắt buộc vào thư mục)
+                Hỗ trợ PNG, JPG, WEBP, SVG, GIF, MP4, PDF, DOCX (Tối đa 10MB/tệp • Tải vào Thư viện hệ thống)
               </div>
               <button type="button" className={styles.confirmBtn} style={{ marginTop: '1rem' }}>
                 <Plus size={18} /> Chọn Tệp Máy Tính

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Eye,
-  Upload,
   Save,
   RefreshCw,
   History,
@@ -47,25 +46,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   onClose,
 }) => {
   const { showToast } = useToast();
-  const coverImageInputRef = useRef<HTMLInputElement>(null);
-
-  const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showToast('Vui lòng chọn file định dạng hình ảnh (PNG, JPG, WEBP...)', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const base64Data = evt.target?.result as string;
-      setImage(base64Data);
-      showToast('Đã tải ảnh từ máy tính lên thành công! ✓', 'success');
-    };
-    reader.readAsDataURL(file);
-  };
 
   const getInitialCategory = () => {
     const cats = getCategories();
@@ -388,17 +368,10 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               <label className={styles.label}>
                 Hình ảnh bìa bài viết (URL hoặc Tải từ máy tính) <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <input
-                type="file"
-                ref={coverImageInputRef}
-                accept="image/*"
-                onChange={handleCoverImageUpload}
-                style={{ display: 'none' }}
-              />
               <div className={styles.imageInputGroup}>
                 <input
                   type="text"
-                  placeholder="Dán URL ảnh hoặc bấm Tải ảnh từ máy..."
+                  placeholder="Dán URL ảnh hoặc chọn từ Thư viện hệ thống..."
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
                   className={styles.input}
@@ -408,17 +381,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                   onClick={() => setIsMediaSelectorOpen(true)}
                   className={styles.uploadPlaceholderBtn}
                   style={{ background: '#F58220', color: '#ffffff' }}
-                  title="Chọn hoặc tải ảnh lên từ Thư viện Media"
+                  title="Chọn ảnh từ Thư viện hệ thống"
                 >
-                  <FolderTree size={16} /> Thư Viện Media
-                </button>
-                <button
-                  type="button"
-                  onClick={() => coverImageInputRef.current?.click()}
-                  className={styles.uploadPlaceholderBtn}
-                  title="Chọn ảnh từ máy tính / điện thoại"
-                >
-                  <Upload size={16} /> Tải trực tiếp
+                  <FolderTree size={16} /> Thư viện hệ thống
                 </button>
               </div>
               {errors.image && <span className={styles.errorText}>{errors.image}</span>}

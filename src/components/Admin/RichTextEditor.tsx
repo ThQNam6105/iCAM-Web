@@ -43,7 +43,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Nhập nội dung bài viết...',
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -84,22 +83,6 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  // Word DOCX File Import
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const parsedHtml = await parseWordDocument(file);
-      if (contentRef.current) {
-        contentRef.current.innerHTML += parsedHtml;
-        triggerChange();
-      }
-    } catch (err) {
-      console.error('Error importing Word document:', err);
-    }
-  };
-
   // Insert Custom Educational Block
   const insertEducationBlock = (blockHtml: string) => {
     execCmd('insertHTML', blockHtml);
@@ -122,97 +105,53 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
-  const imageFileInputRef = useRef<HTMLInputElement>(null);
-  const videoFileInputRef = useRef<HTMLInputElement>(null);
-
-  // Local inline image upload handler
-  const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const base64Data = evt.target?.result as string;
-      execCmd('insertImage', base64Data);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Local inline video upload handler
-  const handleInlineVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('video/')) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const base64Data = evt.target?.result as string;
-      const videoHtml = `<video controls style="max-width:100%; border-radius:12px; margin: 1rem 0;" src="${base64Data}"></video>`;
-      execCmd('insertHTML', videoHtml);
-    };
-    reader.readAsDataURL(file);
-  };
-
+  const [mediaFilterType, setMediaFilterType] = useState<'image' | 'video' | 'doc'>('image');
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
 
   const insertImage = () => {
+    setMediaFilterType('image');
     setIsMediaModalOpen(true);
   };
 
-  const handleSelectMediaAsset = (assets: MediaItem[]) => {
-    if (assets.length > 0) {
-      const asset = assets[0];
+  const insertVideo = () => {
+    setMediaFilterType('video');
+    setIsMediaModalOpen(true);
+  };
+
+  const handleImportWord = () => {
+    setMediaFilterType('doc');
+    setIsMediaModalOpen(true);
+  };
+
+  const handleSelectMediaAsset = async (assets: MediaItem[]) => {
+    if (assets.length === 0) return;
+    const asset = assets[0];
+
+    if (mediaFilterType === 'image') {
       const altText = asset.default_alt_vi || asset.default_alt_en || asset.original_filename;
       const imgHtml = `<img src="${asset.public_url}" alt="${altText}" style="max-width: 100%; height: auto; border-radius: 14px; margin: 1rem 0; display: block;" />`;
       execCmd('insertHTML', imgHtml);
-    }
-  };
-
-  const insertVideo = () => {
-    if (confirm('Bấm OK để TẢI CLIP VIDEO TỪ MÁY TÍNH, hoặc bấm CANCEL để dán đường dẫn Video/YouTube URL!')) {
-      videoFileInputRef.current?.click();
-    } else {
-      const url = prompt('Nhập đường dẫn Video URL (MP4, YouTube, Vimeo...):', 'https://');
-      if (url) {
-        if (url.includes('youtube.com') || url.includes('youtu.be')) {
-          const ytId = url.split('v=')[1] || url.split('/').pop();
-          const iframeHtml = `<iframe width="100%" height="380" src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen style="border-radius:12px; margin: 1rem 0;"></iframe>`;
-          execCmd('insertHTML', iframeHtml);
-        } else {
-          const videoHtml = `<video controls style="max-width:100%; border-radius:12px; margin: 1rem 0;" src="${url}"></video>`;
-          execCmd('insertHTML', videoHtml);
+    } else if (mediaFilterType === 'video') {
+      const videoHtml = `<video controls style="max-width:100%; border-radius:12px; margin: 1rem 0;" src="${asset.public_url}"></video>`;
+      execCmd('insertHTML', videoHtml);
+    } else if (mediaFilterType === 'doc') {
+      try {
+        const response = await fetch(asset.public_url);
+        const blob = await response.blob();
+        const file = new File([blob], asset.original_filename, { type: asset.mime_type });
+        const parsedHtml = await parseWordDocument(file);
+        if (contentRef.current) {
+          contentRef.current.innerHTML += parsedHtml;
+          triggerChange();
         }
+      } catch (err) {
+        console.error('Error parsing Word document from system library:', err);
       }
     }
   };
 
   return (
     <div className={`${styles.editorContainer} ${isFullscreen ? styles.fullscreenEditor : ''}`}>
-      <input
-        type="file"
-        ref={fileInputRef}
-        accept=".docx,.doc,.txt,.html"
-        onChange={handleFileUpload}
-        style={{ display: 'none' }}
-      />
-      <input
-        type="file"
-        ref={imageFileInputRef}
-        accept="image/*"
-        onChange={handleInlineImageUpload}
-        style={{ display: 'none' }}
-      />
-      <input
-        type="file"
-        ref={videoFileInputRef}
-        accept="video/*"
-        onChange={handleInlineVideoUpload}
-        style={{ display: 'none' }}
-      />
-
       {/* Word-like Formatting Toolbar */}
       <div className={styles.toolbar}>
         {/* Undo / Redo */}
@@ -421,9 +360,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div className={styles.toolbarGroup}>
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={handleImportWord}
             className={styles.toolBtn}
-            title="Nhập tài liệu MS Word (.docx)"
+            title="Nhập tài liệu MS Word từ Thư viện hệ thống"
           >
             <FileDown size={15} />
           </button>
@@ -495,8 +434,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       <MediaSelectorModal
         isOpen={isMediaModalOpen}
         onClose={() => setIsMediaModalOpen(false)}
-        filterType="image"
-        title="Chọn hoặc Tải Ảnh Mới vào Thư Viện Media"
+        filterType={mediaFilterType === 'doc' ? 'pdf' : (mediaFilterType === 'video' ? 'all' : 'image')}
+        title={
+          mediaFilterType === 'doc'
+            ? 'Chọn Tài Liệu Word từ Thư Viện Hệ Thống'
+            : mediaFilterType === 'video'
+            ? 'Chọn Video Clip từ Thư Viện Hệ Thống'
+            : 'Chọn Hình Ảnh từ Thư Viện Hệ Thống'
+        }
         onSelect={handleSelectMediaAsset}
       />
     </div>
