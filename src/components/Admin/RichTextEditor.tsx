@@ -27,6 +27,8 @@ import {
 import { cleanWordHtml, parseWordDocument } from '../../services/importService';
 import { sanitizeHtml } from '../../services/sanitizerService';
 import { EDUCATION_BLOCKS } from './EducationBlocks';
+import { MediaSelectorModal } from './MediaSelectorModal';
+import type { MediaItem } from '../../types/media';
 import styles from './RichTextEditor.module.css';
 
 interface RichTextEditorProps {
@@ -154,14 +156,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     reader.readAsDataURL(file);
   };
 
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+
   const insertImage = () => {
-    if (confirm('Bấm OK để TẢI ẢNH TỪ MÁY TÍNH, hoặc bấm CANCEL để dán đường dẫn URL ảnh!')) {
-      imageFileInputRef.current?.click();
-    } else {
-      const url = prompt('Nhập đường dẫn hình ảnh (URL):', 'https://');
-      if (url) {
-        execCmd('insertImage', url);
-      }
+    setIsMediaModalOpen(true);
+  };
+
+  const handleSelectMediaAsset = (assets: MediaItem[]) => {
+    if (assets.length > 0) {
+      const asset = assets[0];
+      const altText = asset.default_alt_vi || asset.default_alt_en || asset.original_filename;
+      const imgHtml = `<img src="${asset.public_url}" alt="${altText}" style="max-width: 100%; height: auto; border-radius: 14px; margin: 1rem 0; display: block;" />`;
+      execCmd('insertHTML', imgHtml);
     }
   };
 
@@ -484,6 +490,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         className={styles.editableContent}
         data-placeholder={placeholder}
         suppressContentEditableWarning
+      />
+
+      <MediaSelectorModal
+        isOpen={isMediaModalOpen}
+        onClose={() => setIsMediaModalOpen(false)}
+        filterType="image"
+        title="Chọn hoặc Tải Ảnh Mới vào Thư Viện Media"
+        onSelect={handleSelectMediaAsset}
       />
     </div>
   );
