@@ -67,34 +67,6 @@
   color: #ef4444;
 }
 
-.modalTabs {
-  display: flex;
-  gap: 1rem;
-  padding: 0 1.75rem;
-  background: #091a36;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.tabBtn {
-  padding: 0.85rem 1.25rem;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  color: #94a3b8;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.25s ease;
-}
-
-.tabBtnActive {
-  color: #F58220;
-  border-bottom-color: #F58220;
-}
-
 .toolbar {
   display: flex;
   align-items: center;
