@@ -89,6 +89,10 @@ export const AdminMediaLibrary: React.FC = () => {
   // Delete Candidate
   const [deleteCandidate, setDeleteCandidate] = useState<MediaItem | null>(null);
 
+  // Upload Destination Folder Prompt State
+  const [uploadPendingFiles, setUploadPendingFiles] = useState<File[] | null>(null);
+  const [selectedUploadFolderId, setSelectedUploadFolderId] = useState<string>('');
+
   // Debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -234,12 +238,10 @@ export const AdminMediaLibrary: React.FC = () => {
     await refreshMediaList();
   };
 
-  // Upload handler with SHA-256 Duplicate detection
-  const handleUploadFiles = async (files: FileList | File[]) => {
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const targetFolder = selectedFolderId !== 'all' && selectedFolderId !== 'root' ? selectedFolderId : null;
-      const res = await mediaService.uploadMedia(file, { folderId: targetFolder });
+  const executeUploadWithFolder = async (filesToUpload: File[], destFolderId: string) => {
+    for (let i = 0; i < filesToUpload.length; i++) {
+      const file = filesToUpload[i];
+      const res = await mediaService.uploadMedia(file, { folderId: destFolderId });
 
       if (res.isDuplicate && res.existingAsset) {
         setDuplicateWarning({ file, existingAsset: res.existingAsset });
@@ -251,6 +253,24 @@ export const AdminMediaLibrary: React.FC = () => {
       }
     }
     await refreshMediaList();
+  };
+
+  // Upload handler with Mandatory Folder Check & SHA-256 Duplicate detection
+  const handleUploadFiles = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
+    if (selectedFolderId !== 'all' && selectedFolderId !== 'root') {
+      await executeUploadWithFolder(fileArray, selectedFolderId);
+    } else {
+      if (folders.length === 0) {
+        showToast('Vui lòng tạo ít nhất một Thư mục trước khi tải tệp lên!', 'error');
+        handleOpenCreateFolderModal();
+        return;
+      }
+      setSelectedUploadFolderId(folders[0].id);
+      setUploadPendingFiles(fileArray);
+    }
   };
 
   const handleUseExistingDuplicate = () => {
@@ -1174,6 +1194,68 @@ export const AdminMediaLibrary: React.FC = () => {
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteCandidate(null)}
       />
+
+      {/* Mandatory Upload Folder Destination Selection Modal */}
+      {uploadPendingFiles && (
+        <div className={styles.drawerOverlay} onClick={() => setUploadPendingFiles(null)}>
+          <div
+            className={styles.drawer}
+            style={{ position: 'relative', margin: 'auto', maxWidth: '480px', height: 'auto', borderRadius: '20px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.drawerHeader}>
+              <h3 className={styles.drawerTitle} style={{ color: '#F58220', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FolderOpen size={20} /> Chọn Thư Mục Lưu Trữ Cho Tệp Mới
+              </h3>
+              <button type="button" onClick={() => setUploadPendingFiles(null)} className={styles.closeBtn}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.drawerBody}>
+              <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: 1.6 }}>
+                Hệ thống yêu cầu mọi tệp media phải được phân loại vào một Thư mục cụ thể. Vui lòng chọn thư mục lưu trữ cho{' '}
+                <strong>{uploadPendingFiles.length} tệp</strong> sắp tải lên:
+              </p>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Thư Mục Đích *</label>
+                <select
+                  value={selectedUploadFolderId}
+                  onChange={(e) => setSelectedUploadFolderId(e.target.value)}
+                  className={styles.input}
+                >
+                  {folders.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      📁 {f.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.drawerFooter}>
+              <button type="button" onClick={() => setUploadPendingFiles(null)} className={styles.resetBtn}>
+                Hủy Bỏ
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const filesToUpload = uploadPendingFiles;
+                  const targetFId = selectedUploadFolderId || folders[0]?.id;
+                  setUploadPendingFiles(null);
+                  if (filesToUpload && targetFId) {
+                    await executeUploadWithFolder(filesToUpload, targetFId);
+                  }
+                }}
+                className={styles.uploadTriggerBtn}
+              >
+                <Upload size={16} /> Tải Vào Thư Mục
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

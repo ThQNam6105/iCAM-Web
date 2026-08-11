@@ -39,6 +39,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   const [selectedFileType, setSelectedFileType] = useState<string>(filterType);
   const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadTargetFolderId, setUploadTargetFolderId] = useState<string>('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -56,7 +57,12 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     let isMounted = true;
     if (isOpen) {
       mediaService.getFolders().then((f) => {
-        if (isMounted) setFolders(f);
+        if (isMounted) {
+          setFolders(f);
+          if (f.length > 0 && !uploadTargetFolderId) {
+            setUploadTargetFolderId(f[0].id);
+          }
+        }
       });
       mediaService.getMediaItems({
         searchQuery,
@@ -70,7 +76,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [isOpen, searchQuery, selectedFileType, selectedFolderId]);
+  }, [isOpen, searchQuery, selectedFileType, selectedFolderId, uploadTargetFolderId]);
 
   if (!isOpen) return null;
 
@@ -96,12 +102,19 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    const targetFolder = uploadTargetFolderId || (selectedFolderId !== 'all' && selectedFolderId !== 'root' ? selectedFolderId : folders[0]?.id);
+
+    if (!targetFolder) {
+      showToast('Vui lòng chọn hoặc tạo một Thư mục trước khi tải tệp lên!', 'error');
+      return;
+    }
+
     setIsUploading(true);
     const uploadedAssets: MediaItem[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const res = await mediaService.uploadMedia(file);
+      const res = await mediaService.uploadMedia(file, { folderId: targetFolder });
 
       if (res.success && res.asset) {
         uploadedAssets.push(res.asset);
@@ -255,7 +268,25 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
           </>
         ) : (
           /* Direct Upload Tab */
-          <div className={styles.modalBody}>
+          <div className={styles.modalBody} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ background: '#091a36', padding: '1.25rem', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', maxWidth: '500px', margin: '0 auto', width: '100%' }}>
+              <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                📁 Chọn Thư Mục Lưu Trữ Cho Tệp Mới <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <select
+                value={uploadTargetFolderId}
+                onChange={(e) => setUploadTargetFolderId(e.target.value)}
+                className={styles.selectFilter}
+                style={{ width: '100%' }}
+              >
+                {folders.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    📁 {f.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <input
               type="file"
               ref={fileInputRef}
@@ -271,7 +302,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                 {isUploading ? 'Đang tải lên và xử lý...' : 'Bấm vào đây để chọn tệp từ máy tính'}
               </div>
               <div style={{ fontSize: '0.88rem', color: '#94a3b8' }}>
-                Hỗ trợ PNG, JPG, WEBP, SVG, GIF, PDF (Tối đa 10MB/tệp)
+                Hỗ trợ PNG, JPG, WEBP, SVG, GIF, PDF (Tối đa 10MB/tệp • Bắt buộc vào thư mục)
               </div>
               <button type="button" className={styles.confirmBtn} style={{ marginTop: '1rem' }}>
                 <Plus size={18} /> Chọn Tệp Máy Tính
