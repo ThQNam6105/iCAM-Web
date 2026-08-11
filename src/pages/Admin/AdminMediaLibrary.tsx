@@ -77,6 +77,7 @@ export const AdminMediaLibrary: React.FC = () => {
   const [editingFolder, setEditingFolder] = useState<MediaFolder | null>(null);
   const [folderNameInput, setFolderNameInput] = useState('');
   const [folderColorInput, setFolderColorInput] = useState('#F58220');
+  const [folderSearchQuery, setFolderSearchQuery] = useState('');
   const [deleteFolderCandidate, setDeleteFolderCandidate] = useState<MediaFolder | null>(null);
 
   // Modals state
@@ -379,10 +380,23 @@ export const AdminMediaLibrary: React.FC = () => {
             {/* Root Folders Section */}
           <div className={styles.folderSection}>
             <div className={styles.folderSectionHeader}>
-              {/* TOP LEFT BUTTON */}
-              <button type="button" onClick={handleOpenCreateFolderModal} className={styles.createFolderBtn}>
-                <FolderPlus size={18} /> + Thư Mục Mới
-              </button>
+              {/* TOP LEFT BUTTON & SEARCH */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+                <button type="button" onClick={handleOpenCreateFolderModal} className={styles.createFolderBtn}>
+                  <FolderPlus size={18} /> + Thư Mục Mới
+                </button>
+
+                <div className={styles.searchBox} style={{ maxWidth: '260px' }}>
+                  <Search size={15} className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm thư mục..."
+                    value={folderSearchQuery}
+                    onChange={(e) => setFolderSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                </div>
+              </div>
 
               {/* TOP RIGHT BUTTONS */}
               <div className={styles.folderRightActions}>
@@ -438,7 +452,10 @@ export const AdminMediaLibrary: React.FC = () => {
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString(),
                 };
-                const displayFolders = [rootFolder, ...folders];
+                const q = folderSearchQuery.toLowerCase().trim();
+                const displayFolders = [rootFolder, ...folders].filter((f) =>
+                  f.name.toLowerCase().includes(q)
+                );
 
                 return displayFolders.map((folder) => {
                   const isSelected = selectedFolder?.id === folder.id;

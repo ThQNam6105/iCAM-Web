@@ -65,12 +65,15 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
 
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
 
+  const [folderSearchQuery, setFolderSearchQuery] = useState('');
+
   if (isOpen !== prevIsOpen) {
     setPrevIsOpen(isOpen);
     if (!isOpen) {
       setSelectedFolderId(null);
       setSelectedAssetIds([]);
       setSearchQuery('');
+      setFolderSearchQuery('');
     }
   }
 
@@ -197,45 +200,55 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
         {activeTab === 'library' ? (
           !selectedFolderId ? (
             /* LEVEL 1: FOLDER DIRECTORY SELECTION */
-            <div className={styles.modalBody}>
-              <h4 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, marginBottom: '1.25rem' }}>
-                📁 Bước 1: Vui lòng chọn một Thư Mục để duyệt tài nguyên hệ thống:
-              </h4>
-
-              <div className={styles.folderGrid}>
-                {/* Root Folder Card */}
-                {(() => {
-                  const rootCount = items.filter((i) => !i.folder_id && i.status !== 'archived').length;
-                  return (
-                    <div
-                      className={styles.folderCard}
-                      onClick={() => setSelectedFolderId('root')}
-                    >
-                      <Folder color="#94a3b8" size={32} />
-                      <div>
-                        <div className={styles.folderName}>Thư mục gốc</div>
-                        <div className={styles.folderCount}>{rootCount} tệp</div>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Custom Folders */}
-                {folders.map((f) => (
-                  <div
-                    key={f.id}
-                    className={styles.folderCard}
-                    onClick={() => setSelectedFolderId(f.id)}
-                  >
-                    <Folder color={f.color || '#F58220'} size={32} />
-                    <div>
-                      <div className={styles.folderName}>{f.name}</div>
-                      <div className={styles.folderCount}>{f.item_count || 0} tệp</div>
-                    </div>
-                  </div>
-                ))}
+            <>
+              <div className={styles.toolbar}>
+                <div className={styles.searchBox}>
+                  <Search size={16} className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm thư mục..."
+                    value={folderSearchQuery}
+                    onChange={(e) => setFolderSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                </div>
               </div>
-            </div>
+
+              <div className={styles.modalBody}>
+                <div className={styles.folderGrid}>
+                  {(() => {
+                    const uncategorizedCount = items.filter((i) => !i.folder_id && i.status !== 'archived').length;
+                    const rootFolder: MediaFolder = {
+                      id: 'root',
+                      name: 'Thư mục gốc',
+                      slug: 'root',
+                      color: '#94a3b8',
+                      item_count: uncategorizedCount,
+                      created_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString(),
+                    };
+                    const q = folderSearchQuery.toLowerCase().trim();
+                    const displayFolders = [rootFolder, ...folders].filter((f) =>
+                      f.name.toLowerCase().includes(q)
+                    );
+
+                    return displayFolders.map((f) => (
+                      <div
+                        key={f.id}
+                        className={styles.folderCard}
+                        onClick={() => setSelectedFolderId(f.id)}
+                      >
+                        <Folder color={f.color || '#F58220'} size={32} />
+                        <div>
+                          <div className={styles.folderName}>{f.name}</div>
+                          <div className={styles.folderCount}>{f.item_count || 0} tệp</div>
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
+            </>
           ) : (
             /* LEVEL 2: ASSET SELECTION INSIDE SELECTED FOLDER */
             <>
