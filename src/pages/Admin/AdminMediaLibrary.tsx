@@ -572,7 +572,7 @@ export const AdminMediaLibrary: React.FC = () => {
                 onClick={() => fileInputRef.current?.click()}
                 className={styles.uploadTriggerBtn}
               >
-                <Upload size={18} /> + Thêm Tệp Mới Vượt Bậc
+                <Upload size={18} /> Tải tệp lên từ máy
               </button>
             </div>
 
