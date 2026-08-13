@@ -137,22 +137,32 @@
 .cancelBtn {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  border: none;
-  padding: 0.65rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0 1.25rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .saveBtn {
   background: #F58220;
   color: #ffffff;
   border: none;
-  padding: 0.65rem 1.5rem;
+  padding: 0 1.5rem;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
+  height: 40px;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
   gap: 0.4rem;
 }

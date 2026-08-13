@@ -203,11 +203,17 @@
   background: #F58220;
   color: #ffffff;
   border: none;
-  padding: 0.65rem;
+  padding: 0 0.9rem;
   font-size: 0.85rem;
   font-weight: 700;
   border-radius: 8px;
   cursor: pointer;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
   transition: background 0.2s ease;
 }
 
@@ -219,11 +225,17 @@
   background: #f1f5f9;
   color: #64748b;
   border: none;
-  padding: 0.65rem 1rem;
+  padding: 0 1rem;
   font-size: 0.85rem;
   font-weight: 700;
   border-radius: 8px;
   cursor: pointer;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .cancelBtn:hover {

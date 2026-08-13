@@ -951,7 +951,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   type="button"
                   onClick={() => handleCopyUrl(activeDrawerAsset.public_url)}
                   className={styles.resetBtn}
-                  style={{ flex: 1, justifyContent: 'center' }}
+                  style={{ flex: 1, justifyContent: 'center', alignItems: 'center', display: 'inline-flex', height: '40px', whiteSpace: 'nowrap' }}
                 >
                   <Copy size={15} /> Sao chép URL CDN
                 </button>
@@ -964,7 +964,7 @@ export const AdminMediaLibrary: React.FC = () => {
                       setIsCropperOpen(true);
                     }}
                     className={styles.resetBtn}
-                    style={{ background: '#F58220', color: '#fff', borderColor: '#F58220' }}
+                    style={{ flex: 1, justifyContent: 'center', alignItems: 'center', display: 'inline-flex', height: '40px', whiteSpace: 'nowrap', background: '#F58220', color: '#fff', borderColor: '#F58220' }}
                   >
                     <Edit2 size={15} /> Cắt & tâm điểm
                   </button>
@@ -1071,12 +1071,12 @@ export const AdminMediaLibrary: React.FC = () => {
                 type="button"
                 onClick={() => handleRequestDelete(activeDrawerAsset)}
                 className={styles.resetBtn}
-                style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}
+                style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)', height: '42px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}
               >
                 <Trash2 size={16} /> Xóa vĩnh viễn
               </button>
 
-              <button type="button" onClick={handleSaveMetadata} className={styles.uploadTriggerBtn}>
+              <button type="button" onClick={handleSaveMetadata} className={styles.uploadTriggerBtn} style={{ height: '42px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>
                 <Save size={16} /> Lưu Metadata
               </button>
             </div>

@@ -62,12 +62,18 @@
   background: transparent;
   color: #94a3b8;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0.75rem 1.5rem;
+  padding: 0 1.5rem;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   flex: 1;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .cancelBtn:hover {
@@ -79,12 +85,18 @@
   background: #ef4444;
   color: #ffffff;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 0 1.5rem;
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   flex: 1;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
   box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
 }
 

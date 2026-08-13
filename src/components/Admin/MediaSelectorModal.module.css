@@ -70,6 +70,7 @@
 .toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem 1.75rem;
   background: rgba(9, 26, 54, 0.4);
@@ -245,14 +246,18 @@
   background: #F58220;
   border: none;
   color: #ffffff;
-  padding: 0.65rem 1.75rem;
+  padding: 0 1.75rem;
+  height: 42px;
   border-radius: 12px;
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  box-sizing: border-box;
+  white-space: nowrap;
   box-shadow: 0 4px 15px rgba(245, 130, 32, 0.3);
   transition: all 0.25s ease;
 }
