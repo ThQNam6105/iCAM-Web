@@ -188,13 +188,20 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
   };
 
   const getViewportStyle = (): React.CSSProperties => {
-    if (state.aspectRatio === '16:9') return { aspectRatio: '16 / 9', height: '100%', maxWidth: '100%' };
-    if (state.aspectRatio === '4:3') return { aspectRatio: '4 / 3', height: '100%', maxWidth: '100%' };
-    if (state.aspectRatio === '3:2') return { aspectRatio: '3 / 2', height: '100%', maxWidth: '100%' };
-    if (state.aspectRatio === '1:1') return { aspectRatio: '1 / 1', height: '100%', maxWidth: '100%' };
-    if (state.aspectRatio === '9:16') return { aspectRatio: '9 / 16', height: '100%', maxWidth: '100%' };
+    if (mode === 'quick') {
+      if (contextFrame === 'card') return { aspectRatio: '3 / 2', height: '85%', maxWidth: '100%' };
+      if (contextFrame === 'thumb') return { aspectRatio: '1 / 1', height: '75%', borderRadius: '50%', maxWidth: '100%' };
+      if (contextFrame === 'mobile') return { aspectRatio: '9 / 16', height: '95%', maxWidth: '100%' };
+      return { aspectRatio: '16 / 9', width: '100%', maxHeight: '100%' };
+    }
+
+    if (state.aspectRatio === '16:9') return { aspectRatio: '16 / 9', width: '100%', maxHeight: '100%' };
+    if (state.aspectRatio === '4:3') return { aspectRatio: '4 / 3', height: '90%', maxWidth: '100%' };
+    if (state.aspectRatio === '3:2') return { aspectRatio: '3 / 2', height: '90%', maxWidth: '100%' };
+    if (state.aspectRatio === '1:1') return { aspectRatio: '1 / 1', height: '80%', borderRadius: '12px', maxWidth: '100%' };
+    if (state.aspectRatio === '9:16') return { aspectRatio: '9 / 16', height: '95%', maxWidth: '100%' };
     if (state.aspectRatio === 'original' && naturalSize.w && naturalSize.h) {
-      return { aspectRatio: `${naturalSize.w} / ${naturalSize.h}`, height: '100%', maxWidth: '100%' };
+      return { aspectRatio: `${naturalSize.w} / ${naturalSize.h}`, height: '90%', maxWidth: '100%' };
     }
     return { width: '100%', height: '100%' };
   };
@@ -548,15 +555,7 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
               zoom: Math.min(300, Math.max(100, prev.zoom + (e.deltaY < 0 ? 10 : -10))),
             }));
           }}
-          className={`${styles.cropViewport} ${isDragging ? styles.cropViewportDragging : ''} ${
-            mode === 'quick' && contextFrame === 'card'
-              ? styles.contextCardFrame
-              : mode === 'quick' && contextFrame === 'thumb'
-              ? styles.contextThumbFrame
-              : mode === 'quick' && contextFrame === 'mobile'
-              ? styles.contextMobileFrame
-              : ''
-          }`}
+          className={`${styles.cropViewport} ${isDragging ? styles.cropViewportDragging : ''}`}
           title="Nhấn giữ & kéo chuột để di chuyển ảnh (Lăn chuột để Zoom)"
         >
           {isShowingBefore && <div className={styles.beforeAfterBadge}>Ảnh gốc</div>}
@@ -874,6 +873,7 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
               className={`${styles.contextBtn} ${contextFrame === 'banner' ? styles.contextBtnActive : ''}`}
               onClick={() => setContextFrame('banner')}
               aria-label="Banner preview"
+              title="Khung xem trước banner ngang bài viết (16:9)"
             >
               <Monitor size={13} /> Banner bài viết (16:9)
             </button>
@@ -882,24 +882,27 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
               className={`${styles.contextBtn} ${contextFrame === 'card' ? styles.contextBtnActive : ''}`}
               onClick={() => setContextFrame('card')}
               aria-label="Card preview"
+              title="Khung xem trước card danh sách bài viết (3:2)"
             >
-              <LayoutGrid size={13} /> Card tin tức
+              <LayoutGrid size={13} /> Card tin tức (3:2)
             </button>
             <button
               type="button"
               className={`${styles.contextBtn} ${contextFrame === 'thumb' ? styles.contextBtnActive : ''}`}
               onClick={() => setContextFrame('thumb')}
               aria-label="Thumbnail preview"
+              title="Khung xem trước thumbnail vuông / avatar tròn (1:1)"
             >
-              <Tablet size={13} /> Avatar / Vuông
+              <Tablet size={13} /> Avatar / Vuông (1:1)
             </button>
             <button
               type="button"
               className={`${styles.contextBtn} ${contextFrame === 'mobile' ? styles.contextBtnActive : ''}`}
               onClick={() => setContextFrame('mobile')}
               aria-label="Mobile preview"
+              title="Khung xem trước màn hình dọc điện thoại (9:16)"
             >
-              <Smartphone size={13} /> Mobile feed
+              <Smartphone size={13} /> Mobile feed (9:16)
             </button>
           </div>
         </div>
