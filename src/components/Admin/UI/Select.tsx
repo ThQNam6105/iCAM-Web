@@ -14,6 +14,7 @@ export interface SelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  fullWidth?: boolean;
   className?: string;
   triggerStyle?: React.CSSProperties;
   menuStyle?: React.CSSProperties;
@@ -25,6 +26,7 @@ export const Select: React.FC<SelectProps> = ({
   onChange,
   placeholder = 'Chọn một tùy chọn...',
   disabled = false,
+  fullWidth = false,
   className = '',
   triggerStyle,
   menuStyle,
@@ -80,7 +82,7 @@ export const Select: React.FC<SelectProps> = ({
   };
 
   return (
-    <div className={`${styles.selectWrapper} ${className}`} ref={wrapperRef}>
+    <div className={`${styles.selectWrapper} ${fullWidth ? styles.fullWidth : ''} ${className}`} ref={wrapperRef}>
       <button
         type="button"
         tabIndex={disabled ? -1 : 0}

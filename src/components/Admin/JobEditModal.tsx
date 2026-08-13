@@ -108,6 +108,7 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 ]}
                 value={department}
                 onChange={setDepartment}
+                fullWidth
               />
             </div>
 
@@ -123,6 +124,7 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 ]}
                 value={type}
                 onChange={(val) => setType(val as JobType)}
+                fullWidth
               />
             </div>
           </div>
@@ -182,6 +184,7 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 ]}
                 value={status}
                 onChange={(val) => setStatus(val as JobStatus)}
+                fullWidth
               />
             </div>
           </div>

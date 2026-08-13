@@ -1002,6 +1002,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   ]}
                   value={editFolderId || ''}
                   onChange={(val) => setEditFolderId(val ? val : null)}
+                  fullWidth
                 />
               </div>
 

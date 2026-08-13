@@ -244,6 +244,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                   ]}
                   value={status}
                   onChange={(val) => setStatus(val as PostStatus)}
+                  fullWidth
                 />
               </div>
 
@@ -263,6 +264,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       setCategoryLabelEn(found.nameEn);
                     }
                   }}
+                  fullWidth
                 />
               </div>
             </div>

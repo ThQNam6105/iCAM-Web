@@ -1,8 +1,11 @@
 .selectWrapper {
   position: relative;
-  display: inline-block;
-  width: 100%;
+  display: inline-flex;
   font-family: inherit;
+}
+
+.fullWidth {
+  width: 100%;
 }
 
 .trigger {
