@@ -108,7 +108,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Page Header */}
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Quản Lý Bài Viết & Tin Tức</h1>
+          <h1 className={styles.pageTitle}>Quản lý bài viết & tin tức</h1>
           <p className={styles.pageSubtitle}>Quản lý, chỉnh sửa, xem trước và xuất bản tin tức iCANCAM</p>
         </div>
 
@@ -120,7 +120,7 @@ export const AdminDashboard: React.FC = () => {
           }}
           className={styles.createBtn}
         >
-          <Plus size={18} /> Thêm Bài Viết Mới
+          <Plus size={18} /> Thêm bài viết mới
         </button>
       </div>
 
@@ -129,7 +129,7 @@ export const AdminDashboard: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.total}</div>
-            <div className={styles.statLabel}>Tổng Bài Viết</div>
+            <div className={styles.statLabel}>Tổng bài viết</div>
           </div>
           <div className={styles.statIcon}>
             <FileText size={24} />
@@ -139,7 +139,7 @@ export const AdminDashboard: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.published}</div>
-            <div className={styles.statLabel}>Đã Xuất Bản</div>
+            <div className={styles.statLabel}>Đã xuất bản</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#10b981' }}>
             <CheckCircle size={24} />
@@ -149,7 +149,7 @@ export const AdminDashboard: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.drafts}</div>
-            <div className={styles.statLabel}>Bản Nháp</div>
+            <div className={styles.statLabel}>Bản nháp</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#F58220' }}>
             <Clock size={24} />
@@ -159,7 +159,7 @@ export const AdminDashboard: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{getCategories().length}</div>
-            <div className={styles.statLabel}>Danh Mục Nổi Bật</div>
+            <div className={styles.statLabel}>Danh mục nổi bật</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#8b5cf6' }}>
             <FolderTree size={24} />
@@ -186,7 +186,7 @@ export const AdminDashboard: React.FC = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className={styles.selectFilter}
           >
-            <option value="all">Tất cả Danh mục</option>
+            <option value="all">Tất cả danh mục</option>
             {getCategories().map((cat) => (
               <option key={cat.id} value={cat.id || cat.slug}>
                 {cat.nameVi}
@@ -199,7 +199,7 @@ export const AdminDashboard: React.FC = () => {
             onChange={(e) => setSelectedStatus(e.target.value as PostStatus | 'all')}
             className={styles.selectFilter}
           >
-            <option value="all">Tất cả Trạng thái</option>
+            <option value="all">Tất cả trạng thái</option>
             <option value="published">Đã xuất bản</option>
             <option value="draft">Bản nháp</option>
             <option value="archived">Lưu trữ</option>
@@ -236,7 +236,7 @@ export const AdminDashboard: React.FC = () => {
               }}
               className={styles.createBtn}
             >
-              <Plus size={18} /> Tạo Bài Viết Đầu Tiên
+              <Plus size={18} /> Tạo bài viết đầu tiên
             </button>
           </div>
         ) : (
@@ -368,8 +368,8 @@ export const AdminDashboard: React.FC = () => {
         isOpen={deleteCandidateId !== null}
         title="Xác nhận xóa bài viết"
         message="Hành động này sẽ xóa vĩnh viễn bài viết khỏi hệ thống và không thể hoàn tác. Bạn có chắc chắn muốn xóa?"
-        confirmLabel="Xóa Vĩnh Viễn"
-        cancelLabel="Hủy Bỏ"
+        confirmLabel="Xóa vĩnh viễn"
+        cancelLabel="Hủy bỏ"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteCandidateId(null)}
       />

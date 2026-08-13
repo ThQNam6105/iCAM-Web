@@ -71,7 +71,7 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
       <div className={styles.modalContent}>
         <div className={styles.header}>
           <h3 className={styles.title}>
-            {jobToEdit ? 'Chỉnh Sửa Vị Trí Tuyển Dụng' : 'Tạo Vị Trí Tuyển Dụng Mới'}
+            {jobToEdit ? 'Chỉnh sửa vị trí tuyển dụng' : 'Tạo vị trí tuyển dụng mới'}
           </h3>
           <button type="button" onClick={onClose} className={styles.closeBtn}>
             <X size={20} />
@@ -86,7 +86,7 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <input
               type="text"
               required
-              placeholder="VD: Giáo Viên Tiếng Anh Trẻ Em..."
+              placeholder="VD: Giáo viên tiếng Anh trẻ em..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className={styles.input}
@@ -103,10 +103,10 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 onChange={(e) => setDepartment(e.target.value)}
                 className={styles.select}
               >
-                <option value="Khối Đào Tạo">Khối Đào Tạo</option>
-                <option value="Khối Tư Vấn & Tuyển Sinh">Khối Tư Vấn & Tuyển Sinh</option>
+                <option value="Khối Đào Tạo">Khối đào tạo</option>
+                <option value="Khối Tư Vấn & Tuyển Sinh">Khối tư vấn & tuyển sinh</option>
                 <option value="Khối Marketing">Khối Marketing</option>
-                <option value="Khối Hành Chính & Nhân Sự">Khối Hành Chính & Nhân Sự</option>
+                <option value="Khối Hành Chính & Nhân Sự">Khối hành chính & nhân sự</option>
               </select>
             </div>
 
@@ -178,28 +178,28 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 onChange={(e) => setStatus(e.target.value as JobStatus)}
                 className={styles.select}
               >
-                <option value="open">Đang Tuyển (Open - Hiện trên web)</option>
-                <option value="closed">Đã Đóng (Closed - Tạm dừng)</option>
-                <option value="draft">Bản Nháp (Draft - Ẩn trên web)</option>
+                <option value="open">Đang tuyển (Open - hiện trên web)</option>
+                <option value="closed">Đã đóng (Closed - tạm dừng)</option>
+                <option value="draft">Bản nháp (Draft - ẩn trên web)</option>
               </select>
             </div>
           </div>
 
           <div className={styles.inputGroup}>
             <div className={styles.labelHeader}>
-              <label className={styles.label}>Mô tả công việc (Job Description)</label>
+              <label className={styles.label}>Mô tả công việc (Job description)</label>
               <button
                 type="button"
                 className={styles.bulletBtn}
                 onClick={() => addBulletPoint(description, setDescription)}
                 title="Tự động chèn gạch đầu dòng"
               >
-                <List size={14} /> • Thêm Gạch Đầu Dòng
+                <List size={14} /> • Thêm gạch đầu dòng
               </button>
             </div>
             <textarea
               rows={4}
-              placeholder="Mô tả chi tiết nhiệm vụ (Bấm 'Thêm Gạch Đầu Dòng' hoặc gõ '• ')..."
+              placeholder="Mô tả chi tiết nhiệm vụ (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               onKeyDown={(e) => handleKeyDownBullet(e, description, setDescription)}
@@ -216,12 +216,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 onClick={() => addBulletPoint(requirements, setRequirements)}
                 title="Tự động chèn gạch đầu dòng"
               >
-                <List size={14} /> • Thêm Gạch Đầu Dòng
+                <List size={14} /> • Thêm gạch đầu dòng
               </button>
             </div>
             <textarea
               rows={4}
-              placeholder="Bằng cấp, kỹ năng, kinh nghiệm (Bấm 'Thêm Gạch Đầu Dòng' hoặc gõ '• ')..."
+              placeholder="Bằng cấp, kỹ năng, kinh nghiệm (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
               value={requirements}
               onChange={(e) => setRequirements(e.target.value)}
               onKeyDown={(e) => handleKeyDownBullet(e, requirements, setRequirements)}
@@ -238,12 +238,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 onClick={() => addBulletPoint(benefits, setBenefits)}
                 title="Tự động chèn gạch đầu dòng"
               >
-                <List size={14} /> • Thêm Gạch Đầu Dòng
+                <List size={14} /> • Thêm gạch đầu dòng
               </button>
             </div>
             <textarea
               rows={4}
-              placeholder="Chế độ bảo hiểm, thưởng (Bấm 'Thêm Gạch Đầu Dòng' hoặc gõ '• ')..."
+              placeholder="Chế độ bảo hiểm, thưởng (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
               value={benefits}
               onChange={(e) => setBenefits(e.target.value)}
               onKeyDown={(e) => handleKeyDownBullet(e, benefits, setBenefits)}
@@ -253,10 +253,10 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
 
           <div className={styles.actions}>
             <button type="button" onClick={onClose} className={styles.cancelBtn}>
-              Hủy Bỏ
+              Hủy bỏ
             </button>
             <button type="submit" className={styles.saveBtn}>
-              <Save size={16} /> {jobToEdit ? 'Lưu Thay Đổi' : 'Đăng Vị Trí Mới'}
+              <Save size={16} /> {jobToEdit ? 'Lưu thay đổi' : 'Đăng vị trí mới'}
             </button>
           </div>
         </form>

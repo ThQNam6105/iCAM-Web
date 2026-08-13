@@ -142,7 +142,7 @@ export const AdminCategories: React.FC = () => {
       <div className={styles.pageHeader}>
         <div>
           <h1 className={styles.pageTitle}>
-            <FolderTree className={styles.titleIcon} size={28} /> Quản Lý Danh Mục Bài Viết
+            <FolderTree className={styles.titleIcon} size={28} /> Quản lý danh mục bài viết
           </h1>
           <p className={styles.pageSubtitle}>
             Tạo mới, chỉnh sửa tên song ngữ (VI/EN) và thiết lập màu sắc hiển thị danh mục bài viết CMS
@@ -155,7 +155,7 @@ export const AdminCategories: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.totalCategories}</div>
-            <div className={styles.statLabel}>Tổng Danh Mục</div>
+            <div className={styles.statLabel}>Tổng danh mục</div>
           </div>
           <div className={styles.statIcon}>
             <FolderTree size={24} />
@@ -165,7 +165,7 @@ export const AdminCategories: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.customCategories}</div>
-            <div className={styles.statLabel}>Danh Mục Tùy Chỉnh</div>
+            <div className={styles.statLabel}>Danh mục tùy chỉnh</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#8b5cf6' }}>
             <Layers size={24} />
@@ -175,7 +175,7 @@ export const AdminCategories: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.totalPostsAssigned}</div>
-            <div className={styles.statLabel}>Tổng Bài Viết Đang Phân Loại</div>
+            <div className={styles.statLabel}>Tổng bài viết đang phân loại</div>
           </div>
           <div className={styles.statIcon} style={{ color: '#10b981' }}>
             <FileText size={24} />
@@ -189,13 +189,13 @@ export const AdminCategories: React.FC = () => {
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>
             {editingCategory ? <Edit2 size={18} /> : <Plus size={18} />}
-            {editingCategory ? 'Chỉnh Sửa Danh Mục' : 'Thêm Danh Mục Mới'}
+            {editingCategory ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
           </h3>
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                Tên Tiếng Việt <span style={{ color: '#ef4444' }}>*</span>
+                Tên tiếng Việt <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="text"
@@ -207,7 +207,7 @@ export const AdminCategories: React.FC = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tên Tiếng Anh (English Name)</label>
+              <label className={styles.label}>Tên tiếng Anh (English name)</label>
               <input
                 type="text"
                 placeholder="Ví dụ: FEATURED EVENTS"
@@ -219,7 +219,7 @@ export const AdminCategories: React.FC = () => {
 
             {/* Color Palette */}
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Màu sắc nhận diện Badge</label>
+              <label className={styles.label}>Màu sắc nhận diện badge</label>
               <div className={styles.colorPalette}>
                 {PRESET_COLORS.map((c) => (
                   <button
@@ -255,11 +255,11 @@ export const AdminCategories: React.FC = () => {
 
             <div className={styles.formActions}>
               <button type="submit" className={styles.submitBtn}>
-                {editingCategory ? 'Lưu Thay Đổi' : 'Thêm Danh Mục'}
+                {editingCategory ? 'Lưu thay đổi' : 'Thêm danh mục'}
               </button>
               {editingCategory && (
                 <button type="button" onClick={resetForm} className={styles.cancelBtn}>
-                  Hủy Bỏ
+                  Hủy bỏ
                 </button>
               )}
             </div>
@@ -269,7 +269,7 @@ export const AdminCategories: React.FC = () => {
         {/* Right Column: Category List Grid */}
         <div className={`${styles.card} ${styles.listCard}`}>
           <h3 className={styles.cardTitle}>
-            <Tag size={18} /> Danh Sách Danh Mục Hiện Có ({categories.length})
+            <Tag size={18} /> Danh sách danh mục hiện có ({categories.length})
           </h3>
 
           <div className={styles.categoryScrollArea}>
@@ -326,8 +326,8 @@ export const AdminCategories: React.FC = () => {
         isOpen={deleteCandidateId !== null}
         title="Xác nhận xóa danh mục"
         message="Hành động này sẽ xóa vĩnh viễn danh mục khỏi hệ thống. Bạn có chắc chắn muốn xóa?"
-        confirmLabel="Xóa Vĩnh Viễn"
-        cancelLabel="Hủy Bỏ"
+        confirmLabel="Xóa vĩnh viễn"
+        cancelLabel="Hủy bỏ"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteCandidateId(null)}
       />

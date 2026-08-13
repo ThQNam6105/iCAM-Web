@@ -34,7 +34,7 @@ export const AdminSidebar: React.FC = () => {
       </div>
 
       <nav className={styles.navGroup}>
-        <span className={styles.navSectionTitle}>Nội Dung & Tin Tức</span>
+        <span className={styles.navSectionTitle}>Nội dung & tin tức</span>
 
         <NavLink
           to="/admin"
@@ -42,7 +42,7 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <FileText size={18} />
-          <span>Quản lý Bài viết & Dashboard</span>
+          <span>Quản lý bài viết & Dashboard</span>
         </NavLink>
 
         <NavLink
@@ -62,22 +62,22 @@ export const AdminSidebar: React.FC = () => {
         </NavLink>
 
         <span className={styles.navSectionTitle} style={{ marginTop: '1rem' }}>
-          Đào Tạo & Tuyển Sinh
+          Đào tạo & tuyển sinh
         </span>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <GraduationCap size={18} />
-          <span>Khóa Học</span>
+          <span>Khóa học</span>
         </div>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <Users size={18} />
-          <span>Giáo Viên & Nhân Sự</span>
+          <span>Giáo viên & nhân sự</span>
         </div>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <HelpCircle size={18} />
-          <span>Hỏi Đáp</span>
+          <span>Hỏi đáp</span>
         </div>
 
         <NavLink
@@ -85,12 +85,12 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <Briefcase size={18} />
-          <span>Tuyển Dụng</span>
+          <span>Tuyển dụng</span>
         </NavLink>
 
         <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
           <Settings size={18} />
-          <span>Cấu Hình Hệ Thống</span>
+          <span>Cấu hình hệ thống</span>
         </div>
       </nav>
 

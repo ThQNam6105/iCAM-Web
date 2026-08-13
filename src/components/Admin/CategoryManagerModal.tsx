@@ -95,7 +95,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameVi.trim()) {
-      showToast('Vui lòng nhập Tên Tiếng Việt cho danh mục!', 'error');
+      showToast('Vui lòng nhập tên tiếng Việt cho danh mục!', 'error');
       return;
     }
 
@@ -147,7 +147,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
           <div className={styles.headerTitle}>
             <FolderTree className={styles.headerIcon} size={22} />
             <div>
-              <h3>QUẢN LÝ DANH MỤC BÀI VIẾT (CMS CATEGORIES)</h3>
+              <h3>Quản lý danh mục bài viết (CMS Categories)</h3>
               <p className={styles.headerSubText}>Tạo, chỉnh sửa tên song ngữ VI/EN và màu sắc hiển thị danh mục</p>
             </div>
           </div>
@@ -162,13 +162,13 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
           <div className={styles.formCard}>
             <h4 className={styles.formCardTitle}>
               {editingCategory ? <Edit2 size={16} /> : <Plus size={16} />}
-              {editingCategory ? 'Chỉnh sửa Danh mục' : 'Thêm Danh mục Mới'}
+              {editingCategory ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
             </h4>
 
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>
-                  Tên Tiếng Việt <span style={{ color: '#ef4444' }}>*</span>
+                  Tên tiếng Việt <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="text"
@@ -180,7 +180,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Tên Tiếng Anh (English Name)</label>
+                <label className={styles.label}>Tên tiếng Anh (English name)</label>
                 <input
                   type="text"
                   placeholder="Ví dụ: FEATURED EVENTS"
@@ -192,7 +192,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
 
               {/* Preset Palette */}
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Màu sắc nhận diện Badge</label>
+                <label className={styles.label}>Màu sắc nhận diện badge</label>
                 <div className={styles.colorPalette}>
                   {PRESET_COLORS.map((c) => (
                     <button
@@ -242,7 +242,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
           {/* Right: Existing Categories List */}
           <div className={styles.listCard}>
             <h4 className={styles.listCardTitle}>
-              <Tag size={16} /> Danh sách Danh mục ({categories.length})
+              <Tag size={16} /> Danh sách danh mục ({categories.length})
             </h4>
 
             <div className={styles.categoryGrid}>

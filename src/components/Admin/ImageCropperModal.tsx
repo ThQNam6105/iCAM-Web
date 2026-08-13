@@ -173,7 +173,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>
-            <Crop size={20} color="#F58220" /> Cắt Ảnh & Điều Chỉnh Tâm Điểm Hiển Thị
+            <Crop size={20} color="#F58220" /> Cắt ảnh & điều chỉnh tâm điểm hiển thị
           </h3>
           <button type="button" onClick={onClose} className={styles.closeBtn}>
             <X size={20} />
@@ -183,7 +183,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
         <div className={styles.modalBody}>
           {/* Aspect Ratio Toolbar */}
           <div className={styles.aspectRatioBar}>
-            <span className={styles.ratioLabel}>Tỉ lệ cắt (Aspect Ratio):</span>
+            <span className={styles.ratioLabel}>Tỉ lệ cắt (Aspect ratio):</span>
             {(['16:9', '4:3', '1:1', 'free'] as AspectRatioOption[]).map((ratio) => (
               <button
                 key={ratio}
@@ -220,14 +220,14 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               }}
             />
             <div className={styles.dragHelpBadge}>
-              <Move size={13} /> Nhấn giữ & Kéo chuột di chuyển | Zoom: {zoom}%
+              <Move size={13} /> Nhấn giữ & kéo chuột di chuyển | Zoom: {zoom}%
             </div>
           </div>
 
           {/* Zoom Slider Controls (Matching Cover Image Cropper) */}
           <div className={styles.zoomControlRow}>
             <span className={styles.zoomLabel}>
-              <ZoomIn size={14} /> Phóng To / Thu Nhỏ:
+              <ZoomIn size={14} /> Phóng to / thu nhỏ:
             </span>
             <button
               type="button"
@@ -259,7 +259,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               type="button"
               onClick={handleReset}
               className={styles.alignBtn}
-              title="Đặt lại Mặc Định"
+              title="Đặt lại mặc định"
             >
               <RotateCcw size={13} /> Đặt lại
             </button>
@@ -277,7 +277,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               Hủy bỏ
             </button>
             <button type="button" onClick={handleApplyCrop} className={styles.saveBtn}>
-              <Save size={16} /> Áp Dụng & Lưu Tệp Mới
+              <Save size={16} /> Áp dụng & lưu tệp mới
             </button>
           </div>
         </div>

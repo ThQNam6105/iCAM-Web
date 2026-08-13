@@ -363,7 +363,7 @@ export const AdminMediaLibrary: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statValue}>{totalSizeMB.toFixed(1)} MB</div>
-                <div className={styles.statLabel}>Dung Lượng Sử Dụng</div>
+                <div className={styles.statLabel}>Dung lượng sử dụng</div>
               </div>
               <Layers size={32} color="#3b82f6" />
             </div>
@@ -371,7 +371,7 @@ export const AdminMediaLibrary: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statValue}>{folders.length}</div>
-                <div className={styles.statLabel}>Số Lượng Thư Mục</div>
+                <div className={styles.statLabel}>Số lượng thư mục</div>
               </div>
               <Folder size={32} color="#F58220" />
             </div>
@@ -408,7 +408,7 @@ export const AdminMediaLibrary: React.FC = () => {
                       className={styles.actionPillBtn}
                       title="Tải toàn bộ tệp trong thư mục về máy"
                     >
-                      <Download size={15} /> Tải Xuống
+                      <Download size={15} /> Tải xuống
                     </button>
                     {selectedFolder.id !== 'root' && (
                       <>
@@ -418,7 +418,7 @@ export const AdminMediaLibrary: React.FC = () => {
                           className={styles.actionPillBtn}
                           title="Đổi tên & sửa màu thư mục"
                         >
-                          <Edit2 size={15} /> Đổi Tên
+                          <Edit2 size={15} /> Đổi tên
                         </button>
                         <button
                           type="button"
@@ -527,10 +527,10 @@ export const AdminMediaLibrary: React.FC = () => {
               }}
               className={styles.backBtn}
             >
-              <ArrowLeft size={18} /> Quay Lại Danh Sách Thư Mục
+              <ArrowLeft size={18} /> Quay lại danh sách thư mục
             </button>
             <div className={styles.currentFolderTitle}>
-              <Folder color={currentFolder.color || '#F58220'} size={24} /> Thư Mục: {currentFolder.name}
+              <Folder color={currentFolder.color || '#F58220'} size={24} /> Thư mục: {currentFolder.name}
             </div>
           </div>
 
@@ -539,7 +539,7 @@ export const AdminMediaLibrary: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statValue}>{totalSizeMB.toFixed(1)} MB</div>
-                <div className={styles.statLabel}>Dung Lượng Thư Mục</div>
+                <div className={styles.statLabel}>Dung lượng thư mục</div>
               </div>
               <HardDrive size={32} color="#F58220" />
             </div>
@@ -583,7 +583,7 @@ export const AdminMediaLibrary: React.FC = () => {
                 onClick={() => handleDownloadFolder(currentFolder)}
                 className={styles.actionPillBtn}
               >
-                <Download size={16} /> Tải Xuống Thư Mục
+                <Download size={16} /> Tải xuống thư mục
               </button>
               {currentFolder.id !== 'root' && (
                 <>
@@ -592,7 +592,7 @@ export const AdminMediaLibrary: React.FC = () => {
                     onClick={() => handleOpenEditFolderModal(currentFolder)}
                     className={styles.actionPillBtn}
                   >
-                    <Edit2 size={16} /> Chỉnh Sửa Thư Mục
+                    <Edit2 size={16} /> Chỉnh sửa thư mục
                   </button>
                   <button
                     type="button"
@@ -600,7 +600,7 @@ export const AdminMediaLibrary: React.FC = () => {
                     className={styles.actionPillBtn}
                     style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}
                   >
-                    <Trash2 size={16} /> Xóa Thư Mục
+                    <Trash2 size={16} /> Xóa thư mục
                   </button>
                 </>
               )}
@@ -649,7 +649,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   }}
                   className={styles.selectFilter}
                 >
-                  <option value="all">Tất cả Loại tệp</option>
+                  <option value="all">Tất cả loại tệp</option>
                   <option value="image">Hình ảnh (JPG, PNG, WEBP)</option>
                   <option value="svg">Vector SVG</option>
                   <option value="gif">Ảnh động GIF</option>
@@ -664,7 +664,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   }}
                   className={styles.selectFilter}
                 >
-                  <option value="all">Tất cả Trạng thái</option>
+                  <option value="all">Tất cả trạng thái</option>
                   <option value="used">Đang được sử dụng</option>
                   <option value="unused">Chưa sử dụng</option>
                   <option value="archived">Đã lưu trữ</option>
@@ -730,9 +730,9 @@ export const AdminMediaLibrary: React.FC = () => {
                     style={{ background: 'rgba(9, 26, 54, 0.8)' }}
                   >
                     <option value="" disabled>
-                      📁 Chuyển sang Thư Mục khác...
+                      📁 Chuyển sang thư mục khác...
                     </option>
-                    <option value="root">📁 Chuyển về Thư mục Gốc</option>
+                    <option value="root">📁 Chuyển về Thư mục gốc</option>
                     {folders
                       .filter((f) => f.id !== currentFolder.id)
                       .map((f) => (
@@ -743,7 +743,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   </select>
 
                   <button type="button" onClick={handleBulkArchive} className={styles.bulkBtn}>
-                    <Archive size={15} /> Lưu Trữ
+                    <Archive size={15} /> Lưu trữ
                   </button>
                 </div>
               </div>
@@ -822,12 +822,12 @@ export const AdminMediaLibrary: React.FC = () => {
                       />
                     </th>
                     <th>Xem trước</th>
-                    <th>Tên Tệp</th>
-                    <th>Định Dạng</th>
-                    <th>Kích Thước</th>
-                    <th>Dung Lượng</th>
-                    <th>Sử Dụng</th>
-                    <th>Thao Tác</th>
+                    <th>Tên tệp</th>
+                    <th>Định dạng</th>
+                    <th>Kích thước</th>
+                    <th>Dung lượng</th>
+                    <th>Sử dụng</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -923,7 +923,7 @@ export const AdminMediaLibrary: React.FC = () => {
         <div className={styles.drawerOverlay} onClick={() => setActiveDrawerAsset(null)}>
           <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.drawerHeader}>
-              <h3 className={styles.drawerTitle}>Chi Tiết & Metadata Tài Nguyên</h3>
+              <h3 className={styles.drawerTitle}>Chi tiết & metadata tài nguyên</h3>
               <button type="button" onClick={() => setActiveDrawerAsset(null)} className={styles.closeBtn}>
                 <X size={20} />
               </button>
@@ -953,7 +953,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   className={styles.resetBtn}
                   style={{ flex: 1, justifyContent: 'center' }}
                 >
-                  <Copy size={15} /> Sao Chép URL CDN
+                  <Copy size={15} /> Sao chép URL CDN
                 </button>
 
                 {activeDrawerAsset.mime_type.includes('image') && (
@@ -966,7 +966,7 @@ export const AdminMediaLibrary: React.FC = () => {
                     className={styles.resetBtn}
                     style={{ background: '#F58220', color: '#fff', borderColor: '#F58220' }}
                   >
-                    <Edit2 size={15} /> Cắt & Tâm Điểm
+                    <Edit2 size={15} /> Cắt & tâm điểm
                   </button>
                 )}
               </div>
@@ -1001,7 +1001,7 @@ export const AdminMediaLibrary: React.FC = () => {
                   onChange={(e) => setEditFolderId(e.target.value ? e.target.value : null)}
                   className={styles.input}
                 >
-                  <option value="">📁 Thư mục Gốc (Uncategorized)</option>
+                  <option value="">📁 Thư mục gốc (Uncategorized)</option>
                   {folders.map((f) => (
                     <option key={f.id} value={f.id}>
                       📁 {f.name}
@@ -1011,18 +1011,18 @@ export const AdminMediaLibrary: React.FC = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Default Alt Text (Tiếng Việt) *</label>
+                <label className={styles.formLabel}>Default Alt Text (tiếng Việt) *</label>
                 <input
                   type="text"
                   value={editAltVi}
                   onChange={(e) => setEditAltVi(e.target.value)}
                   className={styles.input}
-                  placeholder="Mô tả hình ảnh bằng Tiếng Việt cho Google SEO..."
+                  placeholder="Mô tả hình ảnh bằng tiếng Việt cho Google SEO..."
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Default Alt Text (Tiếng Anh)</label>
+                <label className={styles.formLabel}>Default Alt Text (tiếng Anh)</label>
                 <input
                   type="text"
                   value={editAltEn}
@@ -1045,7 +1045,7 @@ export const AdminMediaLibrary: React.FC = () => {
 
               <div className={styles.usageBox}>
                 <div className={styles.usageHeader}>
-                  <Eye size={16} /> Lịch Sử Sử Dụng ({activeAssetUsages.length} Vị Trí)
+                  <Eye size={16} /> Lịch sử sử dụng ({activeAssetUsages.length} vị trí)
                 </div>
                 {activeAssetUsages.length === 0 ? (
                   <div style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -1073,7 +1073,7 @@ export const AdminMediaLibrary: React.FC = () => {
                 className={styles.resetBtn}
                 style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}
               >
-                <Trash2 size={16} /> Xóa Vĩnh Viễn
+                <Trash2 size={16} /> Xóa vĩnh viễn
               </button>
 
               <button type="button" onClick={handleSaveMetadata} className={styles.uploadTriggerBtn}>
@@ -1115,7 +1115,7 @@ export const AdminMediaLibrary: React.FC = () => {
           >
             <div className={styles.drawerHeader}>
               <h3 className={styles.drawerTitle}>
-                <FolderPlus size={20} color="#F58220" /> {editingFolder ? 'Đổi Tên Thư Mục' : 'Tạo Thư Mục Media Mới'}
+                <FolderPlus size={20} color="#F58220" /> {editingFolder ? 'Đổi tên thư mục' : 'Tạo thư mục media mới'}
               </h3>
               <button type="button" onClick={() => setIsFolderModalOpen(false)} className={styles.closeBtn}>
                 <X size={20} />
@@ -1124,20 +1124,20 @@ export const AdminMediaLibrary: React.FC = () => {
 
             <form onSubmit={handleSaveFolder} className={styles.drawerBody}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Tên Thư Mục *</label>
+                <label className={styles.formLabel}>Tên thư mục *</label>
                 <input
                   type="text"
                   value={folderNameInput}
                   onChange={(e) => setFolderNameInput(e.target.value)}
                   className={styles.input}
-                  placeholder="VD: Bài Viết Tin Tức, Ảnh Giáo Viên..."
+                  placeholder="VD: Bài viết tin tức, ảnh giáo viên..."
                   autoFocus
                   required
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Màu Nhận Diện Thư Mục</label>
+                <label className={styles.formLabel}>Màu nhận diện thư mục</label>
                 <div className={styles.colorPickerRow}>
                   {COLOR_OPTIONS.map((c) => (
                     <div
@@ -1152,10 +1152,10 @@ export const AdminMediaLibrary: React.FC = () => {
 
               <div className={styles.drawerFooter} style={{ padding: '1rem 0 0 0', border: 'none', background: 'transparent' }}>
                 <button type="button" onClick={() => setIsFolderModalOpen(false)} className={styles.resetBtn}>
-                  Hủy Bỏ
+                  Hủy bỏ
                 </button>
                 <button type="submit" className={styles.uploadTriggerBtn}>
-                  <Save size={16} /> {editingFolder ? 'Lưu Đổi Tên' : 'Tạo Thư Mục'}
+                  <Save size={16} /> {editingFolder ? 'Lưu đổi tên' : 'Tạo thư mục'}
                 </button>
               </div>
             </form>
@@ -1166,10 +1166,10 @@ export const AdminMediaLibrary: React.FC = () => {
       {/* Delete Folder Confirm Modal */}
       <ConfirmModal
         isOpen={Boolean(deleteFolderCandidate)}
-        title="Xác Nhận Xóa Thư Mục"
+        title="Xác nhận xóa thư mục"
         message={`Bạn có chắc chắn muốn xóa thư mục "${deleteFolderCandidate?.name}"? Các tệp bên trong sẽ được chuyển về Thư mục Gốc an toàn.`}
-        confirmLabel="Xóa Thư Mục"
-        cancelLabel="Hủy Bỏ"
+        confirmLabel="Xóa thư mục"
+        cancelLabel="Hủy bỏ"
         onConfirm={handleConfirmDeleteFolder}
         onCancel={() => setDeleteFolderCandidate(null)}
       />
@@ -1183,7 +1183,7 @@ export const AdminMediaLibrary: React.FC = () => {
           >
             <div className={styles.drawerHeader}>
               <h3 className={styles.drawerTitle} style={{ color: '#F58220', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ShieldAlert size={20} /> Phát Hiện Tệp Trùng Lặp (Deduplication)
+                <ShieldAlert size={20} /> Phát hiện tệp trùng lặp (Deduplication)
               </h3>
             </div>
 
@@ -1196,7 +1196,7 @@ export const AdminMediaLibrary: React.FC = () => {
 
             <div className={styles.drawerFooter}>
               <button type="button" onClick={() => setDuplicateWarning(null)} className={styles.resetBtn}>
-                Hủy Bỏ Upload
+                Hủy bỏ tải lên
               </button>
               <button
                 type="button"
@@ -1206,7 +1206,7 @@ export const AdminMediaLibrary: React.FC = () => {
                 }}
                 className={styles.uploadTriggerBtn}
               >
-                Sử Dụng Tệp Có Sẵn
+                Sử dụng tệp có sẵn
               </button>
             </div>
           </div>
@@ -1216,10 +1216,10 @@ export const AdminMediaLibrary: React.FC = () => {
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={Boolean(deleteCandidate)}
-        title="Xác Nhận Xóa Vĩnh Viễn Tệp Media"
+        title="Xác nhận xóa vĩnh viễn tệp media"
         message={`Bạn có chắc chắn muốn xóa vĩnh viễn tệp "${deleteCandidate?.original_filename}" khỏi hệ thống?`}
-        confirmLabel="Xóa Vĩnh Viễn"
-        cancelLabel="Hủy Bỏ"
+        confirmLabel="Xóa vĩnh viễn"
+        cancelLabel="Hủy bỏ"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteCandidate(null)}
       />

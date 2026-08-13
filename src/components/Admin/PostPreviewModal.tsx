@@ -43,7 +43,7 @@ export const PostPreviewModal: React.FC<PostPreviewModalProps> = ({ isOpen, post
         </div>
 
         <button type="button" onClick={onClose} className={styles.closeBtn}>
-          <X size={18} /> Đóng Xem Trước
+          <X size={18} /> Đóng xem trước
         </button>
       </div>
 

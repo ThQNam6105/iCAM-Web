@@ -23,7 +23,7 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
       <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h3 className={styles.title}>
-            <History size={20} color="#F58220" /> Lịch Sử Phiên Bản & Khôi Phục (Revision History)
+            <History size={20} color="#F58220" /> Lịch sử phiên bản & khôi phục (Revision History)
           </h3>
           <button type="button" onClick={onClose} className={styles.closeBtn}>
             <X size={20} />
@@ -46,7 +46,7 @@ export const RevisionHistoryModal: React.FC<RevisionHistoryModalProps> = ({
                   onClick={() => onRestore(rev)}
                   className={styles.restoreBtn}
                 >
-                  <RotateCcw size={14} style={{ display: 'inline', marginRight: '4px' }} /> Khôi Phục Bản Này
+                  <RotateCcw size={14} style={{ display: 'inline', marginRight: '4px' }} /> Khôi phục bản này
                 </button>
               </div>
             ))

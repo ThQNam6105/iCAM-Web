@@ -258,14 +258,14 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             type="button"
             onClick={onClose}
             className={styles.closeModalXBtn}
-            title="Đóng cửa sổ soạn thảo (Hủy bỏ)"
+            title="Đóng cửa sổ soạn thảo (hủy bỏ)"
           >
             <X size={20} />
           </button>
 
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>
-              {postToEdit ? 'Chỉnh Sửa Bài Viết' : 'Thêm Bài Viết Mới'}
+              {postToEdit ? 'Chỉnh sửa bài viết' : 'Thêm bài viết mới'}
             </h2>
 
             <div className={styles.headerActions}>
@@ -289,7 +289,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                 onClick={() => setIsPreviewOpen(true)}
                 className={styles.previewBtn}
               >
-                <Eye size={16} /> Xem Trước (Preview)
+                <Eye size={16} /> Xem trước (Preview)
               </button>
             </div>
           </div>
@@ -303,8 +303,8 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                   onChange={(e) => setStatus(e.target.value as PostStatus)}
                   className={styles.select}
                 >
-                  <option value="draft">Bản nháp (Draft - Ẩn trên web)</option>
-                  <option value="published">Đã xuất bản (Published - Hiện trên web)</option>
+                  <option value="draft">Bản nháp (Draft - ẩn trên web)</option>
+                  <option value="published">Đã xuất bản (Published - hiện trên web)</option>
                   <option value="archived">Lưu trữ (Archived)</option>
                 </select>
               </div>
@@ -338,11 +338,11 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                Tiêu đề bài viết (Tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
+                Tiêu đề bài viết (tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="text"
-                placeholder="Nhập tiêu đề Tiếng Việt..."
+                placeholder="Nhập tiêu đề tiếng Việt..."
                 value={title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 className={styles.input}
@@ -352,7 +352,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                Tiêu đề bài viết (Tiếng Anh) <span style={{ color: '#ef4444' }}>*</span>
+                Tiêu đề bài viết (tiếng Anh) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <input
                 type="text"
@@ -366,7 +366,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                Hình ảnh bìa bài viết (URL hoặc Tải từ máy tính) <span style={{ color: '#ef4444' }}>*</span>
+                Hình ảnh bìa bài viết (URL hoặc tải từ máy tính) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <div className={styles.imageInputGroup}>
                 <input
@@ -391,7 +391,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               {image && (
                 <div className={styles.coverControlPanel}>
                   <div className={styles.coverControlTitle}>
-                    <Sliders size={15} color="#F58220" /> Căn Chỉnh Vị Trí & Phóng To/Thu Nhỏ Ảnh Bìa (Cover Image Cropper)
+                    <Sliders size={15} color="#F58220" /> Căn chỉnh vị trí & phóng to/thu nhỏ ảnh bìa (Cover Image Cropper)
                   </div>
 
                   {/* Interactive Drag & Zoom 16:9 Canvas */}
@@ -404,7 +404,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       setImageZoom((prev) => Math.min(300, Math.max(100, prev + (e.deltaY < 0 ? 10 : -10))));
                     }}
                     className={`${styles.coverPreviewWrapper} ${isDragging ? styles.coverPreviewWrapperIsDragging : ''}`}
-                    title="Nhấn giữ & kéo chuột để di chuyển ảnh (Lăn chuột để Zoom)"
+                    title="Nhấn giữ & kéo chuột để di chuyển ảnh (lăn chuột để zoom)"
                   >
                     <img
                       src={image}
@@ -418,14 +418,14 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       }}
                     />
                     <div className={styles.dragHelpBadge}>
-                      <Move size={13} /> Nhấn giữ & Kéo chuột di chuyển | Zoom: {imageZoom}%
+                      <Move size={13} /> Nhấn giữ & kéo chuột di chuyển | Zoom: {imageZoom}%
                     </div>
                   </div>
 
                   {/* Zoom Slider Controls */}
                   <div className={styles.zoomControlRow}>
                     <span className={styles.zoomLabel}>
-                      <ZoomIn size={14} /> Phóng To / Thu Nhỏ:
+                      <ZoomIn size={14} /> Phóng to / thu nhỏ:
                     </span>
                     <button
                       type="button"
@@ -461,7 +461,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                         setPanY(50);
                       }}
                       className={styles.alignBtn}
-                      title="Đặt lại Mặc Định"
+                      title="Đặt lại mặc định"
                     >
                       <RotateCcw size={13} /> Đặt lại
                     </button>
@@ -472,7 +472,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                Tóm tắt bài viết (Tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
+                Tóm tắt bài viết (tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <textarea
                 rows={2}
@@ -485,7 +485,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tóm tắt bài viết (Tiếng Anh)</label>
+              <label className={styles.label}>Tóm tắt bài viết (tiếng Anh)</label>
               <textarea
                 rows={2}
                 placeholder="Short excerpt in English..."
@@ -497,18 +497,18 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
-                Nội dung chi tiết bài viết (Tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
+                Nội dung chi tiết bài viết (tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
               </label>
               <RichTextEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Soạn thảo nội dung bài viết Tiếng Việt như trên Word..."
+                placeholder="Soạn thảo nội dung bài viết tiếng Việt như trên Word..."
               />
               {errors.content && <span className={styles.errorText}>{errors.content}</span>}
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Nội dung chi tiết bài viết (Tiếng Anh)</label>
+              <label className={styles.label}>Nội dung chi tiết bài viết (tiếng Anh)</label>
               <RichTextEditor
                 value={contentEn}
                 onChange={setContentEn}
@@ -543,7 +543,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
 
             <div className={styles.modalActions}>
               <button type="submit" className={styles.saveBtn}>
-                <Save size={16} /> {postToEdit ? 'Lưu Thay Đổi' : 'Lưu & Đăng Bài'}
+                <Save size={16} /> {postToEdit ? 'Lưu thay đổi' : 'Lưu & đăng bài'}
               </button>
             </div>
           </form>

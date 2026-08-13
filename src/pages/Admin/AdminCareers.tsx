@@ -93,7 +93,7 @@ export const AdminCareers: React.FC = () => {
       {/* Header */}
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Quản Lý Tuyển Dụng (Careers)</h1>
+          <h1 className={styles.pageTitle}>Quản lý tuyển dụng (Careers)</h1>
           <p className={styles.pageSubtitle}>
             Quản lý các vị trí tuyển dụng giáo viên, nhân viên & nhận hồ sơ ứng tuyển tại iCANCAM
           </p>
@@ -107,7 +107,7 @@ export const AdminCareers: React.FC = () => {
           }}
           className={styles.createBtn}
         >
-          <Plus size={18} /> + Thêm Vị Trí Mới
+          <Plus size={18} /> + Thêm vị trí mới
         </button>
       </div>
 
@@ -116,7 +116,7 @@ export const AdminCareers: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statVal}>{stats.total}</div>
-            <div className={styles.statLabel}>Tổng Vị Trí Tuyển Dụng</div>
+            <div className={styles.statLabel}>Tổng vị trí tuyển dụng</div>
           </div>
           <Briefcase size={28} color="#F58220" />
         </div>
@@ -124,7 +124,7 @@ export const AdminCareers: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statVal}>{stats.openCount}</div>
-            <div className={styles.statLabel}>Đang Tuyển</div>
+            <div className={styles.statLabel}>Đang tuyển</div>
           </div>
           <CheckCircle size={28} color="#22c55e" />
         </div>
@@ -132,7 +132,7 @@ export const AdminCareers: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statVal}>{stats.closedCount}</div>
-            <div className={styles.statLabel}>Đã Đóng</div>
+            <div className={styles.statLabel}>Đã đóng</div>
           </div>
           <Clock size={28} color="#ef4444" />
         </div>
@@ -140,7 +140,7 @@ export const AdminCareers: React.FC = () => {
         <div className={styles.statCard}>
           <div>
             <div className={styles.statVal}>{stats.totalApps}</div>
-            <div className={styles.statLabel}>Tổng Hồ Sơ Đã Ứng Tuyển</div>
+            <div className={styles.statLabel}>Tổng hồ sơ đã ứng tuyển</div>
           </div>
           <Users size={28} color="#3b82f6" />
         </div>
@@ -164,11 +164,11 @@ export const AdminCareers: React.FC = () => {
           onChange={(e) => setSelectedDepartment(e.target.value)}
           className={styles.selectFilter}
         >
-          <option value="all">Tất cả Phòng Ban</option>
-          <option value="Khối Đào Tạo">Khối Đào Tạo</option>
-          <option value="Khối Tư Vấn & Tuyển Sinh">Khối Tư Vấn & Tuyển Sinh</option>
+          <option value="all">Tất cả phòng ban</option>
+          <option value="Khối Đào Tạo">Khối đào tạo</option>
+          <option value="Khối Tư Vấn & Tuyển Sinh">Khối tư vấn & tuyển sinh</option>
           <option value="Khối Marketing">Khối Marketing</option>
-          <option value="Khối Hành Chính & Nhân Sự">Khối Hành Chính & Nhân Sự</option>
+          <option value="Khối Hành Chính & Nhân Sự">Khối hành chính & nhân sự</option>
         </select>
 
         <select
@@ -176,10 +176,10 @@ export const AdminCareers: React.FC = () => {
           onChange={(e) => setSelectedStatus(e.target.value as JobStatus | 'all')}
           className={styles.selectFilter}
         >
-          <option value="all">Tất cả Trạng Thái</option>
-          <option value="open">Đang Tuyển</option>
-          <option value="closed">Đã Đóng</option>
-          <option value="draft">Bản Nháp</option>
+          <option value="all">Tất cả trạng thái</option>
+          <option value="open">Đang tuyển</option>
+          <option value="closed">Đã đóng</option>
+          <option value="draft">Bản nháp</option>
         </select>
       </div>
 
@@ -188,13 +188,13 @@ export const AdminCareers: React.FC = () => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Chức Danh & Địa Điểm</th>
-              <th>Phòng Ban</th>
-              <th>Mức Lương</th>
-              <th>Hạn Nộp</th>
-              <th>Trạng Thái</th>
-              <th>Hồ Sơ</th>
-              <th>Thao Tác</th>
+              <th>Chức danh & địa điểm</th>
+              <th>Phòng ban</th>
+              <th>Mức lương</th>
+              <th>Hạn nộp</th>
+              <th>Trạng thái</th>
+              <th>Hồ sơ</th>
+              <th>Thao tác</th>
             </tr>
           </thead>
 
@@ -222,7 +222,7 @@ export const AdminCareers: React.FC = () => {
                         : styles.statusDraft
                     }`}
                   >
-                    {job.status === 'open' ? 'Đang Tuyển' : job.status === 'closed' ? 'Đã Đóng' : 'Bản Nháp'}
+                    {job.status === 'open' ? 'Đang tuyển' : job.status === 'closed' ? 'Đã đóng' : 'Bản nháp'}
                   </span>
                 </td>
                 <td style={{ fontWeight: 700, color: '#F58220' }}>{job.applicationsCount} Hồ sơ</td>
@@ -272,8 +272,8 @@ export const AdminCareers: React.FC = () => {
         isOpen={deleteCandidateId !== null}
         title="Xác nhận xóa vị trí tuyển dụng"
         message="Hành động này sẽ xóa vị trí tuyển dụng khỏi hệ thống và không thể hoàn tác. Bạn có chắc chắn muốn xóa?"
-        confirmLabel="Xóa Vĩnh Viễn"
-        cancelLabel="Hủy Bỏ"
+        confirmLabel="Xóa vĩnh viễn"
+        cancelLabel="Hủy bỏ"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteCandidateId(null)}
       />

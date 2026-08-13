@@ -42,11 +42,11 @@ export const QualityChecker: React.FC<QualityCheckerProps> = ({
     <div className={styles.checkerCard}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <ShieldCheck size={18} color="#F58220" /> Kiểm Tra Chất Lượng Đăng Bài (Publishing Readiness)
+          <ShieldCheck size={18} color="#F58220" /> Kiểm tra chất lượng đăng bài (Publishing Readiness)
         </div>
 
         <div className={`${styles.scoreBadge} ${getScoreClass()}`}>
-          Điểm SEO & Xuất bản: {scorePercent}%
+          Điểm SEO & xuất bản: {scorePercent}%
         </div>
       </div>
 

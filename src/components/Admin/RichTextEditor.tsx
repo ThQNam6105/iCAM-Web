@@ -299,7 +299,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           defaultValue=""
         >
           <option value="" disabled>
-            ✨ Chèn Khung Giáo Dục iCANCAM...
+            ✨ Chèn khung giáo dục iCANCAM...
           </option>
           {EDUCATION_BLOCKS.map((block) => (
             <option key={block.id} value={block.html}>
@@ -370,7 +370,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             onClick={() => setShowSearch(!showSearch)}
             className={styles.toolBtn}
-            title="Tìm kiếm & Thay thế"
+            title="Tìm kiếm & thay thế"
           >
             <Search size={15} />
           </button>
@@ -378,7 +378,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             type="button"
             onClick={() => setIsFullscreen(!isFullscreen)}
             className={styles.toolBtn}
-            title={isFullscreen ? 'Thoát toàn màn hình' : 'Chế độ Tập Trung Soạn Thảo (Fullscreen)'}
+            title={isFullscreen ? 'Thoát toàn màn hình' : 'Chế độ tập trung soạn thảo (Fullscreen)'}
           >
             {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
@@ -415,7 +415,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             className={styles.searchInput}
           />
           <button type="button" onClick={handleFindAndReplace} className={styles.replaceBtn}>
-            <Sparkles size={14} /> Thay Thế All
+            <Sparkles size={14} /> Thay thế tất cả
           </button>
         </div>
       )}
@@ -437,10 +437,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         filterType={mediaFilterType === 'doc' ? 'pdf' : (mediaFilterType === 'video' ? 'all' : 'image')}
         title={
           mediaFilterType === 'doc'
-            ? 'Chọn Tài Liệu Word từ Thư Viện Hệ Thống'
+            ? 'Chọn tài liệu Word từ Thư viện hệ thống'
             : mediaFilterType === 'video'
-            ? 'Chọn Video Clip từ Thư Viện Hệ Thống'
-            : 'Chọn Hình Ảnh từ Thư Viện Hệ Thống'
+            ? 'Chọn video clip từ Thư viện hệ thống'
+            : 'Chọn hình ảnh từ Thư viện hệ thống'
         }
         onSelect={handleSelectMediaAsset}
       />

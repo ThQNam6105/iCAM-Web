@@ -27,7 +27,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   onClose,
   allowMultiple = false,
   filterType = 'all',
-  title = 'Chọn Tài Nguyên từ Thư Viện Hệ Thống',
+  title = 'Chọn tài nguyên từ Thư viện hệ thống',
 }) => {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,7 +179,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                 }}
                 className={styles.backBtn}
               >
-                <ArrowLeft size={16} /> Đổi Thư Mục
+                <ArrowLeft size={16} /> Đổi thư mục
               </button>
 
               <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#F58220', whiteSpace: 'nowrap' }}>
@@ -267,7 +267,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                 onClick={handleConfirmSelection}
                 className={styles.confirmBtn}
               >
-                <Check size={18} /> Sử Dụng Tệp Đã Chọn
+                <Check size={18} /> Sử dụng tệp đã chọn
               </button>
             </div>
           </>

@@ -8,7 +8,7 @@ export interface EducationBlockType {
 export const EDUCATION_BLOCKS: EducationBlockType[] = [
   {
     id: 'grammar-tip',
-    name: '💡 Mẹo Ngữ Pháp (Grammar Tip)',
+    name: '💡 Mẹo ngữ pháp (Grammar Tip)',
     icon: '💡',
     html: `
       <blockquote class="edu-block edu-grammar-tip">
@@ -18,7 +18,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'vocabulary-box',
-    name: '📚 Từ Vựng Mới (Vocabulary Box)',
+    name: '📚 Từ vựng mới (Vocabulary Box)',
     icon: '📚',
     html: `
       <blockquote class="edu-block edu-vocabulary-box">
@@ -30,7 +30,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'ielts-strategy',
-    name: '🎯 Chiến Thuật IELTS (IELTS Strategy)',
+    name: '🎯 Chiến thuật IELTS (IELTS Strategy)',
     icon: '🎯',
     html: `
       <blockquote class="edu-block edu-ielts-strategy">
@@ -40,7 +40,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'common-mistakes',
-    name: '⚠️ Lỗi Thường Gặp (Common Mistakes)',
+    name: '⚠️ Lỗi thường gặp (Common Mistakes)',
     icon: '⚠️',
     html: `
       <blockquote class="edu-block edu-common-mistakes">
@@ -50,7 +50,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'practice-exercise',
-    name: '📝 Bài Tập Luyện Tập (Practice Exercise)',
+    name: '📝 Bài tập luyện tập (Practice Exercise)',
     icon: '📝',
     html: `
       <blockquote class="edu-block edu-practice-exercise">
@@ -62,7 +62,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'learning-objective',
-    name: '🎯 Mục Tiêu Bài Học (Learning Objective)',
+    name: '🎯 Mục tiêu bài học (Learning Objective)',
     icon: '🎯',
     html: `
       <blockquote class="edu-block edu-learning-objective">
@@ -72,7 +72,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'success-story',
-    name: '🏆 Câu Chuyện Thành Công (Success Story)',
+    name: '🏆 Câu chuyện thành công (Success Story)',
     icon: '🏆',
     html: `
       <blockquote class="edu-block edu-success-story">
@@ -82,7 +82,7 @@ export const EDUCATION_BLOCKS: EducationBlockType[] = [
   },
   {
     id: 'call-to-action',
-    name: '🚀 Đăng Ký Tư Vấn (Call To Action)',
+    name: '🚀 Đăng ký tư vấn (Call to Action)',
     icon: '🚀',
     html: `
       <blockquote class="edu-block edu-call-to-action">

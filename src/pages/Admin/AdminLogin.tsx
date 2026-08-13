@@ -23,7 +23,7 @@ export const AdminLogin: React.FC = () => {
     <div className={styles.loginWrapper}>
       <div className={styles.loginCard}>
         <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
-        <h1 className={styles.title}>Quản Trị viên iCANCAM</h1>
+        <h1 className={styles.title}>Quản trị viên iCANCAM</h1>
         <p className={styles.subtitle}>Đăng nhập để quản lý bài viết tin tức & sự kiện</p>
 
         <form onSubmit={handleLogin} className={styles.form}>
@@ -33,7 +33,7 @@ export const AdminLogin: React.FC = () => {
             <label className={styles.label}>Admin Password</label>
             <input
               type="password"
-              placeholder="Nhập mật khẩu Quản trị..."
+              placeholder="Nhập mật khẩu quản trị..."
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}
@@ -43,12 +43,12 @@ export const AdminLogin: React.FC = () => {
           </div>
 
           <button type="submit" className={styles.submitBtn}>
-            Đăng Nhập Quản Trị
+            Đăng nhập quản trị
           </button>
         </form>
 
         <Link to="/" className={styles.backHomeLink}>
-          ← Quay về Trang chủ
+          ← Quay về trang chủ
         </Link>
       </div>
     </div>

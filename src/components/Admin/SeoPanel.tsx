@@ -78,7 +78,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
   };
 
   // Automatic Metadata Fallback Cascade
-  const autoTitle = metaTitle.trim() || articleTitle.trim() || 'Tiêu Đề Bài Viết iCANCAM';
+  const autoTitle = metaTitle.trim() || articleTitle.trim() || 'Tiêu đề bài viết iCANCAM';
   const autoDescription =
     metaDescription.trim() ||
     articleExcerpt.trim() ||
@@ -163,7 +163,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
                 <img src={finalOgImage} alt="Zalo Preview" className={styles.zaloImage} />
               </div>
               <div className={styles.zaloContent}>
-                <div className={styles.zaloBrand}>THÔNG TIN TỪ ICANCAM</div>
+                <div className={styles.zaloBrand}>Thông tin từ iCANCAM</div>
                 <div className={styles.zaloTitle}>{finalOgTitle}</div>
                 <div className={styles.zaloDesc}>{finalOgDescription}</div>
                 <div className={styles.zaloFooter}>
@@ -195,18 +195,18 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Tùy chỉnh Tiêu đề Google (SEO Title)</label>
+            <label className={styles.label}>Tùy chỉnh tiêu đề Google (SEO Title)</label>
             <input
               type="text"
               value={metaTitle}
               onChange={(e) => onChangeMetaTitle?.(e.target.value)}
-              placeholder={articleTitle || 'Tự động sử dụng Tiêu đề bài viết...'}
+              placeholder={articleTitle || 'Tự động sử dụng tiêu đề bài viết...'}
               className={styles.input}
             />
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Tùy chỉnh Mô tả Tìm kiếm</label>
+            <label className={styles.label}>Tùy chỉnh mô tả tìm kiếm</label>
             <textarea
               rows={2}
               value={metaDescription}
@@ -292,7 +292,7 @@ export const SeoPanel: React.FC<SeoPanelProps> = ({
                 onChange={(e) => onChangeNoFollow?.(e.target.checked)}
                 className={styles.checkbox}
               />
-              <span>Không cho phép Robot theo dõi liên kết trong bài (Nofollow)</span>
+              <span>Không cho phép robot theo dõi liên kết trong bài (Nofollow)</span>
             </label>
           </div>
         </div>
