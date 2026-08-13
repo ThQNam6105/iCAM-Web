@@ -337,10 +337,6 @@ export const AdminMediaLibrary: React.FC = () => {
 
   // Computations
   const totalSizeMB = items.reduce((acc, i) => acc + (i.file_size || 0), 0) / (1024 * 1024);
-  const imageCount = items.filter((i) => i.mime_type.includes('image')).length;
-  const audioCount = items.filter((i) => i.mime_type.includes('audio')).length;
-  const videoCount = items.filter((i) => i.mime_type.includes('video')).length;
-  const pdfCount = items.filter((i) => i.mime_type.includes('pdf')).length;
 
   return (
     <div className={styles.container}>
@@ -548,9 +544,7 @@ export const AdminMediaLibrary: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statValue}>{totalItems} Tệp</div>
-                <div className={styles.statLabel}>
-                  {imageCount} Ảnh • {videoCount} Video • {audioCount} Audio • {pdfCount} PDF
-                </div>
+                <div className={styles.statLabel}>Số lượng tệp</div>
               </div>
               <Layers size={32} color="#10b981" />
             </div>
