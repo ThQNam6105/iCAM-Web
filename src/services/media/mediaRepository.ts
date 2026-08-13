@@ -1,17 +1,88 @@
 import { supabase } from '../supabaseClient';
 import type { MediaItem, MediaUsage, MediaFolder, MediaFilter, EntityType } from '../../types/media';
 
+// Import asset images directly to guarantee clean resolution in Dev & Production builds
+import bannerBg from '../../assets/banner-bg.jpg';
+import bannerBgMobile from '../../assets/banner-bg-mobile.jpg';
+import enBannerBg from '../../assets/en_banner-bg.jpg';
+import enBannerBgMobile from '../../assets/en_banner-bg-mobile.jpg';
+
+import footerLogo from '../../assets/footer-logo.jpg';
+import heroImg from '../../assets/hero.png';
+import icanLogo from '../../assets/ican.png';
+import reactSvg from '../../assets/react.svg';
+import viteSvg from '../../assets/vite.svg';
+
+import newsArena from '../../assets/news_arena.png';
+import newsLimit from '../../assets/news_limit.png';
+import newsParenting from '../../assets/news_parenting.png';
+
+import parent1 from '../../assets/parent_1.png';
+import parent2 from '../../assets/parent_2.png';
+import parent3 from '../../assets/parent_3.png';
+import parent4 from '../../assets/parent_4.png';
+
+import studentAn from '../../assets/student_an.png';
+import studentHologram from '../../assets/student_hologram.png';
+import studentHuy from '../../assets/student_huy.png';
+import studentNam from '../../assets/student_nam.png';
+import studentThu from '../../assets/student_thu.png';
+import studentVy from '../../assets/student_vy.png';
+
+import teacherDavid from '../../assets/teacher_david.png';
+import teacherEmma from '../../assets/teacher_emma.png';
+import teacherJames from '../../assets/teacher_james.png';
+import teacherKhoa from '../../assets/teacher_khoa.png';
+import teacherLoan from '../../assets/teacher_loan.png';
+import teacherLucas from '../../assets/teacher_lucas.png';
+import teacherNhat from '../../assets/teacher_nhat.png';
+import teacherOliver from '../../assets/teacher_oliver.png';
+import teacherPhuc from '../../assets/teacher_phuc.png';
+import teacherSarah from '../../assets/teacher_sarah.png';
+import teacherTho from '../../assets/teacher_tho.png';
+
+import achievementSchool from '../../assets/achievement_school.png';
+import achievementSmartboard from '../../assets/achievement_smartboard.png';
+import achievementTeacher from '../../assets/achievement_teacher.png';
+
 const PUBLIC_BUCKET = 'cms-public-media';
 const PRIVATE_BUCKET = 'cms-private-media';
 const LOCAL_STORAGE_KEY = 'ican_cms_media_items_v2';
 const LOCAL_USAGE_KEY = 'ican_cms_media_usages_v2';
 const LOCAL_FOLDER_KEY = 'ican_cms_media_folders_v2';
 
-// In-memory / Persistence fallback for initial table bootstrap
+// Persistence fallback & Cache Auto-Sync
 const getStoredItems = (): MediaItem[] => {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed: MediaItem[] = JSON.parse(raw);
+      let hasChanges = false;
+      const merged = [...parsed];
+
+      for (const defItem of DEFAULT_INITIAL_MEDIA) {
+        const idx = merged.findIndex((m) => m.id === defItem.id || m.original_filename === defItem.original_filename);
+        if (idx === -1) {
+          merged.push(defItem);
+          hasChanges = true;
+        } else {
+          // Always ensure folder_id and public_url match standard assets
+          if (!merged[idx].folder_id && defItem.folder_id) {
+            merged[idx].folder_id = defItem.folder_id;
+            hasChanges = true;
+          }
+          if (defItem.public_url && merged[idx].public_url !== defItem.public_url) {
+            merged[idx].public_url = defItem.public_url;
+            hasChanges = true;
+          }
+        }
+      }
+
+      if (hasChanges) {
+        saveStoredItems(merged);
+      }
+      return merged;
+    }
   } catch {
     // Ignore
   }
@@ -47,7 +118,16 @@ const saveStoredUsages = (usages: MediaUsage[]) => {
 const getStoredFolders = (): MediaFolder[] => {
   try {
     const raw = localStorage.getItem(LOCAL_FOLDER_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed: MediaFolder[] = JSON.parse(raw);
+      const missing = DEFAULT_INITIAL_FOLDERS.filter((df) => !parsed.some((pf) => pf.id === df.id));
+      if (missing.length > 0) {
+        const merged = [...parsed, ...missing];
+        saveStoredFolders(merged);
+        return merged;
+      }
+      return parsed;
+    }
   } catch {
     // Ignore
   }
@@ -73,6 +153,9 @@ export class MediaRepository {
       if (!error && data && data.length > 0) {
         folders = data as MediaFolder[];
         saveStoredFolders(folders);
+      } else {
+        // Sync default initial folders to Supabase if database table is empty
+        await supabase.from('media_folders').upsert(DEFAULT_INITIAL_FOLDERS);
       }
     } catch {
       // Fallback
@@ -253,7 +336,7 @@ export class MediaRepository {
   }
 
   /**
-   * Save media asset metadata record to DB
+   * Save media asset metadata record to DB and LocalStorage
    */
   async saveMediaRecord(item: MediaItem): Promise<MediaItem> {
     try {
@@ -278,6 +361,24 @@ export class MediaRepository {
   }
 
   /**
+   * Update media metadata by ID
+   */
+  async updateMediaMetadata(id: string, updates: Partial<MediaItem>): Promise<MediaItem> {
+    const items = getStoredItems();
+    const item = items.find((i) => i.id === id);
+    if (!item) throw new Error(`MediaItem with ID ${id} not found.`);
+    Object.assign(item, updates, { updated_at: new Date().toISOString() });
+    saveStoredItems(items);
+
+    try {
+      await supabase.from('media_items').update(updates).eq('id', id);
+    } catch {
+      // Fallback
+    }
+    return item;
+  }
+
+  /**
    * Fetch media assets with filtering, debounced search, tags, folders, and pagination
    */
   async getMediaItems(filter: MediaFilter = {}): Promise<{ items: MediaItem[]; total: number }> {
@@ -288,6 +389,9 @@ export class MediaRepository {
       if (!error && data && data.length > 0) {
         items = data as MediaItem[];
         saveStoredItems(items);
+      } else {
+        // Sync default initial media items to Supabase
+        await supabase.from('media_items').upsert(DEFAULT_INITIAL_MEDIA);
       }
     } catch {
       // Fallback to local cache
@@ -348,14 +452,12 @@ export class MediaRepository {
       }
     }
 
-    // Default exclude archived unless filter explicitly asks for archived
-    if (filter.usageStatus !== 'archived') {
-      items = items.filter((i) => i.status !== 'archived');
-    }
-
-    // Sorting
+    // Sort items
     if (filter.sortBy) {
       switch (filter.sortBy) {
+        case 'newest':
+          items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          break;
         case 'oldest':
           items.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
           break;
@@ -371,23 +473,74 @@ export class MediaRepository {
         case 'size-asc':
           items.sort((a, b) => a.file_size - b.file_size);
           break;
-        case 'newest':
-        default:
-          items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-          break;
       }
     }
 
     const total = items.length;
     const page = filter.page || 1;
-    const limit = filter.limit || 24;
-    const paginated = items.slice((page - 1) * limit, page * limit);
+    const pageSize = (filter as { pageSize?: number }).pageSize || 24;
+    const startIndex = (page - 1) * pageSize;
+    const paginatedItems = items.slice(startIndex, startIndex + pageSize);
 
-    return { items: paginated, total };
+    return { items: paginatedItems, total };
   }
 
   /**
-   * Fetch usage details for a given media asset
+   * Delete media asset record permanently
+   */
+  async deleteMediaItem(id: string): Promise<void> {
+    const items = getStoredItems();
+    const filtered = items.filter((i) => i.id !== id);
+    saveStoredItems(filtered);
+
+    const usages = getStoredUsages();
+    const filteredUsages = usages.filter((u) => u.media_id !== id);
+    saveStoredUsages(filteredUsages);
+
+    try {
+      await supabase.from('media_items').delete().eq('id', id);
+      await supabase.from('media_usages').delete().eq('media_id', id);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Hard Delete with Usage Protection
+   */
+  async hardDeleteMediaItem(id: string): Promise<{ success: boolean; error?: string }> {
+    const usages = await this.getMediaUsages(id);
+    if (usages.length > 0) {
+      return {
+        success: false,
+        error: `Tệp này đang được sử dụng ở ${usages.length} vị trí! Không thể xóa vĩnh viễn cho đến khi gỡ liên kết.`,
+      };
+    }
+    await this.deleteMediaItem(id);
+    return { success: true };
+  }
+
+  /**
+   * Move item to archive status
+   */
+  async archiveMediaItem(id: string): Promise<void> {
+    const items = getStoredItems();
+    const item = items.find((i) => i.id === id);
+    if (item) {
+      item.status = 'archived';
+      item.updated_at = new Date().toISOString();
+      saveStoredItems(items);
+    }
+
+    try {
+      await supabase.from('media_items').update({ status: 'archived' }).eq('id', id);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Get usages history for a specific media item
    */
   async getMediaUsages(mediaId: string): Promise<MediaUsage[]> {
     const usages = getStoredUsages();
@@ -395,7 +548,7 @@ export class MediaRepository {
   }
 
   /**
-   * Register or update a media usage
+   * Register usage in a module
    */
   async registerUsage(
     mediaId: string,
@@ -409,89 +562,70 @@ export class MediaRepository {
     focalY?: number
   ): Promise<MediaUsage> {
     const usages = getStoredUsages();
-    const existingIdx = usages.findIndex((u) => u.media_id === mediaId && u.entity_type === entityType && u.entity_id === entityId);
-
-    const now = new Date().toISOString();
-    const usageRecord: MediaUsage = {
-      id: existingIdx >= 0 ? usages[existingIdx].id : `usage_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    const newUsage: MediaUsage = {
+      id: `usage_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
       media_id: mediaId,
       entity_type: entityType,
       entity_id: entityId,
       entity_title: entityTitle,
-      alt_vi: altVi,
-      alt_en: altEn,
-      caption,
-      focal_x: focalX,
-      focal_y: focalY,
-      created_at: existingIdx >= 0 ? usages[existingIdx].created_at : now,
-      updated_at: now,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
-
-    if (existingIdx >= 0) {
-      usages[existingIdx] = usageRecord;
-    } else {
-      usages.push(usageRecord);
-    }
+    usages.push(newUsage);
     saveStoredUsages(usages);
-    return usageRecord;
+
+    if (altVi || altEn || caption || focalX !== undefined || focalY !== undefined) {
+      await this.updateMediaMetadata(mediaId, {
+        ...(altVi && { default_alt_vi: altVi }),
+        ...(altEn && { default_alt_en: altEn }),
+        ...(caption && { default_caption: caption }),
+        ...(focalX !== undefined && { focal_x: focalX }),
+        ...(focalY !== undefined && { focal_y: focalY }),
+      });
+    }
+
+    try {
+      await supabase.from('media_usages').insert(newUsage);
+    } catch {
+      // Ignore
+    }
+
+    return newUsage;
   }
 
   /**
-   * Remove media usage reference
+   * Unregister usage
    */
   async unregisterUsage(mediaId: string, entityType: EntityType, entityId: string): Promise<void> {
     const usages = getStoredUsages();
     const filtered = usages.filter((u) => !(u.media_id === mediaId && u.entity_type === entityType && u.entity_id === entityId));
     saveStoredUsages(filtered);
-  }
-
-  /**
-   * Archive media asset (Soft delete)
-   */
-  async archiveMediaItem(id: string): Promise<void> {
-    const items = getStoredItems();
-    const item = items.find((i) => i.id === id);
-    if (item) {
-      item.status = 'archived';
-      item.updated_at = new Date().toISOString();
-      await this.saveMediaRecord(item);
-    }
-  }
-
-  /**
-   * Hard Delete media asset if usage count is 0
-   */
-  async hardDeleteMediaItem(id: string): Promise<{ success: boolean; error?: string }> {
-    const usages = await this.getMediaUsages(id);
-    if (usages.length > 0) {
-      return {
-        success: false,
-        error: `Không thể xóa vĩnh viễn! File này đang được sử dụng ở ${usages.length} vị trí trên website.`,
-      };
-    }
-
-    const items = getStoredItems();
-    const filtered = items.filter((i) => i.id !== id);
-    saveStoredItems(filtered);
 
     try {
-      await supabase.from('media_items').delete().eq('id', id);
+      await supabase.from('media_usages').delete().eq('media_id', mediaId).eq('entity_type', entityType).eq('entity_id', entityId);
     } catch {
       // Ignore
     }
-
-    return { success: true };
   }
 }
 
 export const mediaRepository = new MediaRepository();
 
+// Standardized System Media Folders
 const DEFAULT_INITIAL_FOLDERS: MediaFolder[] = [
   {
-    id: 'folder_news',
-    name: 'Bài Viết Tin Tức',
-    slug: 'bai-viet-tin-tuc',
-    color: '#F58220',
+    id: 'folder_homepage',
+    name: 'Banner Trang Chủ',
+    slug: 'banner-trang-chu',
+    color: '#10b981',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+  {
+    id: 'folder_branding',
+    name: 'Logo & Nhãn Hiệu',
+    slug: 'logo-nhan-hieu',
+    color: '#8b5cf6',
     created_at: '2026-08-01T10:00:00Z',
     updated_at: '2026-08-01T10:00:00Z',
   },
@@ -504,101 +638,705 @@ const DEFAULT_INITIAL_FOLDERS: MediaFolder[] = [
     updated_at: '2026-08-01T10:00:00Z',
   },
   {
-    id: 'folder_homepage',
-    name: 'Banner Trang Chủ',
-    slug: 'banner-trang-chu',
-    color: '#10b981',
+    id: 'folder_students',
+    name: 'Học Viên & Lớp Học',
+    slug: 'hoc-vien-lop-hoc',
+    color: '#ec4899',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+  {
+    id: 'folder_parents',
+    name: 'Phụ Huynh & Đánh Giá',
+    slug: 'phu-huynh-danh-gia',
+    color: '#f59e0b',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+  {
+    id: 'folder_achievements',
+    name: 'Thành Tích & Trường Học',
+    slug: 'thanh-tich-truong-hoc',
+    color: '#06b6d4',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+  },
+  {
+    id: 'folder_news',
+    name: 'Bài Viết & Tin Tức',
+    slug: 'bai-viet-tin-tuc',
+    color: '#F58220',
     created_at: '2026-08-01T10:00:00Z',
     updated_at: '2026-08-01T10:00:00Z',
   },
 ];
 
-// Pre-populated default seed media assets
+// Pre-populated default catalog mapping all 36 assets in src/assets
 const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
+  // 1. Banner Trang Chủ
   {
-    id: 'asset_hero_banner',
+    id: 'asset_banner_bg',
     original_filename: 'banner-bg.jpg',
-    storage_path: 'uploads/2026/08/banner-bg.jpg',
-    public_url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&auto=format&fit=crop',
+    storage_path: 'assets/banner-bg.jpg',
+    public_url: bannerBg,
     mime_type: 'image/jpeg',
-    file_size: 1980000,
+    file_size: 1939991,
     width: 1920,
     height: 1080,
-    content_hash: 'hash_hero_banner_001',
+    content_hash: 'hash_banner_bg_001',
     status: 'active',
-    default_alt_vi: 'Lớp học tiếng Anh hiện đại iCANCAM',
-    default_alt_en: 'Modern English Classroom at iCANCAM',
+    default_alt_vi: 'Banner chính trang chủ iCANCAM',
+    default_alt_en: 'Main homepage banner iCANCAM',
     default_caption: 'Không gian học tập chuẩn quốc tế tại Hóc Môn & Quận 12',
     focal_x: 0.5,
     focal_y: 0.5,
-    tags: ['banner', 'classroom', 'facilities'],
+    tags: ['banner', 'homepage', 'desktop'],
     folder_id: 'folder_homepage',
     created_at: '2026-08-01T10:00:00Z',
     updated_at: '2026-08-01T10:00:00Z',
     usage_count: 2,
   },
   {
-    id: 'asset_teacher_sarah',
-    original_filename: 'teacher_sarah.png',
-    storage_path: 'uploads/2026/08/teacher_sarah.png',
-    public_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop',
-    mime_type: 'image/png',
-    file_size: 598000,
-    width: 800,
-    height: 800,
-    content_hash: 'hash_teacher_sarah_002',
+    id: 'asset_banner_bg_mobile',
+    original_filename: 'banner-bg-mobile.jpg',
+    storage_path: 'assets/banner-bg-mobile.jpg',
+    public_url: bannerBgMobile,
+    mime_type: 'image/jpeg',
+    file_size: 145204,
+    width: 768,
+    height: 1024,
+    content_hash: 'hash_banner_bg_mobile_002',
     status: 'active',
-    default_alt_vi: 'Cô Sarah Connor - Trưởng khoa Anh văn Trẻ em',
-    default_alt_en: 'Ms. Sarah Connor - Head of Young Learners',
-    default_caption: 'Chuyên gia đào tạo phương pháp 4Ls & LETI',
-    focal_x: 0.5,
-    focal_y: 0.35,
-    tags: ['teachers', 'staff'],
-    folder_id: 'folder_teachers',
-    created_at: '2026-08-02T11:00:00Z',
-    updated_at: '2026-08-02T11:00:00Z',
+    default_alt_vi: 'Banner mobile trang chủ iCANCAM',
+    default_alt_en: 'Mobile homepage banner iCANCAM',
+    default_caption: 'Banner tối ưu cho giao diện di động',
+    folder_id: 'folder_homepage',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
     usage_count: 1,
   },
   {
-    id: 'asset_news_competition',
-    original_filename: 'news_arena.png',
-    storage_path: 'uploads/2026/08/news_arena.png',
-    public_url: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&auto=format&fit=crop',
+    id: 'asset_en_banner_bg',
+    original_filename: 'en_banner-bg.jpg',
+    storage_path: 'assets/en_banner-bg.jpg',
+    public_url: enBannerBg,
+    mime_type: 'image/jpeg',
+    file_size: 1998048,
+    width: 1920,
+    height: 1080,
+    content_hash: 'hash_en_banner_bg_003',
+    status: 'active',
+    default_alt_vi: 'Banner tiếng Anh trang chủ PC',
+    default_alt_en: 'English homepage banner PC',
+    folder_id: 'folder_homepage',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_en_banner_bg_mobile',
+    original_filename: 'en_banner-bg-mobile.jpg',
+    storage_path: 'assets/en_banner-bg-mobile.jpg',
+    public_url: enBannerBgMobile,
+    mime_type: 'image/jpeg',
+    file_size: 1901302,
+    width: 768,
+    height: 1024,
+    content_hash: 'hash_en_banner_bg_mobile_004',
+    status: 'active',
+    default_alt_vi: 'Banner tiếng Anh trang chủ Mobile',
+    default_alt_en: 'English homepage banner Mobile',
+    folder_id: 'folder_homepage',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 1,
+  },
+
+  // 2. Logo & Nhãn Hiệu
+  {
+    id: 'asset_ican_logo',
+    original_filename: 'ican.png',
+    storage_path: 'assets/ican.png',
+    public_url: icanLogo,
     mime_type: 'image/png',
-    file_size: 940000,
+    file_size: 116142,
+    width: 500,
+    height: 200,
+    content_hash: 'hash_ican_logo_005',
+    status: 'active',
+    default_alt_vi: 'Logo iCANCAM chính thức',
+    default_alt_en: 'Official iCANCAM logo',
+    folder_id: 'folder_branding',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 3,
+  },
+  {
+    id: 'asset_footer_logo',
+    original_filename: 'footer-logo.jpg',
+    storage_path: 'assets/footer-logo.jpg',
+    public_url: footerLogo,
+    mime_type: 'image/jpeg',
+    file_size: 100327,
+    width: 400,
+    height: 150,
+    content_hash: 'hash_footer_logo_006',
+    status: 'active',
+    default_alt_vi: 'Logo footer iCANCAM',
+    default_alt_en: 'iCANCAM footer logo',
+    folder_id: 'folder_branding',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 2,
+  },
+  {
+    id: 'asset_hero_img',
+    original_filename: 'hero.png',
+    storage_path: 'assets/hero.png',
+    public_url: heroImg,
+    mime_type: 'image/png',
+    file_size: 13057,
+    width: 300,
+    height: 300,
+    content_hash: 'hash_hero_img_007',
+    status: 'active',
+    default_alt_vi: 'Biểu tượng Hero iCANCAM',
+    default_alt_en: 'iCANCAM hero icon',
+    folder_id: 'folder_branding',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_react_svg',
+    original_filename: 'react.svg',
+    storage_path: 'assets/react.svg',
+    public_url: reactSvg,
+    mime_type: 'image/svg+xml',
+    file_size: 4126,
+    width: 100,
+    height: 100,
+    content_hash: 'hash_react_svg_008',
+    status: 'active',
+    default_alt_vi: 'Biểu tượng React',
+    default_alt_en: 'React SVG icon',
+    folder_id: 'folder_branding',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_vite_svg',
+    original_filename: 'vite.svg',
+    storage_path: 'assets/vite.svg',
+    public_url: viteSvg,
+    mime_type: 'image/svg+xml',
+    file_size: 8709,
+    width: 100,
+    height: 100,
+    content_hash: 'hash_vite_svg_009',
+    status: 'active',
+    default_alt_vi: 'Biểu tượng Vite',
+    default_alt_en: 'Vite SVG icon',
+    folder_id: 'folder_branding',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 1,
+  },
+
+  // 3. Đội Ngũ Giáo Viên
+  {
+    id: 'asset_teacher_david',
+    original_filename: 'teacher_david.png',
+    storage_path: 'assets/teacher_david.png',
+    public_url: teacherDavid,
+    mime_type: 'image/png',
+    file_size: 628115,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_david_010',
+    status: 'active',
+    default_alt_vi: 'Thầy David - Chuyên gia Luyện thi IELTS',
+    default_alt_en: 'Mr. David - IELTS Specialist',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_emma',
+    original_filename: 'teacher_emma.png',
+    storage_path: 'assets/teacher_emma.png',
+    public_url: teacherEmma,
+    mime_type: 'image/png',
+    file_size: 603631,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_emma_011',
+    status: 'active',
+    default_alt_vi: 'Cô Emma - Giảng viên Anh văn Trẻ em',
+    default_alt_en: 'Ms. Emma - Young Learners Instructor',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_james',
+    original_filename: 'teacher_james.png',
+    storage_path: 'assets/teacher_james.png',
+    public_url: teacherJames,
+    mime_type: 'image/png',
+    file_size: 603825,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_james_012',
+    status: 'active',
+    default_alt_vi: 'Thầy James - Giảng viên Tiếng Anh Giao Tiếp',
+    default_alt_en: 'Mr. James - Communication English Teacher',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_khoa',
+    original_filename: 'teacher_khoa.png',
+    storage_path: 'assets/teacher_khoa.png',
+    public_url: teacherKhoa,
+    mime_type: 'image/png',
+    file_size: 544351,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_khoa_013',
+    status: 'active',
+    default_alt_vi: 'Thầy Đăng Khoa - Cố vấn Đào tạo iCANCAM',
+    default_alt_en: 'Mr. Dang Khoa - Academic Advisor',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_loan',
+    original_filename: 'teacher_loan.png',
+    storage_path: 'assets/teacher_loan.png',
+    public_url: teacherLoan,
+    mime_type: 'image/png',
+    file_size: 589598,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_loan_014',
+    status: 'active',
+    default_alt_vi: 'Cô Phương Loan - Giảng viên Tiếng Anh Tiểu học',
+    default_alt_en: 'Ms. Phuong Loan - Primary School Teacher',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_lucas',
+    original_filename: 'teacher_lucas.png',
+    storage_path: 'assets/teacher_lucas.png',
+    public_url: teacherLucas,
+    mime_type: 'image/png',
+    file_size: 745326,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_lucas_015',
+    status: 'active',
+    default_alt_vi: 'Thầy Lucas - Giảng viên Phát âm chuẩn bản ngữ',
+    default_alt_en: 'Mr. Lucas - Native Pronunciation Teacher',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_nhat',
+    original_filename: 'teacher_nhat.png',
+    storage_path: 'assets/teacher_nhat.png',
+    public_url: teacherNhat,
+    mime_type: 'image/png',
+    file_size: 538942,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_nhat_016',
+    status: 'active',
+    default_alt_vi: 'Thầy Minh Nhật - Cố vấn Học thuật',
+    default_alt_en: 'Mr. Minh Nhat - Academic Counselor',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_oliver',
+    original_filename: 'teacher_oliver.png',
+    storage_path: 'assets/teacher_oliver.png',
+    public_url: teacherOliver,
+    mime_type: 'image/png',
+    file_size: 551723,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_oliver_017',
+    status: 'active',
+    default_alt_vi: 'Thầy Oliver - Giảng viên IELTS Advanced',
+    default_alt_en: 'Mr. Oliver - IELTS Advanced Instructor',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_phuc',
+    original_filename: 'teacher_phuc.png',
+    storage_path: 'assets/teacher_phuc.png',
+    public_url: teacherPhuc,
+    mime_type: 'image/png',
+    file_size: 711353,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_phuc_018',
+    status: 'active',
+    default_alt_vi: 'Thầy Hoàng Phúc - Giảng viên Luyện thi THPT',
+    default_alt_en: 'Mr. Hoang Phuc - High School Exam Teacher',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_teacher_sarah',
+    original_filename: 'teacher_sarah.png',
+    storage_path: 'assets/teacher_sarah.png',
+    public_url: teacherSarah,
+    mime_type: 'image/png',
+    file_size: 598302,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_sarah_019',
+    status: 'active',
+    default_alt_vi: 'Cô Sarah - Trưởng khoa Anh văn Trẻ em',
+    default_alt_en: 'Ms. Sarah - Head of Young Learners',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 2,
+  },
+  {
+    id: 'asset_teacher_tho',
+    original_filename: 'teacher_tho.png',
+    storage_path: 'assets/teacher_tho.png',
+    public_url: teacherTho,
+    mime_type: 'image/png',
+    file_size: 667502,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_teacher_tho_020',
+    status: 'active',
+    default_alt_vi: 'Cô Kim Thơ - Giảng viên Tiếng Anh Mầm Non',
+    default_alt_en: 'Ms. Kim Tho - Kindergarten Teacher',
+    folder_id: 'folder_teachers',
+    created_at: '2026-08-02T10:00:00Z',
+    updated_at: '2026-08-02T10:00:00Z',
+    usage_count: 1,
+  },
+
+  // 4. Học Viên & Lớp Học
+  {
+    id: 'asset_student_an',
+    original_filename: 'student_an.png',
+    storage_path: 'assets/student_an.png',
+    public_url: studentAn,
+    mime_type: 'image/png',
+    file_size: 708151,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_student_an_021',
+    status: 'active',
+    default_alt_vi: 'Học viên Minh An - Đạt 8.0 IELTS',
+    default_alt_en: 'Student Minh An - 8.0 IELTS Score',
+    folder_id: 'folder_students',
+    created_at: '2026-08-03T10:00:00Z',
+    updated_at: '2026-08-03T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_student_hologram',
+    original_filename: 'student_hologram.png',
+    storage_path: 'assets/student_hologram.png',
+    public_url: studentHologram,
+    mime_type: 'image/png',
+    file_size: 693084,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_student_hologram_022',
+    status: 'active',
+    default_alt_vi: 'Mô hình Học viên Hologram 3D',
+    default_alt_en: 'Hologram 3D Student model',
+    folder_id: 'folder_students',
+    created_at: '2026-08-03T10:00:00Z',
+    updated_at: '2026-08-03T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_student_huy',
+    original_filename: 'student_huy.png',
+    storage_path: 'assets/student_huy.png',
+    public_url: studentHuy,
+    mime_type: 'image/png',
+    file_size: 670071,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_student_huy_023',
+    status: 'active',
+    default_alt_vi: 'Học viên Gia Huy - Thủ khoa Cambridge Flyers',
+    default_alt_en: 'Student Gia Huy - Cambridge Flyers Valedictorian',
+    folder_id: 'folder_students',
+    created_at: '2026-08-03T10:00:00Z',
+    updated_at: '2026-08-03T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_student_nam',
+    original_filename: 'student_nam.png',
+    storage_path: 'assets/student_nam.png',
+    public_url: studentNam,
+    mime_type: 'image/png',
+    file_size: 578076,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_student_nam_024',
+    status: 'active',
+    default_alt_vi: 'Học viên Nhật Nam - Học sinh xuất sắc',
+    default_alt_en: 'Student Nhat Nam - Outstanding Student',
+    folder_id: 'folder_students',
+    created_at: '2026-08-03T10:00:00Z',
+    updated_at: '2026-08-03T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_student_thu',
+    original_filename: 'student_thu.png',
+    storage_path: 'assets/student_thu.png',
+    public_url: studentThu,
+    mime_type: 'image/png',
+    file_size: 664206,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_student_thu_025',
+    status: 'active',
+    default_alt_vi: 'Học viên Minh Thư - Giải Nhất Tiếng Anh Huyện',
+    default_alt_en: 'Student Minh Thu - 1st Prize District Competition',
+    folder_id: 'folder_students',
+    created_at: '2026-08-03T10:00:00Z',
+    updated_at: '2026-08-03T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_student_vy',
+    original_filename: 'student_vy.png',
+    storage_path: 'assets/student_vy.png',
+    public_url: studentVy,
+    mime_type: 'image/png',
+    file_size: 627185,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_student_vy_026',
+    status: 'active',
+    default_alt_vi: 'Học viên Khánh Vy - Đạt 15/15 Khiên Movers',
+    default_alt_en: 'Student Khanh Vy - 15 Shields Movers',
+    folder_id: 'folder_students',
+    created_at: '2026-08-03T10:00:00Z',
+    updated_at: '2026-08-03T10:00:00Z',
+    usage_count: 1,
+  },
+
+  // 5. Phụ Huynh & Đánh Giá
+  {
+    id: 'asset_parent_1',
+    original_filename: 'parent_1.png',
+    storage_path: 'assets/parent_1.png',
+    public_url: parent1,
+    mime_type: 'image/png',
+    file_size: 775108,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_parent_1_027',
+    status: 'active',
+    default_alt_vi: 'Phụ huynh Chị Thu Trang - Cảm nhận chất lượng đào tạo',
+    default_alt_en: 'Parent Thu Trang testimonial',
+    folder_id: 'folder_parents',
+    created_at: '2026-08-04T10:00:00Z',
+    updated_at: '2026-08-04T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_parent_2',
+    original_filename: 'parent_2.png',
+    storage_path: 'assets/parent_2.png',
+    public_url: parent2,
+    mime_type: 'image/png',
+    file_size: 788185,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_parent_2_028',
+    status: 'active',
+    default_alt_vi: 'Phụ huynh Anh Đức Trí - Đánh giá khóa học iCANCAM',
+    default_alt_en: 'Parent Duc Tri testimonial',
+    folder_id: 'folder_parents',
+    created_at: '2026-08-04T10:00:00Z',
+    updated_at: '2026-08-04T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_parent_3',
+    original_filename: 'parent_3.png',
+    storage_path: 'assets/parent_3.png',
+    public_url: parent3,
+    mime_type: 'image/png',
+    file_size: 779162,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_parent_3_029',
+    status: 'active',
+    default_alt_vi: 'Phụ huynh Chị Hải Yến - Phản hồi về phương pháp 4Ls',
+    default_alt_en: 'Parent Hai Yen testimonial',
+    folder_id: 'folder_parents',
+    created_at: '2026-08-04T10:00:00Z',
+    updated_at: '2026-08-04T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_parent_4',
+    original_filename: 'parent_4.png',
+    storage_path: 'assets/parent_4.png',
+    public_url: parent4,
+    mime_type: 'image/png',
+    file_size: 768143,
+    width: 800,
+    height: 800,
+    content_hash: 'hash_parent_4_030',
+    status: 'active',
+    default_alt_vi: 'Phụ huynh Anh Quốc Việt - Đồng hành cùng con',
+    default_alt_en: 'Parent Quoc Viet testimonial',
+    folder_id: 'folder_parents',
+    created_at: '2026-08-04T10:00:00Z',
+    updated_at: '2026-08-04T10:00:00Z',
+    usage_count: 1,
+  },
+
+  // 6. Thành Tích & Trường Học
+  {
+    id: 'asset_achievement_school',
+    original_filename: 'achievement_school.png',
+    storage_path: 'assets/achievement_school.png',
+    public_url: achievementSchool,
+    mime_type: 'image/png',
+    file_size: 1040825,
+    width: 1200,
+    height: 800,
+    content_hash: 'hash_achievement_school_031',
+    status: 'active',
+    default_alt_vi: 'Khuôn viên trung tâm ngoại ngữ iCANCAM',
+    default_alt_en: 'iCANCAM Language Center campus',
+    folder_id: 'folder_achievements',
+    created_at: '2026-08-05T10:00:00Z',
+    updated_at: '2026-08-05T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_achievement_smartboard',
+    original_filename: 'achievement_smartboard.png',
+    storage_path: 'assets/achievement_smartboard.png',
+    public_url: achievementSmartboard,
+    mime_type: 'image/png',
+    file_size: 830717,
+    width: 1200,
+    height: 800,
+    content_hash: 'hash_achievement_smartboard_032',
+    status: 'active',
+    default_alt_vi: 'Bảng tương tác thông minh Smartboard',
+    default_alt_en: 'Interactive Smartboard technology',
+    folder_id: 'folder_achievements',
+    created_at: '2026-08-05T10:00:00Z',
+    updated_at: '2026-08-05T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_achievement_teacher',
+    original_filename: 'achievement_teacher.png',
+    storage_path: 'assets/achievement_teacher.png',
+    public_url: achievementTeacher,
+    mime_type: 'image/png',
+    file_size: 735754,
+    width: 1200,
+    height: 800,
+    content_hash: 'hash_achievement_teacher_033',
+    status: 'active',
+    default_alt_vi: 'Đội ngũ giảng viên xuất sắc nhận bằng khen',
+    default_alt_en: 'Outstanding teaching staff awards',
+    folder_id: 'folder_achievements',
+    created_at: '2026-08-05T10:00:00Z',
+    updated_at: '2026-08-05T10:00:00Z',
+    usage_count: 1,
+  },
+
+  // 7. Bài Viết Tin Tức
+  {
+    id: 'asset_news_arena',
+    original_filename: 'news_arena.png',
+    storage_path: 'assets/news_arena.png',
+    public_url: newsArena,
+    mime_type: 'image/png',
+    file_size: 940736,
     width: 1200,
     height: 675,
-    content_hash: 'hash_news_arena_003',
+    content_hash: 'hash_news_arena_034',
     status: 'active',
     default_alt_vi: 'Cuộc thi Rung Chuông Vàng Tiếng Anh 2026',
     default_alt_en: 'English Arena Competition 2026',
-    default_caption: 'Học sinh iCANCAM tự tin tranh tài',
-    focal_x: 0.5,
-    focal_y: 0.5,
-    tags: ['news', 'events', 'students'],
     folder_id: 'folder_news',
-    created_at: '2026-08-05T09:30:00Z',
-    updated_at: '2026-08-05T09:30:00Z',
+    created_at: '2026-08-05T10:00:00Z',
+    updated_at: '2026-08-05T10:00:00Z',
     usage_count: 1,
   },
   {
-    id: 'asset_pdf_brochure',
-    original_filename: 'iCANCAM_Curriculum_2026.pdf',
-    storage_path: 'uploads/2026/08/iCANCAM_Curriculum_2026.pdf',
-    public_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
-    mime_type: 'application/pdf',
-    file_size: 2450000,
-    width: 0,
-    height: 0,
-    content_hash: 'hash_pdf_curriculum_004',
+    id: 'asset_news_limit',
+    original_filename: 'news_limit.png',
+    storage_path: 'assets/news_limit.png',
+    public_url: newsLimit,
+    mime_type: 'image/png',
+    file_size: 765196,
+    width: 1200,
+    height: 675,
+    content_hash: 'hash_news_limit_035',
     status: 'active',
-    default_alt_vi: 'Tài liệu Chương trình Học iCANCAM 2026',
-    default_alt_en: 'iCANCAM Curriculum Brochure 2026',
-    default_caption: 'Bản mềm PDF tổng quan lộ trình 4Ls + LETI',
-    tags: ['courses', 'brochure'],
-    folder_id: null,
-    created_at: '2026-08-06T14:00:00Z',
-    updated_at: '2026-08-06T14:00:00Z',
+    default_alt_vi: 'Bí quyết bứt phá giới hạn điểm số Tiếng Anh',
+    default_alt_en: 'Unlocking English score limits',
+    folder_id: 'folder_news',
+    created_at: '2026-08-05T10:00:00Z',
+    updated_at: '2026-08-05T10:00:00Z',
+    usage_count: 1,
+  },
+  {
+    id: 'asset_news_parenting',
+    original_filename: 'news_parenting.png',
+    storage_path: 'assets/news_parenting.png',
+    public_url: newsParenting,
+    mime_type: 'image/png',
+    file_size: 711067,
+    width: 1200,
+    height: 675,
+    content_hash: 'hash_news_parenting_036',
+    status: 'active',
+    default_alt_vi: 'Phương pháp đồng hành cùng con học ngoại ngữ',
+    default_alt_en: 'Parenting guide for English learning',
+    folder_id: 'folder_news',
+    created_at: '2026-08-05T10:00:00Z',
+    updated_at: '2026-08-05T10:00:00Z',
     usage_count: 1,
   },
 ];
@@ -606,7 +1344,7 @@ const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
 const DEFAULT_INITIAL_USAGES: MediaUsage[] = [
   {
     id: 'usage_1',
-    media_id: 'asset_hero_banner',
+    media_id: 'asset_banner_bg',
     entity_type: 'homepage',
     entity_id: 'home_hero',
     entity_title: 'Trang Chủ - Banner Chính',
@@ -615,12 +1353,12 @@ const DEFAULT_INITIAL_USAGES: MediaUsage[] = [
   },
   {
     id: 'usage_2',
-    media_id: 'asset_hero_banner',
-    entity_type: 'news',
-    entity_id: 'post_1',
-    entity_title: 'Tin Tức: Khám phá Mô hình 4Ls',
-    created_at: '2026-08-02T10:00:00Z',
-    updated_at: '2026-08-02T10:00:00Z',
+    media_id: 'asset_ican_logo',
+    entity_type: 'homepage',
+    entity_id: 'header_logo',
+    entity_title: 'Header - Logo Thương Hiệu',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
   },
   {
     id: 'usage_3',
@@ -633,20 +1371,11 @@ const DEFAULT_INITIAL_USAGES: MediaUsage[] = [
   },
   {
     id: 'usage_4',
-    media_id: 'asset_news_competition',
+    media_id: 'asset_news_arena',
     entity_type: 'news',
     entity_id: 'post_arena',
     entity_title: 'Tin Tức: Rung Chuông Vàng 2026',
     created_at: '2026-08-05T09:30:00Z',
     updated_at: '2026-08-05T09:30:00Z',
-  },
-  {
-    id: 'usage_5',
-    media_id: 'asset_pdf_brochure',
-    entity_type: 'courses',
-    entity_id: 'course_overview',
-    entity_title: 'Chương Trình Học - Tải Brochure',
-    created_at: '2026-08-06T14:00:00Z',
-    updated_at: '2026-08-06T14:00:00Z',
   },
 ];
