@@ -619,10 +619,10 @@ export const AdminMediaLibrary: React.FC = () => {
           >
             <Upload size={36} color="#F58220" />
             <div style={{ fontSize: '1.05rem', fontWeight: 700, marginTop: '0.5rem' }}>
-              Kéo & Thả các tệp (Ảnh, Audio, Video, PDF) vào đây để tải trực tiếp vào "{currentFolder.name}"
+              Kéo & thả tệp tại đây (jpg, mp4, mp3,...)
             </div>
             <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-              Tối đa 10MB/tệp • Tự động mã hóa SHA-256 chống trùng lặp
+              Tối đa 10MB/tệp
             </div>
           </div>
 
