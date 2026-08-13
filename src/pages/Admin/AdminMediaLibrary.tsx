@@ -383,7 +383,7 @@ export const AdminMediaLibrary: React.FC = () => {
               {/* TOP LEFT BUTTON & SEARCH */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
                 <button type="button" onClick={handleOpenCreateFolderModal} className={styles.createFolderBtn}>
-                  <FolderPlus size={18} /> + Thư Mục Mới
+                  <FolderPlus size={18} /> Thư Mục Mới
                 </button>
 
                 <div className={styles.searchBox} style={{ maxWidth: '260px' }}>
