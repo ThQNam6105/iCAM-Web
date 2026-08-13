@@ -1,14 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Eye,
   Save,
   RefreshCw,
   History,
-  Sliders,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Move,
   X,
   FolderTree,
 } from 'lucide-react';
@@ -37,6 +32,7 @@ interface PostEditModalProps {
 import { RichTextEditor } from './RichTextEditor';
 import { SeoPanel } from './SeoPanel';
 import { RevisionHistoryModal } from './RevisionHistoryModal';
+import { ImageEditorCore } from './ImageEditorCore';
 import { createPostRevision, getPostRevisions, type PostRevision } from '../../services/revisionService';
 
 export const PostEditModal: React.FC<PostEditModalProps> = ({
@@ -79,65 +75,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [imageZoom, setImageZoom] = useState<number>(postToEdit?.imageZoom ?? 100);
   const [panX, setPanX] = useState<number>(postToEdit?.panX ?? 50);
   const [panY, setPanY] = useState<number>(postToEdit?.panY ?? 50);
-
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef<{ x: number; y: number; startPanX: number; startPanY: number }>({
-    x: 0,
-    y: 0,
-    startPanX: 50,
-    startPanY: 50,
-  });
-  const previewBoxRef = useRef<HTMLDivElement>(null);
-
-  const handleDragStart = (clientX: number, clientY: number) => {
-    setIsDragging(true);
-    dragStartRef.current = {
-      x: clientX,
-      y: clientY,
-      startPanX: panX,
-      startPanY: panY,
-    };
-  };
-
-  const handleDragMove = (clientX: number, clientY: number) => {
-    if (!isDragging || !previewBoxRef.current) return;
-    const rect = previewBoxRef.current.getBoundingClientRect();
-    const deltaX = clientX - dragStartRef.current.x;
-    const deltaY = clientY - dragStartRef.current.y;
-
-    const sensitivity = (imageZoom / 100) * 0.8;
-    const newPanX = Math.min(100, Math.max(0, dragStartRef.current.startPanX - (deltaX / rect.width) * 100 * sensitivity));
-    const newPanY = Math.min(100, Math.max(0, dragStartRef.current.startPanY - (deltaY / rect.height) * 100 * sensitivity));
-
-    setPanX(Math.round(newPanX));
-    setPanY(Math.round(newPanY));
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    const onGlobalMouseMove = (e: MouseEvent) => handleDragMove(e.clientX, e.clientY);
-    const onGlobalMouseUp = () => handleDragEnd();
-    const onGlobalTouchMove = (e: TouchEvent) => {
-      if (e.touches[0]) handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
-    };
-    const onGlobalTouchEnd = () => handleDragEnd();
-
-    if (isDragging) {
-      window.addEventListener('mousemove', onGlobalMouseMove);
-      window.addEventListener('mouseup', onGlobalMouseUp);
-      window.addEventListener('touchmove', onGlobalTouchMove);
-      window.addEventListener('touchend', onGlobalTouchEnd);
-    }
-    return () => {
-      window.removeEventListener('mousemove', onGlobalMouseMove);
-      window.removeEventListener('mouseup', onGlobalMouseUp);
-      window.removeEventListener('touchmove', onGlobalTouchMove);
-      window.removeEventListener('touchend', onGlobalTouchEnd);
-    };
-  }, [isDragging]);
   const [excerpt, setExcerpt] = useState(postToEdit?.excerpt || '');
   const [excerptEn, setExcerptEn] = useState(postToEdit?.excerptEn || '');
   const [content, setContent] = useState(postToEdit?.content || '');
@@ -389,83 +326,20 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               {errors.image && <span className={styles.errorText}>{errors.image}</span>}
 
               {image && (
-                <div className={styles.coverControlPanel}>
-                  <div className={styles.coverControlTitle}>
-                    <Sliders size={15} color="#F58220" /> Căn chỉnh vị trí & phóng to/thu nhỏ ảnh bìa (Cover Image Cropper)
-                  </div>
-
-                  {/* Interactive Drag & Zoom 16:9 Canvas */}
-                  <div
-                    ref={previewBoxRef}
-                    onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
-                    onTouchStart={(e) => e.touches[0] && handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
-                    onWheel={(e) => {
-                      e.preventDefault();
-                      setImageZoom((prev) => Math.min(300, Math.max(100, prev + (e.deltaY < 0 ? 10 : -10))));
+                <div style={{ marginTop: '0.75rem', background: '#0f172a', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <ImageEditorCore
+                    mode="quick"
+                    imageSrc={image}
+                    initialPanX={panX}
+                    initialPanY={panY}
+                    initialZoom={imageZoom}
+                    filename="cover.jpg"
+                    onQuickChange={(s) => {
+                      setPanX(s.panX);
+                      setPanY(s.panY);
+                      setImageZoom(s.zoom);
                     }}
-                    className={`${styles.coverPreviewWrapper} ${isDragging ? styles.coverPreviewWrapperIsDragging : ''}`}
-                    title="Nhấn giữ & kéo chuột để di chuyển ảnh (lăn chuột để zoom)"
-                  >
-                    <img
-                      src={image}
-                      alt="Preview Cover"
-                      className={styles.coverPreviewImg}
-                      style={{
-                        objectFit: 'cover',
-                        objectPosition: `${panX}% ${panY}%`,
-                        transform: `scale(${imageZoom / 100})`,
-                        transformOrigin: `${panX}% ${panY}%`,
-                      }}
-                    />
-                    <div className={styles.dragHelpBadge}>
-                      <Move size={13} /> Nhấn giữ & kéo chuột di chuyển | Zoom: {imageZoom}%
-                    </div>
-                  </div>
-
-                  {/* Zoom Slider Controls */}
-                  <div className={styles.zoomControlRow}>
-                    <span className={styles.zoomLabel}>
-                      <ZoomIn size={14} /> Phóng to / thu nhỏ:
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setImageZoom((z) => Math.max(100, z - 10))}
-                      className={styles.alignBtn}
-                      title="Thu nhỏ 10%"
-                    >
-                      <ZoomOut size={13} />
-                    </button>
-                    <input
-                      type="range"
-                      min="100"
-                      max="300"
-                      step="5"
-                      value={imageZoom}
-                      onChange={(e) => setImageZoom(Number(e.target.value))}
-                      className={styles.zoomSlider}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setImageZoom((z) => Math.min(300, z + 10))}
-                      className={styles.alignBtn}
-                      title="Phóng to 10%"
-                    >
-                      <ZoomIn size={13} />
-                    </button>
-                    <span className={styles.zoomValue}>{imageZoom}%</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setImageZoom(100);
-                        setPanX(50);
-                        setPanY(50);
-                      }}
-                      className={styles.alignBtn}
-                      title="Đặt lại mặc định"
-                    >
-                      <RotateCcw size={13} /> Đặt lại
-                    </button>
-                  </div>
+                  />
                 </div>
               )}
             </div>
