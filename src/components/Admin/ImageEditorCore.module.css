@@ -285,6 +285,7 @@
   font-weight: 600;
   color: #94a3b8;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Aspect Ratio Pills */
@@ -322,13 +323,15 @@
 .sliderRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 200px;
+  gap: 0.6rem;
+  flex: 1 1 230px;
+  min-width: 230px;
+  white-space: nowrap;
 }
 
 .sliderInput {
   flex: 1;
+  min-width: 60px;
   height: 6px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.2);
@@ -341,8 +344,9 @@
   font-size: 0.8rem;
   font-weight: 700;
   color: #F58220;
-  min-width: 42px;
+  min-width: 44px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 /* Filters Cards Grid */
