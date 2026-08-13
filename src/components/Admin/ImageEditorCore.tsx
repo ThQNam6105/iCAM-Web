@@ -140,6 +140,8 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
     focalY: initialFocalY,
   }));
 
+  const [naturalSize, setNaturalSize] = useState<{ w: number; h: number }>({ w: 16, h: 9 });
+
   const [history, setHistory] = useState<ImageEditorState[]>([
     {
       ...DEFAULT_STATE,
@@ -177,6 +179,25 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
 
   // Context Preview Tab in Quick Editor Mode
   const [contextFrame, setContextFrame] = useState<'banner' | 'card' | 'thumb' | 'mobile'>('banner');
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth && img.naturalHeight) {
+      setNaturalSize({ w: img.naturalWidth, h: img.naturalHeight });
+    }
+  };
+
+  const getViewportStyle = (): React.CSSProperties => {
+    if (state.aspectRatio === '16:9') return { aspectRatio: '16 / 9', height: '100%', maxWidth: '100%' };
+    if (state.aspectRatio === '4:3') return { aspectRatio: '4 / 3', height: '100%', maxWidth: '100%' };
+    if (state.aspectRatio === '3:2') return { aspectRatio: '3 / 2', height: '100%', maxWidth: '100%' };
+    if (state.aspectRatio === '1:1') return { aspectRatio: '1 / 1', height: '100%', maxWidth: '100%' };
+    if (state.aspectRatio === '9:16') return { aspectRatio: '9 / 16', height: '100%', maxWidth: '100%' };
+    if (state.aspectRatio === 'original' && naturalSize.w && naturalSize.h) {
+      return { aspectRatio: `${naturalSize.w} / ${naturalSize.h}`, height: '100%', maxWidth: '100%' };
+    }
+    return { width: '100%', height: '100%' };
+  };
 
   // Push new state into history stack
   const updateState = useCallback(
@@ -278,7 +299,6 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
   const handleDragEnd = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
-      // Record finalized pan in history
       setHistory((prevHist) => {
         const newHist = prevHist.slice(0, historyIndex + 1);
         return [...newHist, state];
@@ -337,33 +357,33 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      let targetAspect = naturalSize.w / naturalSize.h;
+      if (state.aspectRatio === '16:9') targetAspect = 16 / 9;
+      else if (state.aspectRatio === '4:3') targetAspect = 4 / 3;
+      else if (state.aspectRatio === '3:2') targetAspect = 3 / 2;
+      else if (state.aspectRatio === '1:1') targetAspect = 1 / 1;
+      else if (state.aspectRatio === '9:16') targetAspect = 9 / 16;
+      else if (state.aspectRatio === 'original') targetAspect = naturalSize.w / naturalSize.h;
 
       let targetW = img.naturalWidth;
-      let targetH = img.naturalHeight;
-
-      if (state.aspectRatio === '16:9') targetH = Math.round(targetW * (9 / 16));
-      else if (state.aspectRatio === '4:3') targetH = Math.round(targetW * (3 / 4));
-      else if (state.aspectRatio === '3:2') targetH = Math.round(targetW * (2 / 3));
-      else if (state.aspectRatio === '1:1') targetH = targetW;
-      else if (state.aspectRatio === '9:16') targetH = Math.round(targetW * (16 / 9));
+      let targetH = Math.round(targetW / targetAspect);
 
       if (state.resizeWidth && state.resizeHeight) {
         targetW = state.resizeWidth;
         targetH = state.resizeHeight;
       }
 
+      const canvas = document.createElement('canvas');
       canvas.width = targetW;
       canvas.height = targetH;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
       ctx.save();
       ctx.filter = getCssFilter();
 
-      // Position & crop region
       const naturalAspect = img.naturalWidth / img.naturalHeight;
-      const targetAspect = targetW / targetH;
       let srcW = img.naturalWidth;
       let srcH = img.naturalHeight;
 
@@ -377,13 +397,12 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
       srcW = Math.round(srcW / zoomFactor);
       srcH = Math.round(srcH / zoomFactor);
 
-      const maxSrcX = img.naturalWidth - srcW;
-      const maxSrcY = img.naturalHeight - srcH;
+      const maxSrcX = Math.max(0, img.naturalWidth - srcW);
+      const maxSrcY = Math.max(0, img.naturalHeight - srcH);
 
       const srcX = Math.max(0, Math.min(maxSrcX, Math.round(maxSrcX * (state.panX / 100))));
       const srcY = Math.max(0, Math.min(maxSrcY, Math.round(maxSrcY * (state.panY / 100))));
 
-      // Apply Center Rotations / Flips on canvas
       ctx.translate(canvas.width / 2, canvas.height / 2);
       const totalRad = ((state.rotation + state.straighten) * Math.PI) / 180;
       ctx.rotate(totalRad);
@@ -514,56 +533,80 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
         </div>
       )}
 
-      {/* Main Preview Canvas Area */}
-      <div
-        ref={previewBoxRef}
-        onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
-        onTouchStart={(e) => e.touches[0] && handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
-        onWheel={(e) => {
-          e.preventDefault();
-          updateState((prev) => ({
-            ...prev,
-            zoom: Math.min(300, Math.max(100, prev.zoom + (e.deltaY < 0 ? 10 : -10))),
-          }));
-        }}
-        className={`${styles.canvasWrapper} ${isDragging ? styles.canvasWrapperDragging : ''} ${
-          mode === 'quick' && contextFrame === 'card'
-            ? styles.contextCardFrame
-            : mode === 'quick' && contextFrame === 'thumb'
-            ? styles.contextThumbFrame
-            : mode === 'quick' && contextFrame === 'mobile'
-            ? styles.contextMobileFrame
-            : ''
-        }`}
-        title="Nhấn giữ & kéo chuột để di chuyển ảnh (Lăn chuột để Zoom)"
-      >
-        {isShowingBefore && <div className={styles.beforeAfterBadge}>Ảnh gốc</div>}
-
-        <img
-          src={imageSrc}
-          alt="Preview Canvas"
-          className={styles.previewImg}
-          style={{
-            objectFit: state.aspectRatio === 'free' ? 'contain' : 'cover',
-            objectPosition: `${state.panX}% ${state.panY}%`,
-            transform: getCssTransform(),
-            transformOrigin: `${state.panX}% ${state.panY}%`,
-            filter: getCssFilter(),
-          }}
-        />
-
-        {/* Interactive Focal Point Overlay Marker */}
+      {/* Outer Checkerboard Viewport Area */}
+      <div className={styles.canvasViewportArea}>
+        {/* Dynamic Crop Viewport Frame */}
         <div
-          className={styles.focalMarker}
-          style={{ left: `${state.focalX * 100}%`, top: `${state.focalY * 100}%` }}
-          title={`Tâm điểm focal point: ${Math.round(state.focalX * 100)}%, ${Math.round(state.focalY * 100)}%`}
+          ref={previewBoxRef}
+          style={getViewportStyle()}
+          onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
+          onTouchStart={(e) => e.touches[0] && handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
+          onWheel={(e) => {
+            e.preventDefault();
+            updateState((prev) => ({
+              ...prev,
+              zoom: Math.min(300, Math.max(100, prev.zoom + (e.deltaY < 0 ? 10 : -10))),
+            }));
+          }}
+          className={`${styles.cropViewport} ${isDragging ? styles.cropViewportDragging : ''} ${
+            mode === 'quick' && contextFrame === 'card'
+              ? styles.contextCardFrame
+              : mode === 'quick' && contextFrame === 'thumb'
+              ? styles.contextThumbFrame
+              : mode === 'quick' && contextFrame === 'mobile'
+              ? styles.contextMobileFrame
+              : ''
+          }`}
+          title="Nhấn giữ & kéo chuột để di chuyển ảnh (Lăn chuột để Zoom)"
         >
-          <div className={styles.focalDot} />
-        </div>
+          {isShowingBefore && <div className={styles.beforeAfterBadge}>Ảnh gốc</div>}
 
-        {/* Canvas Control Hints Badge */}
-        <div className={styles.badgeOverlay}>
-          <Move size={13} /> {state.focalMode ? 'Bấm vị trí bất kỳ trên ảnh để đặt tâm điểm' : 'Kéo chuột di chuyển'} | Zoom: {state.zoom}%
+          {/* Rule of Thirds Crop Grid Overlay Lines */}
+          <div className={styles.cropGridOverlay}>
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+            <div className={styles.cropGridCell} />
+          </div>
+
+          {/* Corner Handles */}
+          <div className={styles.cropCornerTL} />
+          <div className={styles.cropCornerTR} />
+          <div className={styles.cropCornerBL} />
+          <div className={styles.cropCornerBR} />
+
+          <img
+            src={imageSrc}
+            alt="Preview Canvas"
+            onLoad={handleImageLoad}
+            className={styles.previewImg}
+            style={{
+              objectFit: 'cover',
+              objectPosition: `${state.panX}% ${state.panY}%`,
+              transform: getCssTransform(),
+              transformOrigin: `${state.panX}% ${state.panY}%`,
+              filter: getCssFilter(),
+            }}
+          />
+
+          {/* Interactive Focal Point Overlay Marker */}
+          <div
+            className={styles.focalMarker}
+            style={{ left: `${state.focalX * 100}%`, top: `${state.focalY * 100}%` }}
+            title={`Tâm điểm focal point: ${Math.round(state.focalX * 100)}%, ${Math.round(state.focalY * 100)}%`}
+          >
+            <div className={styles.focalDot} />
+          </div>
+
+          {/* Canvas Control Hints Badge */}
+          <div className={styles.badgeOverlay}>
+            <Move size={13} /> {state.focalMode ? 'Bấm vị trí bất kỳ để đặt tâm điểm' : 'Kéo chuột di chuyển'} | Zoom: {state.zoom}%
+          </div>
         </div>
       </div>
 
