@@ -21,6 +21,7 @@ import {
 import { JobEditModal } from '../../components/Admin/JobEditModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
+import { Button, Select } from '../../components/Admin/UI';
 import styles from './AdminCareers.module.css';
 
 export const AdminCareers: React.FC = () => {
@@ -99,16 +100,17 @@ export const AdminCareers: React.FC = () => {
           </p>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="md"
+          icon={<Plus size={18} />}
           onClick={() => {
             setEditingJob(null);
             setIsEditModalOpen(true);
           }}
-          className={styles.createBtn}
         >
-          <Plus size={18} /> + Thêm vị trí mới
-        </button>
+          Thêm vị trí mới
+        </Button>
       </div>
 
       {/* Stat Cards */}
@@ -159,28 +161,30 @@ export const AdminCareers: React.FC = () => {
           />
         </div>
 
-        <select
+        <Select
+          options={[
+            { value: 'all', label: 'Tất cả phòng ban' },
+            { value: 'Khối Đào Tạo', label: 'Khối đào tạo' },
+            { value: 'Khối Tư Vấn & Tuyển Sinh', label: 'Khối tư vấn & tuyển sinh' },
+            { value: 'Khối Marketing', label: 'Khối Marketing' },
+            { value: 'Khối Hành Chính & Nhân Sự', label: 'Khối hành chính & nhân sự' },
+          ]}
           value={selectedDepartment}
-          onChange={(e) => setSelectedDepartment(e.target.value)}
-          className={styles.selectFilter}
-        >
-          <option value="all">Tất cả phòng ban</option>
-          <option value="Khối Đào Tạo">Khối đào tạo</option>
-          <option value="Khối Tư Vấn & Tuyển Sinh">Khối tư vấn & tuyển sinh</option>
-          <option value="Khối Marketing">Khối Marketing</option>
-          <option value="Khối Hành Chính & Nhân Sự">Khối hành chính & nhân sự</option>
-        </select>
+          onChange={setSelectedDepartment}
+          triggerStyle={{ minWidth: '200px' }}
+        />
 
-        <select
+        <Select
+          options={[
+            { value: 'all', label: 'Tất cả trạng thái' },
+            { value: 'open', label: 'Đang tuyển' },
+            { value: 'closed', label: 'Đã đóng' },
+            { value: 'draft', label: 'Bản nháp' },
+          ]}
           value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value as JobStatus | 'all')}
-          className={styles.selectFilter}
-        >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="open">Đang tuyển</option>
-          <option value="closed">Đã đóng</option>
-          <option value="draft">Bản nháp</option>
-        </select>
+          onChange={(val) => setSelectedStatus(val as JobStatus | 'all')}
+          triggerStyle={{ minWidth: '170px' }}
+        />
       </div>
 
       {/* Job Table */}

@@ -26,6 +26,7 @@ import { PostEditModal } from '../../components/Admin/PostEditModal';
 import { PostPreviewModal } from '../../components/Admin/PostPreviewModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
+import { Button, Select, type SelectOption } from '../../components/Admin/UI';
 import styles from './AdminDashboard.module.css';
 
 export const AdminDashboard: React.FC = () => {
@@ -72,6 +73,37 @@ export const AdminDashboard: React.FC = () => {
     });
   }, [searchQuery, selectedCategory, selectedStatus, sortBy, refreshKey]);
 
+  // Options for UI Selects
+  const categoryOptions = useMemo<SelectOption[]>(() => {
+    const cats = getCategories();
+    return [
+      { value: 'all', label: 'Tất cả danh mục' },
+      ...cats.map((cat) => ({
+        value: cat.id || cat.slug,
+        label: cat.nameVi,
+      })),
+    ];
+  }, [refreshKey]);
+
+  const statusOptions: SelectOption[] = useMemo(
+    () => [
+      { value: 'all', label: 'Tất cả trạng thái' },
+      { value: 'published', label: 'Đã xuất bản' },
+      { value: 'draft', label: 'Bản nháp' },
+      { value: 'archived', label: 'Lưu trữ' },
+    ],
+    []
+  );
+
+  const sortOptions: SelectOption[] = useMemo(
+    () => [
+      { value: 'newest', label: 'Mới nhất trước' },
+      { value: 'oldest', label: 'Cũ nhất trước' },
+      { value: 'alphabetical', label: 'Xếp theo A-Z' },
+    ],
+    []
+  );
+
   // Statistics calculation
   const stats = useMemo(() => {
     const total = allRawPosts.length;
@@ -98,38 +130,41 @@ export const AdminDashboard: React.FC = () => {
     if (deleteCandidateId) {
       deleteNewsPost(deleteCandidateId);
       showToast('Đã xóa bài viết thành công!', 'info');
-      setDeleteCandidateId(null);
       loadPosts();
     }
+    setDeleteCandidateId(null);
   };
 
   return (
     <div className={styles.container}>
-      {/* Page Header */}
+      {/* Top Header Row */}
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Quản lý bài viết & tin tức</h1>
-          <p className={styles.pageSubtitle}>Quản lý, chỉnh sửa, xem trước và xuất bản tin tức iCANCAM</p>
+          <h1 className={styles.pageTitle}>Quản lý bài viết tin tức</h1>
+          <p className={styles.pageSubtitle}>
+            Tổng quan nội dung tin tức, bài viết hoạt động trung tâm iCANCAM
+          </p>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="md"
+          icon={<Plus size={18} />}
           onClick={() => {
             setEditingPost(null);
             setIsEditModalOpen(true);
           }}
-          className={styles.createBtn}
         >
-          <Plus size={18} /> Thêm bài viết mới
-        </button>
+          Tạo bài viết mới
+        </Button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Summary KPI Cards Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div>
             <div className={styles.statValue}>{stats.total}</div>
-            <div className={styles.statLabel}>Tổng bài viết</div>
+            <div className={styles.statLabel}>Tổng số bài viết</div>
           </div>
           <div className={styles.statIcon}>
             <FileText size={24} />
@@ -181,39 +216,26 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <div className={styles.filterControls}>
-          <select
+          <Select
+            options={categoryOptions}
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className={styles.selectFilter}
-          >
-            <option value="all">Tất cả danh mục</option>
-            {getCategories().map((cat) => (
-              <option key={cat.id} value={cat.id || cat.slug}>
-                {cat.nameVi}
-              </option>
-            ))}
-          </select>
+            onChange={setSelectedCategory}
+            triggerStyle={{ minWidth: '180px' }}
+          />
 
-          <select
+          <Select
+            options={statusOptions}
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value as PostStatus | 'all')}
-            className={styles.selectFilter}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="published">Đã xuất bản</option>
-            <option value="draft">Bản nháp</option>
-            <option value="archived">Lưu trữ</option>
-          </select>
+            onChange={(val) => setSelectedStatus(val as PostStatus | 'all')}
+            triggerStyle={{ minWidth: '170px' }}
+          />
 
-          <select
+          <Select
+            options={sortOptions}
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
-            className={styles.selectFilter}
-          >
-            <option value="newest">Mới nhất trước</option>
-            <option value="oldest">Cũ nhất trước</option>
-            <option value="alphabetical">Xếp theo A-Z</option>
-          </select>
+            onChange={(val) => setSortBy(val as 'newest' | 'oldest' | 'alphabetical')}
+            triggerStyle={{ minWidth: '170px' }}
+          />
         </div>
       </div>
 
@@ -228,16 +250,17 @@ export const AdminDashboard: React.FC = () => {
             <p className={styles.emptyDesc}>
               Không có bài viết nào phù hợp với bộ lọc hiện tại. Vui lòng thử tìm kiếm từ khóa khác hoặc tạo bài viết mới.
             </p>
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size="md"
+              icon={<Plus size={18} />}
               onClick={() => {
                 setEditingPost(null);
                 setIsEditModalOpen(true);
               }}
-              className={styles.createBtn}
             >
-              <Plus size={18} /> Tạo bài viết đầu tiên
-            </button>
+              Tạo bài viết đầu tiên
+            </Button>
           </div>
         ) : (
           <table className={styles.postsTable}>
@@ -248,17 +271,21 @@ export const AdminDashboard: React.FC = () => {
                 <th>Danh mục</th>
                 <th>Trạng thái</th>
                 <th>Ngày cập nhật</th>
-                <th>Thao tác</th>
+                <th style={{ textAlign: 'right' }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {posts.map((post) => (
                 <tr key={post.id}>
                   <td>
-                    <img src={post.image} alt={post.title} className={styles.postThumb} />
+                    <img
+                      src={post.image || 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d'}
+                      alt={post.title}
+                      className={styles.postThumb}
+                    />
                   </td>
                   <td>
-                    <div style={{ fontWeight: 700 }}>{post.title}</div>
+                    <div style={{ fontWeight: 700, color: '#ffffff' }}>{post.title}</div>
                     <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>/{post.slug}</div>
                   </td>
                   <td>
@@ -300,38 +327,39 @@ export const AdminDashboard: React.FC = () => {
                     {new Date(post.updatedAt || post.createdAt).toLocaleDateString('vi-VN')}
                   </td>
                   <td>
-                    <div className={styles.actionsCell}>
-                      <button
-                        type="button"
+                    <div className={styles.actionsCell} style={{ justifyContent: 'flex-end' }}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        icon={<Eye size={15} />}
                         onClick={() => {
                           setPreviewPostData(post);
                           setIsPreviewOpen(true);
                         }}
-                        className={styles.actionBtn}
                         title="Xem trước"
-                      >
-                        <Eye size={15} />
-                      </button>
+                      />
 
-                      <button
-                        type="button"
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        icon={<Edit2 size={15} />}
                         onClick={() => {
                           setEditingPost(post);
                           setIsEditModalOpen(true);
                         }}
-                        className={styles.actionBtn}
                         title="Chỉnh sửa"
                       >
-                        <Edit2 size={15} /> Sửa
-                      </button>
-                      <button
-                        type="button"
+                        Sửa
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        icon={<Trash2 size={15} />}
                         onClick={() => setDeleteCandidateId(post.id)}
-                        className={`${styles.actionBtn} ${styles.actionDelete}`}
                         title="Xóa bài"
                       >
-                        <Trash2 size={15} /> Xóa
-                      </button>
+                        Xóa
+                      </Button>
                     </div>
                   </td>
                 </tr>

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { MediaItem, MediaFolder } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
+import { Button, Select } from './UI';
 import styles from './MediaSelectorModal.module.css';
 
 interface MediaSelectorModalProps {
@@ -197,17 +198,18 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                 />
               </div>
 
-              <select
+              <Select
+                options={[
+                  { value: 'all', label: 'Tất cả định dạng' },
+                  { value: 'image', label: 'Hình ảnh (JPG, PNG, WEBP)' },
+                  { value: 'svg', label: 'Vector SVG' },
+                  { value: 'gif', label: 'Ảnh động GIF' },
+                  { value: 'pdf', label: 'Tài liệu PDF / Word' },
+                ]}
                 value={selectedFileType}
-                onChange={(e) => setSelectedFileType(e.target.value)}
-                className={styles.selectFilter}
-              >
-                <option value="all">Tất cả định dạng</option>
-                <option value="image">Hình ảnh (JPG, PNG, WEBP)</option>
-                <option value="svg">Vector SVG</option>
-                <option value="gif">Ảnh động GIF</option>
-                <option value="pdf">Tài liệu PDF / Word</option>
-              </select>
+                onChange={setSelectedFileType}
+                triggerStyle={{ minWidth: '200px' }}
+              />
             </div>
 
             {/* Assets Grid */}
@@ -261,14 +263,15 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                 Đã chọn: <strong>{selectedAssetIds.length}</strong> tệp
               </span>
 
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="md"
                 disabled={selectedAssetIds.length === 0}
                 onClick={handleConfirmSelection}
-                className={styles.confirmBtn}
+                icon={<Check size={18} />}
               >
-                <Check size={18} /> Sử dụng tệp đã chọn
-              </button>
+                Sử dụng tệp đã chọn
+              </Button>
             </div>
           </>
         )}

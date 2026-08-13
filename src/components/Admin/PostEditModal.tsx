@@ -20,6 +20,7 @@ import { getCategories } from '../../services/categoryService';
 import { PostPreviewModal } from './PostPreviewModal';
 import { MediaSelectorModal } from './MediaSelectorModal';
 import { useToast } from '../Toast/Toast';
+import { Button, Select } from './UI';
 import styles from './PostEditModal.module.css';
 
 interface PostEditModalProps {
@@ -235,23 +236,26 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             <div className={styles.rowTwo}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Trạng thái xuất bản (Status)</label>
-                <select
+                <Select
+                  options={[
+                    { value: 'draft', label: 'Bản nháp (Draft - ẩn trên web)' },
+                    { value: 'published', label: 'Đã xuất bản (Published - hiện trên web)' },
+                    { value: 'archived', label: 'Lưu trữ (Archived)' },
+                  ]}
                   value={status}
-                  onChange={(e) => setStatus(e.target.value as PostStatus)}
-                  className={styles.select}
-                >
-                  <option value="draft">Bản nháp (Draft - ẩn trên web)</option>
-                  <option value="published">Đã xuất bản (Published - hiện trên web)</option>
-                  <option value="archived">Lưu trữ (Archived)</option>
-                </select>
+                  onChange={(val) => setStatus(val as PostStatus)}
+                />
               </div>
 
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Danh mục bài viết</label>
-                <select
+                <Select
+                  options={getCategories().map((cat) => ({
+                    value: cat.id || cat.slug,
+                    label: cat.nameVi,
+                  }))}
                   value={category}
-                  onChange={(e) => {
-                    const val = e.target.value;
+                  onChange={(val) => {
                     setCategory(val);
                     const found = getCategories().find((c) => c.id === val || c.slug === val);
                     if (found) {
@@ -259,17 +263,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       setCategoryLabelEn(found.nameEn);
                     }
                   }}
-                  className={styles.select}
-                >
-                  {getCategories().map((cat) => (
-                    <option key={cat.id} value={cat.id || cat.slug}>
-                      {cat.nameVi}
-                    </option>
-                  ))}
-                  {!getCategories().some((c) => c.id === category || c.slug === category) && (
-                    <option value={category}>{categoryLabel || category.toUpperCase()}</option>
-                  )}
-                </select>
+                />
               </div>
             </div>
 
@@ -416,9 +410,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             />
 
             <div className={styles.modalActions}>
-              <button type="submit" className={styles.saveBtn}>
-                <Save size={16} /> {postToEdit ? 'Lưu thay đổi' : 'Lưu & đăng bài'}
-              </button>
+              <Button type="submit" variant="primary" size="md" icon={<Save size={16} />}>
+                {postToEdit ? 'Lưu thay đổi' : 'Lưu & đăng bài'}
+              </Button>
             </div>
           </form>
         </div>

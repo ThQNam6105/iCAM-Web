@@ -1,5 +1,6 @@
 import React from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Trash2 } from 'lucide-react';
+import { Button } from '../Admin/UI';
 import styles from './ConfirmModal.module.css';
 
 interface ConfirmModalProps {
@@ -16,7 +17,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
   title,
   message,
-  confirmLabel = 'Xác nhận xóa',
+  confirmLabel = 'Xóa vĩnh viễn',
   cancelLabel = 'Hủy bỏ',
   onConfirm,
   onCancel,
@@ -32,12 +33,19 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.message}>{message}</p>
         <div className={styles.actions}>
-          <button type="button" onClick={onCancel} className={styles.cancelBtn}>
+          <Button type="button" variant="secondary" size="md" fullWidth onClick={onCancel}>
             {cancelLabel}
-          </button>
-          <button type="button" onClick={onConfirm} className={styles.confirmBtn}>
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            size="md"
+            fullWidth
+            icon={<Trash2 size={16} />}
+            onClick={onConfirm}
+          >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

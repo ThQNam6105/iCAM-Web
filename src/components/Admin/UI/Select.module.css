@@ -1,0 +1,140 @@
+.selectWrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  font-family: inherit;
+}
+
+.trigger {
+  width: 100%;
+  height: 40px;
+  padding: 0 1rem;
+  background: #050d1a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: #091a36;
+}
+
+.triggerOpen,
+.trigger:focus-visible {
+  border-color: #F58220 !important;
+  box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.2) !important;
+  background: #091a36;
+}
+
+.trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.labelGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+  color: #F58220;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 180px;
+  background: #091a36;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.35rem;
+  z-index: 9999;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  max-height: 260px;
+  overflow-y: auto;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownMenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdownMenu::-webkit-scrollbar-track {
+  background: rgba(5, 13, 26, 0.5);
+  border-radius: 4px;
+}
+
+.dropdownMenu::-webkit-scrollbar-thumb {
+  background: rgba(245, 130, 32, 0.4);
+  border-radius: 4px;
+}
+
+.optionItem {
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.optionItem:hover,
+.optionFocused {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.optionSelected {
+  background: rgba(245, 130, 32, 0.15) !important;
+  color: #F58220 !important;
+  font-weight: 700;
+}

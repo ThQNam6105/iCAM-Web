@@ -18,6 +18,7 @@ import {
 import { getAllNewsPosts, fetchPostsFromSupabase, generateSlug } from '../../services/newsService';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
+import { Button } from '../../components/Admin/UI';
 import styles from './AdminCategories.module.css';
 
 const PRESET_COLORS = [
@@ -254,13 +255,13 @@ export const AdminCategories: React.FC = () => {
             </div>
 
             <div className={styles.formActions}>
-              <button type="submit" className={styles.submitBtn}>
+              <Button type="submit" variant="primary" size="md" fullWidth>
                 {editingCategory ? 'Lưu thay đổi' : 'Thêm danh mục'}
-              </button>
+              </Button>
               {editingCategory && (
-                <button type="button" onClick={resetForm} className={styles.cancelBtn}>
+                <Button type="button" variant="secondary" size="md" onClick={resetForm}>
                   Hủy bỏ
-                </button>
+                </Button>
               )}
             </div>
           </form>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Save, List } from 'lucide-react';
 import { type CareersItem, type JobStatus, type JobType } from '../../services/careersService';
+import { Button, Select } from './UI';
 import styles from './JobEditModal.module.css';
 
 interface JobEditModalProps {
@@ -98,31 +99,31 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
               <label className={styles.label}>
                 Phòng ban <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <select
+              <Select
+                options={[
+                  { value: 'Khối Đào Tạo', label: 'Khối đào tạo' },
+                  { value: 'Khối Tư Vấn & Tuyển Sinh', label: 'Khối tư vấn & tuyển sinh' },
+                  { value: 'Khối Marketing', label: 'Khối Marketing' },
+                  { value: 'Khối Hành Chính & Nhân Sự', label: 'Khối hành chính & nhân sự' },
+                ]}
                 value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className={styles.select}
-              >
-                <option value="Khối Đào Tạo">Khối đào tạo</option>
-                <option value="Khối Tư Vấn & Tuyển Sinh">Khối tư vấn & tuyển sinh</option>
-                <option value="Khối Marketing">Khối Marketing</option>
-                <option value="Khối Hành Chính & Nhân Sự">Khối hành chính & nhân sự</option>
-              </select>
+                onChange={setDepartment}
+              />
             </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
                 Loại hình công việc <span style={{ color: '#ef4444' }}>*</span>
               </label>
-              <select
+              <Select
+                options={[
+                  { value: 'Full-time', label: 'Full-time (Toàn thời gian)' },
+                  { value: 'Part-time', label: 'Part-time (Bán thời gian)' },
+                  { value: 'Internship', label: 'Internship (Thực tập sinh)' },
+                ]}
                 value={type}
-                onChange={(e) => setType(e.target.value as JobType)}
-                className={styles.select}
-              >
-                <option value="Full-time">Full-time (Toàn thời gian)</option>
-                <option value="Part-time">Part-time (Bán thời gian)</option>
-                <option value="Internship">Internship (Thực tập sinh)</option>
-              </select>
+                onChange={(val) => setType(val as JobType)}
+              />
             </div>
           </div>
 
@@ -173,15 +174,15 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>Trạng thái tuyển dụng</label>
-              <select
+              <Select
+                options={[
+                  { value: 'open', label: 'Đang tuyển (Open - hiện trên web)' },
+                  { value: 'closed', label: 'Đã đóng (Closed - tạm dừng)' },
+                  { value: 'draft', label: 'Bản nháp (Draft - ẩn trên web)' },
+                ]}
                 value={status}
-                onChange={(e) => setStatus(e.target.value as JobStatus)}
-                className={styles.select}
-              >
-                <option value="open">Đang tuyển (Open - hiện trên web)</option>
-                <option value="closed">Đã đóng (Closed - tạm dừng)</option>
-                <option value="draft">Bản nháp (Draft - ẩn trên web)</option>
-              </select>
+                onChange={(val) => setStatus(val as JobStatus)}
+              />
             </div>
           </div>
 
@@ -252,12 +253,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
           </div>
 
           <div className={styles.actions}>
-            <button type="button" onClick={onClose} className={styles.cancelBtn}>
+            <Button type="button" variant="secondary" size="md" onClick={onClose}>
               Hủy bỏ
-            </button>
-            <button type="submit" className={styles.saveBtn}>
-              <Save size={16} /> {jobToEdit ? 'Lưu thay đổi' : 'Đăng vị trí mới'}
-            </button>
+            </Button>
+            <Button type="submit" variant="primary" size="md" icon={<Save size={16} />}>
+              {jobToEdit ? 'Lưu thay đổi' : 'Đăng vị trí mới'}
+            </Button>
           </div>
         </form>
       </div>

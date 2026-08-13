@@ -17,6 +17,7 @@ import {
 } from '../../services/categoryService';
 import { getAllNewsPosts, generateSlug } from '../../services/newsService';
 import { useToast } from '../Toast/Toast';
+import { Button } from './UI';
 import styles from './CategoryManagerModal.module.css';
 
 interface CategoryManagerModalProps {
@@ -227,13 +228,13 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
               </div>
 
               <div className={styles.formActions}>
-                <button type="submit" className={styles.submitBtn}>
+                <Button type="submit" variant="primary" size="md" fullWidth>
                   {editingCategory ? 'Lưu thay đổi' : 'Tạo danh mục'}
-                </button>
+                </Button>
                 {editingCategory && (
-                  <button type="button" onClick={resetForm} className={styles.cancelBtn}>
+                  <Button type="button" variant="secondary" size="md" onClick={resetForm}>
                     Hủy bỏ
-                  </button>
+                  </Button>
                 )}
               </div>
             </form>

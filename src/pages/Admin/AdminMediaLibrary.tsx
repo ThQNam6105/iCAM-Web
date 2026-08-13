@@ -30,6 +30,7 @@ import { mediaService } from '../../services/media/mediaService';
 import { ImageCropperModal } from '../../components/Admin/ImageCropperModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
+import { Button, Select } from '../../components/Admin/UI';
 import styles from './AdminMediaLibrary.module.css';
 
 const COLOR_OPTIONS = ['#F58220', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b'];
@@ -641,40 +642,49 @@ export const AdminMediaLibrary: React.FC = () => {
               </div>
 
               <div className={styles.filterControls}>
-                <select
+                <Select
+                  options={[
+                    { value: 'all', label: 'Tất cả loại tệp' },
+                    { value: 'image', label: 'Hình ảnh (JPG, PNG, WEBP)' },
+                    { value: 'svg', label: 'Vector SVG' },
+                    { value: 'gif', label: 'Ảnh động GIF' },
+                    { value: 'pdf', label: 'Tài liệu PDF' },
+                  ]}
                   value={fileType}
-                  onChange={(e) => {
-                    setFileType(e.target.value);
+                  onChange={(val) => {
+                    setFileType(val);
                     setPage(1);
                   }}
-                  className={styles.selectFilter}
-                >
-                  <option value="all">Tất cả loại tệp</option>
-                  <option value="image">Hình ảnh (JPG, PNG, WEBP)</option>
-                  <option value="svg">Vector SVG</option>
-                  <option value="gif">Ảnh động GIF</option>
-                  <option value="pdf">Tài liệu PDF</option>
-                </select>
+                  triggerStyle={{ minWidth: '175px' }}
+                />
 
-                <select
+                <Select
+                  options={[
+                    { value: 'all', label: 'Tất cả trạng thái' },
+                    { value: 'used', label: 'Đang được sử dụng' },
+                    { value: 'unused', label: 'Chưa sử dụng' },
+                    { value: 'archived', label: 'Đã lưu trữ' },
+                  ]}
                   value={usageStatus}
-                  onChange={(e) => {
-                    setUsageStatus(e.target.value as 'all' | 'used' | 'unused' | 'archived');
+                  onChange={(val) => {
+                    setUsageStatus(val as 'all' | 'used' | 'unused' | 'archived');
                     setPage(1);
                   }}
-                  className={styles.selectFilter}
-                >
-                  <option value="all">Tất cả trạng thái</option>
-                  <option value="used">Đang được sử dụng</option>
-                  <option value="unused">Chưa sử dụng</option>
-                  <option value="archived">Đã lưu trữ</option>
-                </select>
+                  triggerStyle={{ minWidth: '170px' }}
+                />
 
-                <select
+                <Select
+                  options={[
+                    { value: 'newest', label: 'Mới nhất trước' },
+                    { value: 'oldest', label: 'Cũ nhất trước' },
+                    { value: 'name-asc', label: 'Tên A-Z' },
+                    { value: 'name-desc', label: 'Tên Z-A' },
+                    { value: 'size-desc', label: 'Dung lượng lớn trước' },
+                  ]}
                   value={sortBy}
-                  onChange={(e) =>
+                  onChange={(val) =>
                     setSortBy(
-                      e.target.value as
+                      val as
                         | 'newest'
                         | 'oldest'
                         | 'name-asc'
@@ -683,14 +693,8 @@ export const AdminMediaLibrary: React.FC = () => {
                         | 'size-asc'
                     )
                   }
-                  className={styles.selectFilter}
-                >
-                  <option value="newest">Mới nhất trước</option>
-                  <option value="oldest">Cũ nhất trước</option>
-                  <option value="name-asc">Tên A-Z</option>
-                  <option value="name-desc">Tên Z-A</option>
-                  <option value="size-desc">Dung lượng lớn trước</option>
-                </select>
+                  triggerStyle={{ minWidth: '170px' }}
+                />
 
                 <div className={styles.viewToggleGroup}>
                   <button
@@ -719,32 +723,27 @@ export const AdminMediaLibrary: React.FC = () => {
                 </span>
 
                 <div className={styles.bulkActions}>
-                  <select
-                    onChange={(e) => {
-                      const targetF = e.target.value === 'root' ? null : e.target.value;
+                  <Select
+                    options={[
+                      { value: '', label: '📁 Chuyển sang thư mục khác...' },
+                      { value: 'root', label: '📁 Chuyển về Thư mục gốc' },
+                      ...folders
+                        .filter((f) => f.id !== currentFolder.id)
+                        .map((f) => ({ value: f.id, label: `📁 ${f.name}` })),
+                    ]}
+                    value=""
+                    onChange={(val) => {
+                      if (!val) return;
+                      const targetF = val === 'root' ? null : val;
                       handleMoveSelectedToFolder(targetF);
-                      e.target.value = '';
                     }}
-                    defaultValue=""
-                    className={styles.selectFilter}
-                    style={{ background: 'rgba(9, 26, 54, 0.8)' }}
-                  >
-                    <option value="" disabled>
-                      📁 Chuyển sang thư mục khác...
-                    </option>
-                    <option value="root">📁 Chuyển về Thư mục gốc</option>
-                    {folders
-                      .filter((f) => f.id !== currentFolder.id)
-                      .map((f) => (
-                        <option key={f.id} value={f.id}>
-                          📁 {f.name}
-                        </option>
-                      ))}
-                  </select>
+                    placeholder="📁 Chuyển sang thư mục..."
+                    triggerStyle={{ minWidth: '220px' }}
+                  />
 
-                  <button type="button" onClick={handleBulkArchive} className={styles.bulkBtn}>
-                    <Archive size={15} /> Lưu trữ
-                  </button>
+                  <Button variant="secondary" size="sm" icon={<Archive size={15} />} onClick={handleBulkArchive}>
+                    Lưu trữ
+                  </Button>
                 </div>
               </div>
             )}
@@ -996,18 +995,14 @@ export const AdminMediaLibrary: React.FC = () => {
                 <label className={styles.formLabel}>
                   <FolderInput size={15} /> Thư mục lưu trữ:
                 </label>
-                <select
+                <Select
+                  options={[
+                    { value: '', label: '📁 Thư mục gốc (Uncategorized)' },
+                    ...folders.map((f) => ({ value: f.id, label: `📁 ${f.name}` })),
+                  ]}
                   value={editFolderId || ''}
-                  onChange={(e) => setEditFolderId(e.target.value ? e.target.value : null)}
-                  className={styles.input}
-                >
-                  <option value="">📁 Thư mục gốc (Uncategorized)</option>
-                  {folders.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      📁 {f.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setEditFolderId(val ? val : null)}
+                />
               </div>
 
               <div className={styles.formGroup}>
@@ -1067,18 +1062,23 @@ export const AdminMediaLibrary: React.FC = () => {
             </div>
 
             <div className={styles.drawerFooter}>
-              <button
-                type="button"
+              <Button
+                variant="danger"
+                size="md"
+                icon={<Trash2 size={16} />}
                 onClick={() => handleRequestDelete(activeDrawerAsset)}
-                className={styles.resetBtn}
-                style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)', height: '42px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}
               >
-                <Trash2 size={16} /> Xóa vĩnh viễn
-              </button>
+                Xóa vĩnh viễn
+              </Button>
 
-              <button type="button" onClick={handleSaveMetadata} className={styles.uploadTriggerBtn} style={{ height: '42px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}>
-                <Save size={16} /> Lưu Metadata
-              </button>
+              <Button
+                variant="primary"
+                size="md"
+                icon={<Save size={16} />}
+                onClick={handleSaveMetadata}
+              >
+                Lưu Metadata
+              </Button>
             </div>
           </div>
         </div>
