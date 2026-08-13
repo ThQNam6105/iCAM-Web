@@ -18,6 +18,7 @@ import { ProtectedRoute } from '../components/Admin/ProtectedRoute';
 import { AdminCareers } from '../pages/Admin/AdminCareers';
 import { AdminCategories } from '../pages/Admin/AdminCategories';
 import { AdminMediaLibrary } from '../pages/Admin/AdminMediaLibrary';
+import { AdminSettings } from '../pages/Admin/AdminSettings';
 
 export const AppRouter: React.FC = () => {
   const base = import.meta.env.BASE_URL;
@@ -40,6 +41,7 @@ export const AppRouter: React.FC = () => {
           <Route path="categories" element={<AdminCategories />} />
           <Route path="media" element={<AdminMediaLibrary />} />
           <Route path="careers" element={<AdminCareers />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
