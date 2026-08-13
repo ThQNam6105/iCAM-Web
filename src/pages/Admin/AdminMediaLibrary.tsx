@@ -946,27 +946,31 @@ export const AdminMediaLibrary: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="md"
+                  fullWidth
+                  icon={<Copy size={15} />}
                   onClick={() => handleCopyUrl(activeDrawerAsset.public_url)}
-                  className={styles.resetBtn}
-                  style={{ flex: 1, justifyContent: 'center', alignItems: 'center', display: 'inline-flex', height: '40px', whiteSpace: 'nowrap' }}
                 >
-                  <Copy size={15} /> Sao chép URL CDN
-                </button>
+                  Sao chép URL CDN
+                </Button>
 
                 {activeDrawerAsset.mime_type.includes('image') && (
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                    icon={<Edit2 size={15} />}
                     onClick={() => {
                       setCropperCandidate(activeDrawerAsset);
                       setIsCropperOpen(true);
                     }}
-                    className={styles.resetBtn}
-                    style={{ flex: 1, justifyContent: 'center', alignItems: 'center', display: 'inline-flex', height: '40px', whiteSpace: 'nowrap', background: '#F58220', color: '#fff', borderColor: '#F58220' }}
                   >
-                    <Edit2 size={15} /> Cắt & tâm điểm
-                  </button>
+                    Cắt & tâm điểm
+                  </Button>
                 )}
               </div>
 
