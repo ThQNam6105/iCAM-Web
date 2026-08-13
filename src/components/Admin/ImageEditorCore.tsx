@@ -155,8 +155,8 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
-  // Tabs for Full Editor Mode
-  const [activeTab, setActiveTab] = useState<'crop' | 'transform' | 'adjust' | 'filter' | 'resize'>('crop');
+  // Optional Advanced Section for Full Mode
+  const [advancedTab, setAdvancedTab] = useState<'none' | 'adjust' | 'filter' | 'resize'>('none');
 
   // Interactive Drag & Canvas Refs
   const [isDragging, setIsDragging] = useState(false);
@@ -453,7 +453,7 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
       <div className={styles.editorHeader}>
         <div className={styles.modeTitle}>
           <Crop size={18} color="#F58220" />
-          <span>{mode === 'quick' ? 'Cắt & căn chỉnh ảnh bìa' : 'Chỉnh sửa hình ảnh'}</span>
+          <span>{mode === 'quick' ? 'Cắt & căn chỉnh ảnh bìa' : 'Cắt & căn chỉnh hình ảnh'}</span>
         </div>
 
         <div className={styles.historyGroup}>
@@ -493,52 +493,6 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Mode Switcher / Tab Bar for Full Mode */}
-      {mode === 'full' && (
-        <div className={styles.tabNav}>
-          <button
-            type="button"
-            onClick={() => setActiveTab('crop')}
-            className={`${styles.tabBtn} ${activeTab === 'crop' ? styles.tabBtnActive : ''}`}
-            aria-label="Crop tab"
-          >
-            <Crop size={15} /> Crop
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('transform')}
-            className={`${styles.tabBtn} ${activeTab === 'transform' ? styles.tabBtnActive : ''}`}
-            aria-label="Transform tab"
-          >
-            <RotateCcw size={15} /> Xoay & lật
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('adjust')}
-            className={`${styles.tabBtn} ${activeTab === 'adjust' ? styles.tabBtnActive : ''}`}
-            aria-label="Adjustments tab"
-          >
-            <Sliders size={15} /> Chỉnh màu
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('filter')}
-            className={`${styles.tabBtn} ${activeTab === 'filter' ? styles.tabBtnActive : ''}`}
-            aria-label="Filters tab"
-          >
-            <Sparkles size={15} /> Bộ lọc
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('resize')}
-            className={`${styles.tabBtn} ${activeTab === 'resize' ? styles.tabBtnActive : ''}`}
-            aria-label="Resize tab"
-          >
-            <Maximize2 size={15} /> Kích thước
-          </button>
-        </div>
-      )}
 
       {/* Outer Checkerboard Viewport Area */}
       <div className={styles.canvasViewportArea}>
@@ -609,258 +563,285 @@ export const ImageEditorCore: React.FC<ImageEditorCoreProps> = ({
         </div>
       </div>
 
-      {/* Sub Toolbars Depending on Mode / Active Tab */}
-
-      {/* 1. CROP & RATIO BAR */}
-      {(mode === 'quick' || activeTab === 'crop') && (
-        <div className={styles.subControlBar}>
-          <div className={styles.subGroup}>
-            <span className={styles.controlLabel}>Tỉ lệ:</span>
-            <div className={styles.ratioGrid}>
-              {ASPECT_RATIOS.map((ratio) => (
-                <button
-                  key={ratio.id}
-                  type="button"
-                  className={`${styles.ratioPill} ${state.aspectRatio === ratio.id ? styles.ratioPillActive : ''}`}
-                  onClick={() => updateState((prev) => ({ ...prev, aspectRatio: ratio.id }))}
-                  aria-label={`Ratio ${ratio.label}`}
-                >
-                  {ratio.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Zoom Controls */}
-          <div className={styles.subGroup}>
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, zoom: Math.max(100, prev.zoom - 10) }))}
-              className={styles.iconBtn}
-              title="Thu nhỏ (-)"
-              aria-label="Zoom out"
-            >
-              <ZoomOut size={14} /> −
-            </button>
-            <span className={styles.sliderValue}>{state.zoom}%</span>
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, zoom: Math.min(300, prev.zoom + 10) }))}
-              className={styles.iconBtn}
-              title="Phóng to (+)"
-              aria-label="Zoom in"
-            >
-              <ZoomIn size={14} /> +
-            </button>
-
-            {/* Focal Mode Toggle */}
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, focalMode: !prev.focalMode }))}
-              className={`${styles.iconBtn} ${state.focalMode ? styles.iconBtnActive : ''}`}
-              title="Bật/Tắt chế độ đặt tâm điểm (Focal Point)"
-              aria-label="Focal point mode"
-            >
-              <Target size={14} /> Tâm điểm
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 2. TRANSFORM BAR (ROTATE, STRAIGHTEN, FLIP) */}
-      {(mode === 'quick' || activeTab === 'transform') && (
-        <div className={styles.subControlBar}>
-          <div className={styles.subGroup}>
-            <span className={styles.controlLabel}>Xoay & lật:</span>
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, rotation: (prev.rotation - 90 + 360) % 360 }))}
-              className={styles.iconBtn}
-              title="Xoay trái 90°"
-              aria-label="Rotate left"
-            >
-              <RotateCcw size={14} /> ↺
-            </button>
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }))}
-              className={styles.iconBtn}
-              title="Xoay phải 90°"
-              aria-label="Rotate right"
-            >
-              <RotateCw size={14} /> ↻
-            </button>
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, flipH: !prev.flipH }))}
-              className={`${styles.iconBtn} ${state.flipH ? styles.iconBtnActive : ''}`}
-              title="Lật ngang (Flip horizontal)"
-              aria-label="Flip horizontal"
-            >
-              <FlipHorizontal size={14} /> ↔
-            </button>
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, flipV: !prev.flipV }))}
-              className={`${styles.iconBtn} ${state.flipV ? styles.iconBtnActive : ''}`}
-              title="Lật dọc (Flip vertical)"
-              aria-label="Flip vertical"
-            >
-              <FlipVertical size={14} /> ↕
-            </button>
-          </div>
-
-          <div className={styles.sliderRow}>
-            <span className={styles.controlLabel}>Cân nghiêng:</span>
-            <input
-              type="range"
-              min="-45"
-              max="45"
-              step="0.5"
-              value={state.straighten}
-              onChange={(e) => updateState((prev) => ({ ...prev, straighten: Number(e.target.value) }))}
-              className={styles.sliderInput}
-            />
-            <span className={styles.sliderValue}>{state.straighten}°</span>
-          </div>
-        </div>
-      )}
-
-      {/* 3. COLOR ADJUSTMENTS BAR */}
-      {mode === 'full' && activeTab === 'adjust' && (
-        <div className={styles.subControlBar}>
-          <div className={styles.sliderRow}>
-            <Sun size={15} color="#F58220" />
-            <span className={styles.controlLabel}>Độ sáng:</span>
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={state.brightness}
-              onChange={(e) => updateState((prev) => ({ ...prev, brightness: Number(e.target.value) }))}
-              className={styles.sliderInput}
-            />
-            <span className={styles.sliderValue}>{state.brightness}%</span>
-          </div>
-
-          <div className={styles.sliderRow}>
-            <Contrast size={15} color="#3b82f6" />
-            <span className={styles.controlLabel}>Độ tương phản:</span>
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={state.contrast}
-              onChange={(e) => updateState((prev) => ({ ...prev, contrast: Number(e.target.value) }))}
-              className={styles.sliderInput}
-            />
-            <span className={styles.sliderValue}>{state.contrast}%</span>
-          </div>
-
-          <div className={styles.sliderRow}>
-            <Sliders size={15} color="#10b981" />
-            <span className={styles.controlLabel}>Độ bão hòa:</span>
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={state.saturation}
-              onChange={(e) => updateState((prev) => ({ ...prev, saturation: Number(e.target.value) }))}
-              className={styles.sliderInput}
-            />
-            <span className={styles.sliderValue}>{state.saturation}%</span>
-          </div>
-        </div>
-      )}
-
-      {/* 4. FILTER PRESETS CARDS */}
-      {mode === 'full' && activeTab === 'filter' && (
-        <div className={styles.subControlBar}>
-          <div className={styles.filterGrid}>
-            {FILTER_PRESETS.map((preset) => (
-              <div
-                key={preset.id}
-                className={`${styles.filterCard} ${state.filterPreset === preset.id ? styles.filterCardActive : ''}`}
-                onClick={() => updateState((prev) => ({ ...prev, filterPreset: preset.id as any }))}
-              >
-                <img
-                  src={imageSrc}
-                  alt={preset.label}
-                  className={styles.filterThumb}
-                  style={{ filter: preset.css }}
-                />
-                <span className={styles.filterName}>{preset.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 5. RESIZE BAR */}
-      {mode === 'full' && activeTab === 'resize' && (
-        <div className={styles.subControlBar}>
-          <div className={styles.subGroup}>
-            <span className={styles.controlLabel}>Rộng (px):</span>
-            <input
-              type="number"
-              value={state.resizeWidth || ''}
-              placeholder="Auto"
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                updateState((prev) => ({
-                  ...prev,
-                  resizeWidth: val || undefined,
-                  resizeHeight: prev.lockResizeRatio && val ? Math.round(val * (9 / 16)) : prev.resizeHeight,
-                }));
-              }}
-              className={styles.numInput}
-            />
-
-            <button
-              type="button"
-              onClick={() => updateState((prev) => ({ ...prev, lockResizeRatio: !prev.lockResizeRatio }))}
-              className={`${styles.iconBtn} ${state.lockResizeRatio ? styles.iconBtnActive : ''}`}
-              title="Khoá / Mở tỉ lệ hình ảnh"
-              aria-label="Lock aspect ratio"
-            >
-              {state.lockResizeRatio ? <Lock size={14} /> : <Unlock size={14} />}
-            </button>
-
-            <span className={styles.controlLabel}>Cao (px):</span>
-            <input
-              type="number"
-              value={state.resizeHeight || ''}
-              placeholder="Auto"
-              onChange={(e) => {
-                const val = Number(e.target.value);
-                updateState((prev) => ({
-                  ...prev,
-                  resizeHeight: val || undefined,
-                  resizeWidth: prev.lockResizeRatio && val ? Math.round(val * (16 / 9)) : prev.resizeWidth,
-                }));
-              }}
-              className={styles.numInput}
-            />
-          </div>
-
-          <div className={styles.subGroup}>
-            <span className={styles.controlLabel}>Presets:</span>
-            {[
-              { label: 'FHD', w: 1920, h: 1080 },
-              { label: 'HD', w: 1280, h: 720 },
-              { label: 'Square', w: 1080, h: 1080 },
-            ].map((p) => (
+      {/* PRIMARY CONTROL BAR 1: ASPECT RATIO + ZOOM + FOCAL POINT (ALWAYS VISIBLE FOR BOTH MODES) */}
+      <div className={styles.subControlBar}>
+        <div className={styles.subGroup}>
+          <span className={styles.controlLabel}>Tỉ lệ:</span>
+          <div className={styles.ratioGrid}>
+            {ASPECT_RATIOS.map((ratio) => (
               <button
-                key={p.label}
+                key={ratio.id}
                 type="button"
-                className={styles.ratioPill}
-                onClick={() => updateState((prev) => ({ ...prev, resizeWidth: p.w, resizeHeight: p.h }))}
+                className={`${styles.ratioPill} ${state.aspectRatio === ratio.id ? styles.ratioPillActive : ''}`}
+                onClick={() => updateState((prev) => ({ ...prev, aspectRatio: ratio.id }))}
+                aria-label={`Ratio ${ratio.label}`}
               >
-                {p.label} ({p.w}x{p.h})
+                {ratio.label}
               </button>
             ))}
           </div>
         </div>
+
+        {/* Quick Zoom Controls */}
+        <div className={styles.subGroup}>
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, zoom: Math.max(100, prev.zoom - 10) }))}
+            className={styles.iconBtn}
+            title="Thu nhỏ (-)"
+            aria-label="Zoom out"
+          >
+            <ZoomOut size={14} /> −
+          </button>
+          <span className={styles.sliderValue}>{state.zoom}%</span>
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, zoom: Math.min(300, prev.zoom + 10) }))}
+            className={styles.iconBtn}
+            title="Phóng to (+)"
+            aria-label="Zoom in"
+          >
+            <ZoomIn size={14} /> +
+          </button>
+
+          {/* Focal Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, focalMode: !prev.focalMode }))}
+            className={`${styles.iconBtn} ${state.focalMode ? styles.iconBtnActive : ''}`}
+            title="Bật/Tắt chế độ đặt tâm điểm (Focal Point)"
+            aria-label="Focal point mode"
+          >
+            <Target size={14} /> Tâm điểm
+          </button>
+        </div>
+      </div>
+
+      {/* PRIMARY CONTROL BAR 2: ROTATE, FLIP & STRAIGHTEN (ALWAYS VISIBLE FOR BOTH MODES) */}
+      <div className={styles.subControlBar}>
+        <div className={styles.subGroup}>
+          <span className={styles.controlLabel}>Xoay & lật:</span>
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, rotation: (prev.rotation - 90 + 360) % 360 }))}
+            className={styles.iconBtn}
+            title="Xoay trái 90°"
+            aria-label="Rotate left"
+          >
+            <RotateCcw size={14} /> ↺
+          </button>
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, rotation: (prev.rotation + 90) % 360 }))}
+            className={styles.iconBtn}
+            title="Xoay phải 90°"
+            aria-label="Rotate right"
+          >
+            <RotateCw size={14} /> ↻
+          </button>
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, flipH: !prev.flipH }))}
+            className={`${styles.iconBtn} ${state.flipH ? styles.iconBtnActive : ''}`}
+            title="Lật ngang (Flip horizontal)"
+            aria-label="Flip horizontal"
+          >
+            <FlipHorizontal size={14} /> ↔
+          </button>
+          <button
+            type="button"
+            onClick={() => updateState((prev) => ({ ...prev, flipV: !prev.flipV }))}
+            className={`${styles.iconBtn} ${state.flipV ? styles.iconBtnActive : ''}`}
+            title="Lật dọc (Flip vertical)"
+            aria-label="Flip vertical"
+          >
+            <FlipVertical size={14} /> ↕
+          </button>
+        </div>
+
+        <div className={styles.sliderRow}>
+          <span className={styles.controlLabel}>Cân nghiêng:</span>
+          <input
+            type="range"
+            min="-45"
+            max="45"
+            step="0.5"
+            value={state.straighten}
+            onChange={(e) => updateState((prev) => ({ ...prev, straighten: Number(e.target.value) }))}
+            className={styles.sliderInput}
+          />
+          <span className={styles.sliderValue}>{state.straighten}°</span>
+        </div>
+      </div>
+
+      {/* OPTIONAL ADVANCED SECTION FOR MEDIA LIBRARY (FULL MODE) */}
+      {mode === 'full' && (
+        <>
+          <div className={styles.tabNav} style={{ marginTop: '0.25rem' }}>
+            <span className={styles.controlLabel} style={{ paddingLeft: '0.5rem' }}>Nâng cao:</span>
+            <button
+              type="button"
+              onClick={() => setAdvancedTab(advancedTab === 'adjust' ? 'none' : 'adjust')}
+              className={`${styles.tabBtn} ${advancedTab === 'adjust' ? styles.tabBtnActive : ''}`}
+              aria-label="Adjustments tab"
+            >
+              <Sliders size={14} /> Chỉnh màu
+            </button>
+            <button
+              type="button"
+              onClick={() => setAdvancedTab(advancedTab === 'filter' ? 'none' : 'filter')}
+              className={`${styles.tabBtn} ${advancedTab === 'filter' ? styles.tabBtnActive : ''}`}
+              aria-label="Filters tab"
+            >
+              <Sparkles size={14} /> Bộ lọc
+            </button>
+            <button
+              type="button"
+              onClick={() => setAdvancedTab(advancedTab === 'resize' ? 'none' : 'resize')}
+              className={`${styles.tabBtn} ${advancedTab === 'resize' ? styles.tabBtnActive : ''}`}
+              aria-label="Resize tab"
+            >
+              <Maximize2 size={14} /> Kích thước
+            </button>
+          </div>
+
+          {/* Advanced Sliders Bar */}
+          {advancedTab === 'adjust' && (
+            <div className={styles.subControlBar}>
+              <div className={styles.sliderRow}>
+                <Sun size={15} color="#F58220" />
+                <span className={styles.controlLabel}>Độ sáng:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={state.brightness}
+                  onChange={(e) => updateState((prev) => ({ ...prev, brightness: Number(e.target.value) }))}
+                  className={styles.sliderInput}
+                />
+                <span className={styles.sliderValue}>{state.brightness}%</span>
+              </div>
+
+              <div className={styles.sliderRow}>
+                <Contrast size={15} color="#3b82f6" />
+                <span className={styles.controlLabel}>Độ tương phản:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={state.contrast}
+                  onChange={(e) => updateState((prev) => ({ ...prev, contrast: Number(e.target.value) }))}
+                  className={styles.sliderInput}
+                />
+                <span className={styles.sliderValue}>{state.contrast}%</span>
+              </div>
+
+              <div className={styles.sliderRow}>
+                <Sliders size={15} color="#10b981" />
+                <span className={styles.controlLabel}>Độ bão hòa:</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="200"
+                  value={state.saturation}
+                  onChange={(e) => updateState((prev) => ({ ...prev, saturation: Number(e.target.value) }))}
+                  className={styles.sliderInput}
+                />
+                <span className={styles.sliderValue}>{state.saturation}%</span>
+              </div>
+            </div>
+          )}
+
+          {/* Advanced Filter Cards */}
+          {advancedTab === 'filter' && (
+            <div className={styles.subControlBar}>
+              <div className={styles.filterGrid}>
+                {FILTER_PRESETS.map((preset) => (
+                  <div
+                    key={preset.id}
+                    className={`${styles.filterCard} ${state.filterPreset === preset.id ? styles.filterCardActive : ''}`}
+                    onClick={() => updateState((prev) => ({ ...prev, filterPreset: preset.id as any }))}
+                  >
+                    <img
+                      src={imageSrc}
+                      alt={preset.label}
+                      className={styles.filterThumb}
+                      style={{ filter: preset.css }}
+                    />
+                    <span className={styles.filterName}>{preset.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Advanced Resize Inputs */}
+          {advancedTab === 'resize' && (
+            <div className={styles.subControlBar}>
+              <div className={styles.subGroup}>
+                <span className={styles.controlLabel}>Rộng (px):</span>
+                <input
+                  type="number"
+                  value={state.resizeWidth || ''}
+                  placeholder="Auto"
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    updateState((prev) => ({
+                      ...prev,
+                      resizeWidth: val || undefined,
+                      resizeHeight: prev.lockResizeRatio && val ? Math.round(val * (9 / 16)) : prev.resizeHeight,
+                    }));
+                  }}
+                  className={styles.numInput}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => updateState((prev) => ({ ...prev, lockResizeRatio: !prev.lockResizeRatio }))}
+                  className={`${styles.iconBtn} ${state.lockResizeRatio ? styles.iconBtnActive : ''}`}
+                  title="Khoá / Mở tỉ lệ hình ảnh"
+                  aria-label="Lock aspect ratio"
+                >
+                  {state.lockResizeRatio ? <Lock size={14} /> : <Unlock size={14} />}
+                </button>
+
+                <span className={styles.controlLabel}>Cao (px):</span>
+                <input
+                  type="number"
+                  value={state.resizeHeight || ''}
+                  placeholder="Auto"
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    updateState((prev) => ({
+                      ...prev,
+                      resizeHeight: val || undefined,
+                      resizeWidth: prev.lockResizeRatio && val ? Math.round(val * (16 / 9)) : prev.resizeWidth,
+                    }));
+                  }}
+                  className={styles.numInput}
+                />
+              </div>
+
+              <div className={styles.subGroup}>
+                <span className={styles.controlLabel}>Presets:</span>
+                {[
+                  { label: 'FHD', w: 1920, h: 1080 },
+                  { label: 'HD', w: 1280, h: 720 },
+                  { label: 'Square', w: 1080, h: 1080 },
+                ].map((p) => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    className={styles.ratioPill}
+                    onClick={() => updateState((prev) => ({ ...prev, resizeWidth: p.w, resizeHeight: p.h }))}
+                  >
+                    {p.label} ({p.w}x{p.h})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Quick Mode Article Cover Context Preview Tabs */}
