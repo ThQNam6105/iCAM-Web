@@ -445,6 +445,10 @@ export class SettingsService {
             parsed.websiteInfo.youtubeUrl = 'https://www.youtube.com/@anhnguicancam3597';
             modified = true;
           }
+          if (!parsed.websiteInfo.businessHours || parsed.websiteInfo.businessHours.includes('Thứ 2 - Chủ Nhật: Thứ 2')) {
+            parsed.websiteInfo.businessHours = 'Thứ 2 - Chủ Nhật: 08:00 - 21:00';
+            modified = true;
+          }
         }
         if (parsed.seo) {
           if (!parsed.seo.faviconUrl || parsed.seo.faviconUrl.includes('ican.png') || parsed.seo.faviconUrl.startsWith('blob:')) {

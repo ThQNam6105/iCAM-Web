@@ -412,14 +412,10 @@ export const Layout: React.FC = () => {
                 </div>
                 <div className={styles.infoItem}>
                   <Clock className={styles.infoIcon} size={18} />
-                  <div className={styles.hoursText}>
-                    <span style={{ fontWeight: 600 }}>
-                      {language === 'en' ? 'Monday – Sunday' : 'Thứ 2 – Chủ Nhật'}
-                    </span>
-                    <span className={styles.hoursDetail}>
-                      {settings.websiteInfo.businessHours || '08:00 – 21:00'}
-                    </span>
-                  </div>
+                  <span>
+                    {settings.websiteInfo.businessHours ||
+                      (language === 'en' ? 'Monday – Sunday: 08:00 – 21:00' : 'Thứ 2 – Chủ Nhật: 08:00 – 21:00')}
+                  </span>
                 </div>
               </div>
 
