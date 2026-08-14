@@ -1,5 +1,4 @@
 import type { SystemSettings } from './settingsService';
-import icanLogo from '../assets/ican.png';
 import bannerBg from '../assets/banner-bg.jpg';
 
 /**
@@ -21,7 +20,7 @@ export const applySEOMetadata = (settings: SystemSettings, language: 'vi' | 'en'
     : settings.seo?.websiteDescVi || 'Trung tâm đào tạo Tiếng Anh chuẩn quốc tế hàng đầu tại Hóc Môn và Quận 12.';
 
   const rawFavicon = settings.seo?.faviconUrl || '';
-  const faviconUrl = (!rawFavicon || rawFavicon.startsWith('blob:')) ? icanLogo : rawFavicon;
+  const faviconUrl = (!rawFavicon || rawFavicon.startsWith('blob:') || rawFavicon.includes('ican.png')) ? '/favicon.ico' : rawFavicon;
 
   const rawSocial = settings.seo?.socialShareImageUrl || '';
   const socialShareImageUrl = (!rawSocial || rawSocial.startsWith('blob:')) ? bannerBg : rawSocial;

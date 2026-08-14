@@ -28,7 +28,6 @@ import {
 import { Button, Select, Input, Badge, Switch, FormField } from '../../components/Admin/UI';
 import { MediaSelectorModal } from '../../components/Admin/MediaSelectorModal';
 import { useToast } from '../../components/Toast/Toast';
-import icanLogo from '../../assets/ican.png';
 import bannerBg from '../../assets/banner-bg.jpg';
 import { applySEOMetadata } from '../../services/seoService';
 import type { MediaItem } from '../../types/media';
@@ -674,10 +673,10 @@ export const AdminSettings: React.FC = () => {
                       alt="Favicon"
                       className={styles.faviconThumbPreview}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = icanLogo;
+                        (e.target as HTMLImageElement).src = '/favicon.ico';
                         updateSettingsState((prev) => ({
                           ...prev,
-                          seo: { ...prev.seo, faviconUrl: icanLogo },
+                          seo: { ...prev.seo, faviconUrl: '/favicon.ico' },
                         }));
                       }}
                     />

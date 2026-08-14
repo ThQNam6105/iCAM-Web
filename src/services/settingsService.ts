@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient';
-import icanLogo from '../assets/ican.png';
 import bannerBg from '../assets/banner-bg.jpg';
 
 export interface BranchLocation {
@@ -148,7 +147,7 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
     websiteTitleEn: 'iCANCAM English Center | Young Learners & IELTS Preparation',
     websiteDescVi: 'Trung tâm đào tạo Tiếng Anh chuẩn quốc tế hàng đầu tại Hóc Môn và Quận 12. Phương pháp giảng dạy 4Ls & LETI tiên tiến giúp học viên tự tin bứt phá điểm số.',
     websiteDescEn: 'International standard English training center in Hoc Mon and District 12. Advanced 4Ls & LETI teaching methodologies for confident learning.',
-    faviconUrl: icanLogo,
+    faviconUrl: '/favicon.ico',
     socialShareImageUrl: bannerBg,
   },
   announcement: {
@@ -209,8 +208,8 @@ export class SettingsService {
       return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:') || url.includes('assets');
     };
 
-    if (!isValidUrl(copy.seo.faviconUrl)) {
-      copy.seo.faviconUrl = icanLogo;
+    if (!isValidUrl(copy.seo.faviconUrl) || copy.seo.faviconUrl.includes('ican.png')) {
+      copy.seo.faviconUrl = '/favicon.ico';
     }
     if (!isValidUrl(copy.seo.socialShareImageUrl)) {
       copy.seo.socialShareImageUrl = bannerBg;
@@ -413,8 +412,8 @@ export class SettingsService {
           }
         }
         if (parsed.seo) {
-          if (!parsed.seo.faviconUrl) {
-            parsed.seo.faviconUrl = icanLogo;
+          if (!parsed.seo.faviconUrl || parsed.seo.faviconUrl.includes('ican.png') || parsed.seo.faviconUrl.startsWith('blob:')) {
+            parsed.seo.faviconUrl = '/favicon.ico';
             modified = true;
           }
           if (!parsed.seo.socialShareImageUrl) {

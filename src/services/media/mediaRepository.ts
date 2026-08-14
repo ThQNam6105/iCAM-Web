@@ -760,6 +760,24 @@ const DEFAULT_INITIAL_MEDIA: MediaItem[] = [
 
   // 2. Logo & Nhãn Hiệu
   {
+    id: 'asset_favicon_ico',
+    original_filename: 'favicon.ico',
+    storage_path: 'public/favicon.ico',
+    public_url: '/favicon.ico',
+    mime_type: 'image/x-icon',
+    file_size: 4286,
+    width: 64,
+    height: 64,
+    content_hash: 'hash_favicon_ico_000',
+    status: 'active',
+    default_alt_vi: 'Biểu tượng Favicon iCANCAM (.ico)',
+    default_alt_en: 'Official iCANCAM Favicon icon (.ico)',
+    folder_id: 'folder_branding',
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    usage_count: 1,
+  },
+  {
     id: 'asset_ican_logo',
     original_filename: 'ican.png',
     storage_path: 'assets/ican.png',
