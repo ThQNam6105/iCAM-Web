@@ -499,20 +499,25 @@
   }
 }
 
-.marqueeTrackPreview {
-  display: flex;
-  width: max-content;
-  animation: marqueePreviewTicker 24s linear infinite;
+.singleSlideTextPreview {
+  position: absolute;
   white-space: nowrap;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
   will-change: transform;
+  display: inline-flex;
+  align-items: center;
+  animation: slideSinglePreviewAcross 7.5s linear forwards;
 }
 
-@keyframes marqueePreviewTicker {
+@keyframes slideSinglePreviewAcross {
   0% {
-    transform: translateX(0);
+    transform: translateX(100%);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 

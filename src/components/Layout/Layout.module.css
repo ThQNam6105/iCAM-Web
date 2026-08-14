@@ -35,7 +35,7 @@
 .marqueeTrack {
   display: flex;
   width: max-content;
-  animation: marqueeTicker 28s linear infinite;
+  animation: marqueeTicker 24s linear infinite;
   white-space: nowrap;
   will-change: transform;
 }
@@ -52,6 +52,32 @@
   padding-right: 0;
   display: inline-flex;
   align-items: center;
+}
+
+.singleSlideText {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  will-change: transform;
+  display: inline-flex;
+  align-items: center;
+  animation: slideSingleAcross 7.5s linear forwards;
+}
+
+.topAnnouncementBar:hover .singleSlideText {
+  animation-play-state: paused;
+}
+
+@keyframes slideSingleAcross {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 @keyframes marqueeTicker {

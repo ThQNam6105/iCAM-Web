@@ -64,6 +64,28 @@ export const AdminSettings: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Announcement Live Preview State
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const [previewWaiting, setPreviewWaiting] = useState(false);
+  const [previewKey, setPreviewKey] = useState(0);
+
+  const activePreviewTexts = useMemo(() => {
+    return (settings.announcement.items || [])
+      .filter((i) => i.isActive && i.textVi.trim())
+      .map((i) => i.textVi);
+  }, [settings.announcement.items]);
+
+  const handlePreviewAnimationEnd = () => {
+    setPreviewWaiting(true);
+    setTimeout(() => {
+      setPreviewIndex((prev) => (activePreviewTexts.length > 0 ? (prev + 1) % activePreviewTexts.length : 0));
+      setPreviewWaiting(false);
+      setPreviewKey((prev) => prev + 1);
+    }, 2000);
+  };
+
+  const currentPreviewText = activePreviewTexts[previewIndex] || activePreviewTexts[0] || 'Nhập nội dung thông báo...';
+
   // Load Settings on Mount
   useEffect(() => {
     let isMounted = true;
@@ -993,7 +1015,7 @@ export const AdminSettings: React.FC = () => {
             {settings.announcement.showAnnouncementBar && (
               <div style={{ marginTop: '1.25rem' }}>
                 <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Activity size={14} color="#F58220" /> Giao diện hiển thị thực tế (Chuỗi các thông báo đang bật chạy từ phải sang trái):
+                  <Activity size={14} color="#F58220" /> Giao diện hiển thị thực tế (Từng thông báo trôi nhanh qua màn hình ➔ Nghỉ 2 giây ➔ Thông báo tiếp theo):
                 </h4>
                 <div
                   style={{
@@ -1010,25 +1032,15 @@ export const AdminSettings: React.FC = () => {
                     boxShadow: '0 2px 8px rgba(245, 130, 32, 0.25)',
                   }}
                 >
-                  <div className={styles.marqueeTrackPreview}>
-                    {(() => {
-                      const activeTexts = (settings.announcement.items || [])
-                        .filter((i) => i.isActive && i.textVi.trim())
-                        .map((i) => i.textVi);
-                      const SEPARATOR = ' \u00A0\u00A0\u00A0\u00A0\u2022\u00A0\u00A0\u00A0\u00A0 ';
-                      const combined = activeTexts.length > 0 ? activeTexts.join(SEPARATOR) + SEPARATOR : 'Nhập nội dung thông báo...' + SEPARATOR;
-                      return (
-                        <>
-                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: 0 }}>
-                            {combined}
-                          </span>
-                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: 0 }}>
-                            {combined}
-                          </span>
-                        </>
-                      );
-                    })()}
-                  </div>
+                  {!previewWaiting && currentPreviewText && (
+                    <span
+                      key={`${previewKey}-${previewIndex}`}
+                      className={styles.singleSlideTextPreview}
+                      onAnimationEnd={handlePreviewAnimationEnd}
+                    >
+                      {currentPreviewText}
+                    </span>
+                  )}
                 </div>
               </div>
             )}

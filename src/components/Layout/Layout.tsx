@@ -87,11 +87,26 @@ export const Layout: React.FC = () => {
     return fallback ? [fallback] : [];
   }, [settings.announcement, language]);
 
-  const announcementTickerString = React.useMemo(() => {
-    if (activeAnnouncements.length === 0) return '';
-    const SEPARATOR = ' \u00A0\u00A0\u00A0\u00A0\u2022\u00A0\u00A0\u00A0\u00A0 ';
-    return activeAnnouncements.join(SEPARATOR) + SEPARATOR;
-  }, [activeAnnouncements]);
+  const [currentAnnIndex, setCurrentAnnIndex] = React.useState(0);
+  const [isAnnWaiting, setIsAnnWaiting] = React.useState(false);
+  const [annSlideKey, setAnnSlideKey] = React.useState(0);
+
+  React.useEffect(() => {
+    setCurrentAnnIndex(0);
+    setIsAnnWaiting(false);
+    setAnnSlideKey((prev) => prev + 1);
+  }, [activeAnnouncements.length, language]);
+
+  const handleAnnAnimationEnd = React.useCallback(() => {
+    setIsAnnWaiting(true);
+    setTimeout(() => {
+      setCurrentAnnIndex((prev) => (activeAnnouncements.length > 0 ? (prev + 1) % activeAnnouncements.length : 0));
+      setIsAnnWaiting(false);
+      setAnnSlideKey((prev) => prev + 1);
+    }, 2000);
+  }, [activeAnnouncements.length]);
+
+  const currentAnnText = activeAnnouncements[currentAnnIndex] || activeAnnouncements[0] || '';
 
   return (
     <div className={styles.layout}>
@@ -99,17 +114,18 @@ export const Layout: React.FC = () => {
       <ProjectInfoBadge />
 
       <header className={styles.header}>
-        {/* Top Announcement Bar from System Settings (Marquee Ticker Right to Left) */}
-        {settings.announcement.showAnnouncementBar && announcementTickerString && (
+        {/* Top Announcement Bar from System Settings (Sequential 1-by-1 Slide with 2s Pause) */}
+        {settings.announcement.showAnnouncementBar && activeAnnouncements.length > 0 && (
           <div className={styles.topAnnouncementBar} title="Di chuột để tạm dừng chữ chạy">
-            <div className={styles.marqueeTrack}>
-              <span className={styles.marqueeContent}>
-                {announcementTickerString}
+            {!isAnnWaiting && currentAnnText && (
+              <span
+                key={`${annSlideKey}-${currentAnnIndex}`}
+                className={styles.singleSlideText}
+                onAnimationEnd={handleAnnAnimationEnd}
+              >
+                {currentAnnText}
               </span>
-              <span className={styles.marqueeContent}>
-                {announcementTickerString}
-              </span>
-            </div>
+            )}
           </div>
         )}
         <nav className={styles.navContainer}>
