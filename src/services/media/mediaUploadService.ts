@@ -16,6 +16,9 @@ export const ALLOWED_MIME_TYPES = new Set([
   'image/webp',
   'image/gif',
   'image/svg+xml',
+  'image/x-icon',
+  'image/vnd.microsoft.icon',
+  'image/ico',
   'application/pdf',
 ]);
 
@@ -26,7 +29,7 @@ export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
  */
 export const validateMediaFile = async (file: File): Promise<FileValidationResult> => {
   const ext = file.name.split('.').pop()?.toLowerCase() || '';
-  const allowedExts = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'pdf']);
+  const allowedExts = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico', 'icon', 'pdf']);
 
   if (!allowedExts.has(ext)) {
     return { valid: false, error: `Định dạng file .${ext} không được hỗ trợ.` };

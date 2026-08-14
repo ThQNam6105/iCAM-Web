@@ -327,6 +327,34 @@ export const AdminMediaLibrary: React.FC = () => {
     await refreshMediaList();
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} tệp đã chọn khỏi hệ thống?`)) return;
+
+    let deletedCount = 0;
+    let blockedCount = 0;
+
+    for (const id of selectedIds) {
+      const usages = await mediaService.getMediaUsages(id);
+      if (usages.length > 0) {
+        blockedCount++;
+      } else {
+        const res = await mediaService.deleteMediaItem(id);
+        if (res.success) deletedCount++;
+      }
+    }
+
+    if (deletedCount > 0) {
+      showToast(`Đã xóa ${deletedCount} tệp khỏi hệ thống!`, 'info');
+    }
+    if (blockedCount > 0) {
+      showToast(`${blockedCount} tệp không thể xóa do đang được sử dụng ở bài viết/trang web.`, 'error');
+    }
+
+    setSelectedIds([]);
+    await refreshMediaList();
+  };
+
   const handleMoveSelectedToFolder = async (targetFolderId: string | null) => {
     if (selectedIds.length === 0) return;
     await mediaService.moveItemsToFolder(selectedIds, targetFolderId);
@@ -738,6 +766,10 @@ export const AdminMediaLibrary: React.FC = () => {
                   <Button variant="secondary" size="sm" icon={<Archive size={15} />} onClick={handleBulkArchive}>
                     Lưu trữ
                   </Button>
+
+                  <Button variant="danger" size="sm" icon={<Trash2 size={15} />} onClick={handleBulkDelete}>
+                    Xóa tệp ({selectedIds.length})
+                  </Button>
                 </div>
               </div>
             )}
@@ -766,6 +798,18 @@ export const AdminMediaLibrary: React.FC = () => {
                       }}
                       className={styles.cardSelectCheckbox}
                     />
+
+                    <button
+                      type="button"
+                      className={styles.cardDeleteBtn}
+                      title="Xóa tệp này"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRequestDelete(item);
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
 
                     <div className={styles.cardThumbArea} onClick={() => handleOpenDrawer(item)}>
                       {isPdf ? (

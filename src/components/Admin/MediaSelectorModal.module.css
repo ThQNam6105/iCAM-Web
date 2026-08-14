@@ -183,6 +183,34 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+.modalDeleteBtn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.85);
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 6;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.assetCard:hover .modalDeleteBtn {
+  opacity: 1;
+}
+
+.modalDeleteBtn:hover {
+  background: #ef4444;
+  transform: scale(1.1);
+}
+
 .assetDetails {
   padding: 0.75rem;
   display: flex;

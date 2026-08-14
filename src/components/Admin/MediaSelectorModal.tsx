@@ -7,6 +7,7 @@ import {
   FileText,
   ArrowLeft,
   Folder,
+  Trash2,
 } from 'lucide-react';
 import type { MediaItem, MediaFolder } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
@@ -96,6 +97,24 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     if (selected.length > 0) {
       onSelect(selected);
       onClose();
+    }
+  };
+
+  const handleDeleteAsset = async (item: MediaItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const usages = await mediaService.getMediaUsages(item.id);
+    if (usages.length > 0) {
+      alert(`Không thể xóa! Tệp "${item.original_filename}" đang được sử dụng ở ${usages.length} vị trí trên website.`);
+      return;
+    }
+    if (window.confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn tệp "${item.original_filename}"?`)) {
+      const res = await mediaService.deleteMediaItem(item.id);
+      if (res.success) {
+        setItems((prev) => prev.filter((i) => i.id !== item.id));
+        setSelectedAssetIds((prev) => prev.filter((id) => id !== item.id));
+      } else {
+        alert(res.error || 'Không thể xóa tệp.');
+      }
     }
   };
 
@@ -236,6 +255,14 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                           ) : (
                             <img src={item.public_url} alt={item.default_alt_vi || item.original_filename} className={styles.thumbImg} />
                           )}
+                          <button
+                            type="button"
+                            className={styles.modalDeleteBtn}
+                            title="Xóa tệp này"
+                            onClick={(e) => handleDeleteAsset(item, e)}
+                          >
+                            <Trash2 size={13} />
+                          </button>
                           {isSelected && (
                             <div className={styles.checkBadge}>
                               <Check size={16} />
