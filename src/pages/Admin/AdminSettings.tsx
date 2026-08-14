@@ -28,6 +28,7 @@ import {
 import { Button, Select, Input, Badge, Switch, FormField } from '../../components/Admin/UI';
 import { MediaSelectorModal } from '../../components/Admin/MediaSelectorModal';
 import { useToast } from '../../components/Toast/Toast';
+import { applySEOMetadata } from '../../services/seoService';
 import type { MediaItem } from '../../types/media';
 import styles from './AdminSettings.module.css';
 
@@ -113,6 +114,7 @@ export const AdminSettings: React.FC = () => {
     if (success) {
       setInitialSettings(JSON.parse(JSON.stringify(settings)));
       setIsDirty(false);
+      applySEOMetadata(settings);
       if (warning) {
         showToast(warning, 'info');
       } else {

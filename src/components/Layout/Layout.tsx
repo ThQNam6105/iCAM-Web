@@ -6,6 +6,7 @@ import { User, LogOut, Menu, X, ChevronUp, MapPin, Phone, Mail, Clock } from 'lu
 import { useAppStore } from '../../store/useAppStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { settingsService, type SystemSettings, DEFAULT_SYSTEM_SETTINGS, formatExternalUrl } from '../../services/settingsService';
+import { applySEOMetadata } from '../../services/seoService';
 import styles from './Layout.module.css';
 import { ProjectInfoBadge } from '../ProjectInfoBadge/ProjectInfoBadge';
 
@@ -22,12 +23,17 @@ export const Layout: React.FC = () => {
     settingsService.getSystemSettings().then(({ settings: loadedSettings }) => {
       if (isMounted) {
         setSettings(loadedSettings);
+        applySEOMetadata(loadedSettings, language);
       }
     });
     return () => {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    applySEOMetadata(settings, language);
+  }, [settings, language]);
 
   React.useEffect(() => {
     const handleScroll = () => {
