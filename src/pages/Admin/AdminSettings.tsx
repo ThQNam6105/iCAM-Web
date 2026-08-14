@@ -23,6 +23,7 @@ import {
   type BranchLocation,
   type SystemHealthStatus,
   type AuditLogEntry,
+  type AnnouncementItem,
   DEFAULT_SYSTEM_SETTINGS,
 } from '../../services/settingsService';
 import { Button, Select, Input, Badge, Switch, FormField } from '../../components/Admin/UI';
@@ -152,6 +153,47 @@ export const AdminSettings: React.FC = () => {
     }));
 
     showToast(`Đã chọn ảnh thành công từ Thư viện Media!`, 'success');
+  };
+
+  // Announcement Item Handlers
+  const handleAddAnnouncementItem = () => {
+    const newItem: AnnouncementItem = {
+      id: `ann_${Date.now()}`,
+      textVi: '',
+      textEn: '',
+      isActive: true,
+    };
+    updateSettingsState((prev) => ({
+      ...prev,
+      announcement: {
+        ...prev.announcement,
+        items: [...(prev.announcement?.items || []), newItem],
+      },
+    }));
+    showToast('Đã thêm dòng thông báo mới! Hãy nhập nội dung và bấm Lưu thay đổi.', 'info');
+  };
+
+  const handleUpdateAnnouncementItem = (id: string, field: 'textVi' | 'textEn' | 'isActive', value: any) => {
+    updateSettingsState((prev) => ({
+      ...prev,
+      announcement: {
+        ...prev.announcement,
+        items: (prev.announcement?.items || []).map((item) =>
+          item.id === id ? { ...item, [field]: value } : item
+        ),
+      },
+    }));
+  };
+
+  const handleDeleteAnnouncementItem = (id: string) => {
+    updateSettingsState((prev) => ({
+      ...prev,
+      announcement: {
+        ...prev.announcement,
+        items: (prev.announcement?.items || []).filter((item) => item.id !== id),
+      },
+    }));
+    showToast('Đã xóa dòng thông báo.', 'info');
   };
 
   // Run Health Check Diagnostics
@@ -845,55 +887,113 @@ export const AdminSettings: React.FC = () => {
               <div className={styles.cardTitleGroup}>
                 <h2 className={styles.cardTitle}>THANH THÔNG BÁO NỔI ĐỈNH TRANG (TOP ANNOUNCEMENT BAR)</h2>
                 <p className={styles.cardSubtitle}>
-                  Hiển thị dòng chữ thông báo ưu đãi hoặc tin tức quan trọng chạy liên tục từ phải sang trái
+                  Quản lý danh sách các dòng thông báo ưu đãi / tin tức chạy liên tục từ phải sang trái
                 </p>
               </div>
 
-              <Switch
-                checked={settings.announcement.showAnnouncementBar}
-                onChange={(val) =>
-                  updateSettingsState((prev) => ({
-                    ...prev,
-                    announcement: { ...prev.announcement, showAnnouncementBar: val },
-                  }))
-                }
-                label={settings.announcement.showAnnouncementBar ? 'Đang hiển thị' : 'Đang ẩn'}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={<Plus size={14} />}
+                  onClick={handleAddAnnouncementItem}
+                >
+                  Thêm thông báo mới
+                </Button>
+                <Switch
+                  checked={settings.announcement.showAnnouncementBar}
+                  onChange={(val) =>
+                    updateSettingsState((prev) => ({
+                      ...prev,
+                      announcement: { ...prev.announcement, showAnnouncementBar: val },
+                    }))
+                  }
+                  label={settings.announcement.showAnnouncementBar ? 'Đang hiển thị' : 'Đang ẩn'}
+                />
+              </div>
             </div>
 
-            <div className={styles.grid2Col}>
-              <FormField label="Nội dung chữ chạy thông báo (Tiếng Việt)" required helperText="Dòng chữ thông báo chạy liên tục từ phải sang trái ở đầu website">
-                <Input
-                  value={settings.announcement.textVi}
-                  placeholder="Khai giảng khóa luyện thi Cambridge & IELTS tháng này..."
-                  onChange={(e) =>
-                    updateSettingsState((prev) => ({
-                      ...prev,
-                      announcement: { ...prev.announcement, textVi: e.target.value },
-                    }))
-                  }
-                />
-              </FormField>
+            {/* Dynamic Announcement Items List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '1.5rem' }}>
+              {(settings.announcement.items && settings.announcement.items.length > 0
+                ? settings.announcement.items
+                : [
+                    {
+                      id: 'ann_default',
+                      textVi: settings.announcement.textVi || '',
+                      textEn: settings.announcement.textEn || '',
+                      isActive: true,
+                    },
+                  ]
+              ).map((item, index) => (
+                <div
+                  key={item.id}
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '12px',
+                    padding: '1.25rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#F58220', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Bell size={14} /> Dòng thông báo #{index + 1}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <Switch
+                        checked={item.isActive}
+                        onChange={(val) => handleUpdateAnnouncementItem(item.id, 'isActive', val)}
+                        label={item.isActive ? 'Đang bật' : 'Đang tắt'}
+                      />
+                      {(settings.announcement.items?.length || 0) > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAnnouncementItem(item.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#ef4444',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                          title="Xóa dòng thông báo này"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
-              <FormField label="Nội dung chữ chạy thông báo (Tiếng Anh)" helperText="Hiển thị khi chuyển sang giao diện Tiếng Anh">
-                <Input
-                  value={settings.announcement.textEn}
-                  placeholder="New Cambridge & IELTS courses opening this month..."
-                  onChange={(e) =>
-                    updateSettingsState((prev) => ({
-                      ...prev,
-                      announcement: { ...prev.announcement, textEn: e.target.value },
-                    }))
-                  }
-                />
-              </FormField>
+                  <div className={styles.grid2Col}>
+                    <FormField label="Nội dung thông báo (Tiếng Việt)" required>
+                      <Input
+                        value={item.textVi}
+                        placeholder="Nhập dòng thông báo tiếng Việt..."
+                        onChange={(e) => handleUpdateAnnouncementItem(item.id, 'textVi', e.target.value)}
+                      />
+                    </FormField>
+                    <FormField label="Nội dung thông báo (Tiếng Anh)">
+                      <Input
+                        value={item.textEn || ''}
+                        placeholder="Nhập dòng thông báo tiếng Anh (không bắt buộc)..."
+                        onChange={(e) => handleUpdateAnnouncementItem(item.id, 'textEn', e.target.value)}
+                      />
+                    </FormField>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Live Announcement Marquee Banner Preview */}
             {settings.announcement.showAnnouncementBar && (
               <div style={{ marginTop: '1.25rem' }}>
                 <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Activity size={14} color="#F58220" /> Giao diện hiển thị thực tế (Chữ chạy tự động từ phải sang trái):
+                  <Activity size={14} color="#F58220" /> Giao diện hiển thị thực tế (Chuỗi các thông báo đang bật chạy từ phải sang trái):
                 </h4>
                 <div
                   style={{
@@ -911,12 +1011,22 @@ export const AdminSettings: React.FC = () => {
                   }}
                 >
                   <div className={styles.marqueeTrackPreview}>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
-                      {settings.announcement.textVi || 'Nhập nội dung thông báo...'} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp; {settings.announcement.textVi || 'Nhập nội dung thông báo...'}
-                    </span>
-                    <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
-                      {settings.announcement.textVi || 'Nhập nội dung thông báo...'} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp; {settings.announcement.textVi || 'Nhập nội dung thông báo...'}
-                    </span>
+                    {(() => {
+                      const activeTexts = (settings.announcement.items || [])
+                        .filter((i) => i.isActive && i.textVi.trim())
+                        .map((i) => i.textVi);
+                      const combined = activeTexts.length > 0 ? activeTexts.join('    •    ') : 'Nhập nội dung thông báo...';
+                      return (
+                        <>
+                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
+                            {combined} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
+                          </span>
+                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
+                            {combined} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
+                          </span>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>

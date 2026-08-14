@@ -78,6 +78,19 @@ export const Layout: React.FC = () => {
     settings.branches[0]?.address ||
     '344 A Tổ 13 KP 1, Trung Mỹ Tây, Hóc Môn & Quận 12, TP.HCM';
 
+  const activeAnnouncements = React.useMemo(() => {
+    const items = settings.announcement.items?.filter((i) => i.isActive) || [];
+    if (items.length > 0) {
+      return items.map((item) => (language === 'en' ? item.textEn || item.textVi : item.textVi));
+    }
+    const fallback = language === 'en' ? settings.announcement.textEn || settings.announcement.textVi : settings.announcement.textVi;
+    return fallback ? [fallback] : [];
+  }, [settings.announcement, language]);
+
+  const announcementTickerString = React.useMemo(() => {
+    return activeAnnouncements.join('    •    ');
+  }, [activeAnnouncements]);
+
   return (
     <div className={styles.layout}>
       {/* Fixed Internship Project Info Badge */}
@@ -85,26 +98,16 @@ export const Layout: React.FC = () => {
 
       <header className={styles.header}>
         {/* Top Announcement Bar from System Settings (Marquee Ticker Right to Left) */}
-        {settings.announcement.showAnnouncementBar && (
+        {settings.announcement.showAnnouncementBar && announcementTickerString && (
           <div className={styles.topAnnouncementBar} title="Di chuột để tạm dừng chữ chạy">
             <div className={styles.marqueeTrack}>
               <span className={styles.marqueeContent}>
-                {language === 'en'
-                  ? settings.announcement.textEn || settings.announcement.textVi
-                  : settings.announcement.textVi}
+                {announcementTickerString}
                 &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
-                {language === 'en'
-                  ? settings.announcement.textEn || settings.announcement.textVi
-                  : settings.announcement.textVi}
               </span>
               <span className={styles.marqueeContent}>
-                {language === 'en'
-                  ? settings.announcement.textEn || settings.announcement.textVi
-                  : settings.announcement.textVi}
+                {announcementTickerString}
                 &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
-                {language === 'en'
-                  ? settings.announcement.textEn || settings.announcement.textVi
-                  : settings.announcement.textVi}
               </span>
             </div>
           </div>

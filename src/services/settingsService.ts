@@ -34,16 +34,24 @@ export interface SeoSettings {
   socialShareImageUrl: string;
 }
 
+export interface AnnouncementItem {
+  id: string;
+  textVi: string;
+  textEn?: string;
+  isActive: boolean;
+}
+
 export interface AnnouncementSettings {
   allowConsultation: boolean;
   showAnnouncementBar: boolean;
   textVi: string;
   textEn: string;
-  ctaTextVi: string;
-  ctaTextEn: string;
-  ctaUrl: string;
-  startDate: string;
-  endDate: string;
+  items?: AnnouncementItem[];
+  ctaTextVi?: string;
+  ctaTextEn?: string;
+  ctaUrl?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface AnalyticsSettings {
@@ -155,9 +163,23 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
     showAnnouncementBar: true,
     textVi: 'Khai giảng khóa luyện thi Cambridge & IELTS tháng này — Ưu đãi 20% học phí cho 30 học viên đăng ký sớm nhất!',
     textEn: 'New Cambridge & IELTS courses opening this month — 20% fee discount for early birds!',
-    ctaTextVi: 'Đăng ký ngay',
-    ctaTextEn: 'Enroll Now',
-    ctaUrl: '/contact',
+    items: [
+      {
+        id: 'ann_1',
+        textVi: 'Khai giảng khóa luyện thi Cambridge & IELTS tháng này — Ưu đãi 20% học phí cho 30 học viên đăng ký sớm nhất!',
+        textEn: 'New Cambridge & IELTS courses opening this month — 20% fee discount for early birds!',
+        isActive: true,
+      },
+      {
+        id: 'ann_2',
+        textVi: 'Lịch kiểm tra trình độ Tiếng Anh miễn phí hàng tuần vào Thứ 7 & Chủ Nhật — Đăng ký ngay tại các cơ sở iCANCAM!',
+        textEn: 'Free weekly English placement test on Saturdays & Sundays — Register at iCANCAM branches!',
+        isActive: true,
+      },
+    ],
+    ctaTextVi: '',
+    ctaTextEn: '',
+    ctaUrl: '',
     startDate: '',
     endDate: '',
   },
@@ -200,6 +222,19 @@ export class SettingsService {
     const copy: SystemSettings = JSON.parse(JSON.stringify(settings || DEFAULT_SYSTEM_SETTINGS));
     if (!copy.seo) {
       copy.seo = { ...DEFAULT_SYSTEM_SETTINGS.seo };
+    }
+    if (!copy.announcement) {
+      copy.announcement = { ...DEFAULT_SYSTEM_SETTINGS.announcement };
+    }
+    if (!copy.announcement.items || copy.announcement.items.length === 0) {
+      copy.announcement.items = [
+        {
+          id: 'ann_1',
+          textVi: copy.announcement.textVi || 'Khai giảng khóa luyện thi Cambridge & IELTS tháng này — Ưu đãi 20% học phí cho 30 học viên đăng ký sớm nhất!',
+          textEn: copy.announcement.textEn || 'New Cambridge & IELTS courses opening this month — 20% fee discount for early birds!',
+          isActive: true,
+        },
+      ];
     }
 
     const isValidUrl = (url?: string) => {
