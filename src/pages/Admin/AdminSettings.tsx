@@ -16,6 +16,8 @@ import {
   RefreshCw,
   ExternalLink,
   Lock,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import {
   settingsService,
@@ -86,6 +88,36 @@ export const AdminSettings: React.FC = () => {
 
   const currentPreviewText = activePreviewTexts[previewIndex] || activePreviewTexts[0] || 'Nhập nội dung thông báo...';
 
+  // Scroll Track Ref & Helper for 1-Row Tab Bar
+  const tabsTrackRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkTabScroll = React.useCallback(() => {
+    if (tabsTrackRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsTrackRef.current;
+      setCanScrollLeft(scrollLeft > 4);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTabScroll();
+    window.addEventListener('resize', checkTabScroll);
+    return () => window.removeEventListener('resize', checkTabScroll);
+  }, [checkTabScroll]);
+
+  const handleScrollTabs = (direction: 'left' | 'right') => {
+    if (tabsTrackRef.current) {
+      const scrollAmount = 260;
+      tabsTrackRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+      setTimeout(checkTabScroll, 320);
+    }
+  };
+
   // Load Settings on Mount
   useEffect(() => {
     let isMounted = true;
@@ -113,11 +145,14 @@ export const AdminSettings: React.FC = () => {
   // Handle Tab Switch with Unsaved Changes Guard
   const handleTabChange = (newTab: SettingsTab) => {
     if (isDirty) {
-      if (!window.confirm('Bạn có thay đổi chưa lưu! Bạn có chắc chắn muốn chuyển trang mà không lưu?')) {
+      if (!window.confirm('Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn chuyển sang thẻ khác?')) {
         return;
       }
     }
     setActiveTab(newTab);
+    setTimeout(() => {
+      checkTabScroll();
+    }, 100);
   };
 
   // State Update Helper
@@ -311,19 +346,47 @@ export const AdminSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className={styles.tabsWrapper}>
-        {tabsList.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            className={`${styles.tabBtn} ${activeTab === tab.key ? styles.tabBtnActive : ''}`}
-            onClick={() => handleTabChange(tab.key)}
-          >
-            {tab.icon}
-            <span>{tab.label}</span>
-          </button>
-        ))}
+      {/* Navigation Tabs Bar with Left/Right Arrows */}
+      <div className={styles.tabsNavContainer}>
+        <button
+          type="button"
+          className={styles.scrollArrowBtn}
+          onClick={() => handleScrollTabs('left')}
+          disabled={!canScrollLeft}
+          title="Cuộn sang trái"
+          aria-label="Cuộn sang trái"
+        >
+          <ChevronLeft size={18} />
+        </button>
+
+        <div
+          ref={tabsTrackRef}
+          className={styles.tabsWrapper}
+          onScroll={checkTabScroll}
+        >
+          {tabsList.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              className={`${styles.tabBtn} ${activeTab === tab.key ? styles.tabBtnActive : ''}`}
+              onClick={() => handleTabChange(tab.key)}
+            >
+              {tab.icon}
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className={styles.scrollArrowBtn}
+          onClick={() => handleScrollTabs('right')}
+          disabled={!canScrollRight}
+          title="Cuộn sang phải"
+          aria-label="Cuộn sang phải"
+        >
+          <ChevronRight size={18} />
+        </button>
       </div>
 
       {/* TAB 1: THÔNG TIN WEBSITE */}
