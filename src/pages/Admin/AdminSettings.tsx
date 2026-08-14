@@ -18,6 +18,7 @@ import {
   Lock,
   ChevronLeft,
   ChevronRight,
+  Clock,
 } from 'lucide-react';
 import {
   settingsService,
@@ -28,7 +29,7 @@ import {
   type AnnouncementItem,
   DEFAULT_SYSTEM_SETTINGS,
 } from '../../services/settingsService';
-import { Button, Select, Input, Badge, Switch, FormField } from '../../components/Admin/UI';
+import { Button, Input, Badge, Switch, FormField } from '../../components/Admin/UI';
 import { MediaSelectorModal } from '../../components/Admin/MediaSelectorModal';
 import { useToast } from '../../components/Toast/Toast';
 import bannerBg from '../../assets/banner-bg.jpg';
@@ -1474,25 +1475,51 @@ export const AdminSettings: React.FC = () => {
               </div>
             </div>
 
-            <FormField label="Thời gian tự động đăng xuất">
-              <Select
-                value={settings.security.sessionTimeoutMinutes}
-                onChange={(val) =>
-                  updateSettingsState((prev) => ({
-                    ...prev,
-                    security: {
-                      ...prev.security,
-                      sessionTimeoutMinutes: val as '30' | '60' | '240' | '480',
-                    },
-                  }))
-                }
-                options={[
+            <FormField label="Thời gian tự động đăng xuất" helperText="Hệ thống sẽ tự động đăng xuất nếu quản trị viên không có thao tác trong khoảng thời gian đã chọn">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem', marginTop: '0.25rem' }}>
+                {[
+                  { value: '15', label: '15 phút' },
                   { value: '30', label: '30 phút' },
                   { value: '60', label: '1 giờ' },
                   { value: '240', label: '4 giờ' },
                   { value: '480', label: '8 giờ' },
-                ]}
-              />
+                ].map((opt) => {
+                  const isSelected = (settings.security.sessionTimeoutMinutes || '60') === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() =>
+                        updateSettingsState((prev) => ({
+                          ...prev,
+                          security: {
+                            ...prev.security,
+                            sessionTimeoutMinutes: opt.value as any,
+                          },
+                        }))
+                      }
+                      style={{
+                        padding: '0.6rem 1.15rem',
+                        borderRadius: '10px',
+                        border: isSelected ? '1px solid #F58220' : '1px solid rgba(255, 255, 255, 0.12)',
+                        background: isSelected ? '#F58220' : 'rgba(15, 23, 42, 0.6)',
+                        color: '#ffffff',
+                        fontSize: '0.88rem',
+                        fontWeight: isSelected ? 700 : 500,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        boxShadow: isSelected ? '0 4px 12px rgba(245, 130, 32, 0.35)' : 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      <Clock size={16} style={{ color: isSelected ? '#ffffff' : '#94a3b8' }} />
+                      <span>{opt.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </FormField>
           </div>
 
