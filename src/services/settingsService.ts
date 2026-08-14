@@ -152,8 +152,8 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   announcement: {
     allowConsultation: true,
     showAnnouncementBar: true,
-    textVi: '🎉 Khai giảng khóa luyện thi Cambridge & IELTS tháng này — Ưu đãi 20% học phí cho 30 học viên đăng ký sớm nhất!',
-    textEn: '🎉 New Cambridge & IELTS courses opening this month — 20% fee discount for early birds!',
+    textVi: 'Khai giảng khóa luyện thi Cambridge & IELTS tháng này — Ưu đãi 20% học phí cho 30 học viên đăng ký sớm nhất!',
+    textEn: 'New Cambridge & IELTS courses opening this month — 20% fee discount for early birds!',
     ctaTextVi: 'Đăng ký ngay',
     ctaTextEn: 'Enroll Now',
     ctaUrl: '/contact',
@@ -382,11 +382,25 @@ export class SettingsService {
       const raw = localStorage.getItem(SETTINGS_CACHE_KEY);
       if (raw) {
         const parsed: SystemSettings = JSON.parse(raw);
+        let modified = false;
         if (parsed.websiteInfo) {
           if (!parsed.websiteInfo.youtubeUrl || parsed.websiteInfo.youtubeUrl.includes('@icancam')) {
             parsed.websiteInfo.youtubeUrl = 'https://www.youtube.com/@anhnguicancam3597';
-            this.saveToCache(parsed);
+            modified = true;
           }
+        }
+        if (parsed.announcement) {
+          if (parsed.announcement.textVi && parsed.announcement.textVi.includes('🎉')) {
+            parsed.announcement.textVi = parsed.announcement.textVi.replace(/🎉\s*/g, '');
+            modified = true;
+          }
+          if (parsed.announcement.textEn && parsed.announcement.textEn.includes('🎉')) {
+            parsed.announcement.textEn = parsed.announcement.textEn.replace(/🎉\s*/g, '');
+            modified = true;
+          }
+        }
+        if (modified) {
+          this.saveToCache(parsed);
         }
         return parsed;
       }

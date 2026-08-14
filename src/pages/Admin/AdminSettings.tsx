@@ -118,10 +118,10 @@ export const AdminSettings: React.FC = () => {
       if (warning) {
         showToast(warning, 'info');
       } else {
-        showToast('✓ Đã lưu thay đổi cấu hình hệ thống!', 'success');
+        showToast('Đã lưu thay đổi cấu hình hệ thống thành công!', 'success');
       }
     } else {
-      showToast(error || '⚠ Không thể lưu cấu hình. Vui lòng thử lại.', 'error');
+      showToast(error || 'Không thể lưu cấu hình. Vui lòng thử lại.', 'error');
     }
   };
 
@@ -733,12 +733,12 @@ export const AdminSettings: React.FC = () => {
             <div className={styles.grid2Col}>
               {/* Google Search Preview */}
               <div>
-                <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
-                  🔍 Khi tìm kiếm trên Google:
+                <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Search size={14} color="#F58220" /> Khi tìm kiếm trên Google:
                 </h4>
                 <div className={styles.previewBox}>
                   <div className={styles.googlePreviewUrl}>
-                    https://icancam.edu.vn <ExternalLink size={12} />
+                    {typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}` : 'https://thieunamicancam.online'} <ExternalLink size={12} />
                   </div>
                   <h3 className={styles.googlePreviewTitle}>
                     {settings.seo.websiteTitleVi || settings.websiteInfo.centerName}
@@ -751,8 +751,8 @@ export const AdminSettings: React.FC = () => {
 
               {/* Social Share Card Preview */}
               <div>
-                <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
-                  💬 Khi chia sẻ qua Zalo / Facebook:
+                <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Globe size={14} color="#F58220" /> Khi chia sẻ qua Zalo / Facebook:
                 </h4>
                 <div className={styles.socialShareCard}>
                   {settings.seo.socialShareImageUrl ? (
@@ -775,7 +775,9 @@ export const AdminSettings: React.FC = () => {
                     </div>
                   )}
                   <div className={styles.socialShareContent}>
-                    <span className={styles.socialShareDomain}>ICANCAM.EDU.VN</span>
+                    <span className={styles.socialShareDomain}>
+                      {typeof window !== 'undefined' ? window.location.hostname.toUpperCase() : 'THIEUNAMICANCAM.ONLINE'}
+                    </span>
                     <h3 className={styles.socialShareTitle}>
                       {settings.seo.websiteTitleVi || settings.websiteInfo.displayName}
                     </h3>
