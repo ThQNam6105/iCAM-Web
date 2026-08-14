@@ -90,6 +90,22 @@ export interface SystemHealthStatus {
 const SETTINGS_CACHE_KEY = 'ican_cms_settings_cache_v2';
 const AUDIT_LOG_KEY = 'ican_cms_audit_logs_v2';
 
+export const formatExternalUrl = (url: string | undefined): string => {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (!trimmed) return '#';
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('//') ||
+    trimmed.startsWith('mailto:') ||
+    trimmed.startsWith('tel:')
+  ) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};
+
 export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   websiteInfo: {
     centerName: 'Hệ thống Trung tâm Ngoại ngữ iCANCAM',
@@ -99,7 +115,7 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
     primaryHotline: '0903 123 456',
     businessHours: 'Thứ 2 - Chủ Nhật: 08:00 - 21:00',
     facebookUrl: 'https://facebook.com/icancam.edu.vn',
-    youtubeUrl: 'https://youtube.com/@icancam',
+    youtubeUrl: 'https://www.youtube.com/@anhnguicancam3597',
     tiktokUrl: 'https://tiktok.com/@icancam.english',
     zaloUrl: 'https://zalo.me/0903123456',
   },
@@ -364,7 +380,16 @@ export class SettingsService {
   private getFromCache(): SystemSettings | null {
     try {
       const raw = localStorage.getItem(SETTINGS_CACHE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed: SystemSettings = JSON.parse(raw);
+        if (parsed.websiteInfo) {
+          if (!parsed.websiteInfo.youtubeUrl || parsed.websiteInfo.youtubeUrl.includes('@icancam')) {
+            parsed.websiteInfo.youtubeUrl = 'https://www.youtube.com/@anhnguicancam3597';
+            this.saveToCache(parsed);
+          }
+        }
+        return parsed;
+      }
     } catch {
       // Storage restricted
     }

@@ -5,7 +5,7 @@ import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { User, LogOut, Menu, X, ChevronUp, MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { settingsService, type SystemSettings, DEFAULT_SYSTEM_SETTINGS } from '../../services/settingsService';
+import { settingsService, type SystemSettings, DEFAULT_SYSTEM_SETTINGS, formatExternalUrl } from '../../services/settingsService';
 import styles from './Layout.module.css';
 import { ProjectInfoBadge } from '../ProjectInfoBadge/ProjectInfoBadge';
 
@@ -377,7 +377,7 @@ export const Layout: React.FC = () => {
               {/* Social Media Row (Dynamic Clickable External Links) */}
               <div className={styles.socialRow}>
                 <a
-                  href={settings.websiteInfo.facebookUrl || 'https://facebook.com/icancam.edu.vn'}
+                  href={formatExternalUrl(settings.websiteInfo.facebookUrl || 'https://facebook.com/icancam.edu.vn')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.socialIconBtn}
@@ -389,7 +389,7 @@ export const Layout: React.FC = () => {
                   </svg>
                 </a>
                 <a
-                  href={settings.websiteInfo.youtubeUrl || 'https://youtube.com/@icancam'}
+                  href={formatExternalUrl(settings.websiteInfo.youtubeUrl || 'https://www.youtube.com/@anhnguicancam3597')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.socialIconBtn}
@@ -401,7 +401,7 @@ export const Layout: React.FC = () => {
                   </svg>
                 </a>
                 <a
-                  href={settings.websiteInfo.tiktokUrl || 'https://tiktok.com/@icancam.english'}
+                  href={formatExternalUrl(settings.websiteInfo.tiktokUrl || 'https://tiktok.com/@icancam.english')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.socialIconBtn}
@@ -413,7 +413,7 @@ export const Layout: React.FC = () => {
                   </svg>
                 </a>
                 <a
-                  href={settings.websiteInfo.zaloUrl || 'https://zalo.me/0903123456'}
+                  href={formatExternalUrl(settings.websiteInfo.zaloUrl || 'https://zalo.me/0903123456')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={styles.socialIconBtn}
@@ -516,7 +516,7 @@ export const Layout: React.FC = () => {
 
         {/* Zalo Shortcut */}
         <a
-          href={settings.websiteInfo.zaloUrl || 'https://zalo.me/0903123456'}
+          href={formatExternalUrl(settings.websiteInfo.zaloUrl || 'https://zalo.me/0903123456')}
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.zaloBtn}`}
@@ -529,7 +529,7 @@ export const Layout: React.FC = () => {
 
         {/* Messenger Shortcut */}
         <a
-          href={settings.websiteInfo.facebookUrl || 'https://facebook.com/icancam.edu.vn'}
+          href={formatExternalUrl(settings.websiteInfo.facebookUrl || 'https://facebook.com/icancam.edu.vn')}
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.messengerBtn}`}
@@ -549,7 +549,7 @@ export const Layout: React.FC = () => {
 
         {/* Gmail / Primary Email Shortcut */}
         <a
-          href={`mailto:${settings.websiteInfo.primaryEmail || 'info@icancam.edu.vn'}`}
+          href={formatExternalUrl(settings.websiteInfo.primaryEmail?.startsWith('mailto:') ? settings.websiteInfo.primaryEmail : `mailto:${settings.websiteInfo.primaryEmail || 'info@icancam.edu.vn'}`)}
           className={`${styles.contactShortcutBtn} ${styles.gmailBtn}`}
           data-tooltip={t.shortcuts.email}
         >
