@@ -19,6 +19,50 @@
   flex-direction: column;
 }
 
+.topAnnouncementBar {
+  background: linear-gradient(90deg, #F58220 0%, #ff9e42 50%, #F58220 100%);
+  color: #ffffff;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(245, 130, 32, 0.25);
+  user-select: none;
+}
+
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: marqueeTicker 28s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.topAnnouncementBar:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+.marqueeContent {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  padding-right: 4rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+@keyframes marqueeTicker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .navContainer {
   max-width: 1400px;
   width: 100%;

@@ -845,7 +845,7 @@ export const AdminSettings: React.FC = () => {
               <div className={styles.cardTitleGroup}>
                 <h2 className={styles.cardTitle}>THANH THÔNG BÁO NỔI ĐỈNH TRANG (TOP ANNOUNCEMENT BAR)</h2>
                 <p className={styles.cardSubtitle}>
-                  Hiển thị dòng chữ thông báo ưu đãi hoặc tin tức quan trọng chạy ở đỉnh trang chủ
+                  Hiển thị dòng chữ thông báo ưu đãi hoặc tin tức quan trọng chạy liên tục từ phải sang trái
                 </p>
               </div>
 
@@ -862,9 +862,10 @@ export const AdminSettings: React.FC = () => {
             </div>
 
             <div className={styles.grid2Col}>
-              <FormField label="Nội dung thông báo (Tiếng Việt)" required>
+              <FormField label="Nội dung chữ chạy thông báo (Tiếng Việt)" required helperText="Dòng chữ thông báo chạy liên tục từ phải sang trái ở đầu website">
                 <Input
                   value={settings.announcement.textVi}
+                  placeholder="Khai giảng khóa luyện thi Cambridge & IELTS tháng này..."
                   onChange={(e) =>
                     updateSettingsState((prev) => ({
                       ...prev,
@@ -874,9 +875,10 @@ export const AdminSettings: React.FC = () => {
                 />
               </FormField>
 
-              <FormField label="Nội dung thông báo (Tiếng Anh)">
+              <FormField label="Nội dung chữ chạy thông báo (Tiếng Anh)" helperText="Hiển thị khi chuyển sang giao diện Tiếng Anh">
                 <Input
                   value={settings.announcement.textEn}
+                  placeholder="New Cambridge & IELTS courses opening this month..."
                   onChange={(e) =>
                     updateSettingsState((prev) => ({
                       ...prev,
@@ -885,59 +887,37 @@ export const AdminSettings: React.FC = () => {
                   }
                 />
               </FormField>
-
-              <FormField label="Tên nút bấm CTA (Việt / Anh)">
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <Input
-                    value={settings.announcement.ctaTextVi}
-                    placeholder="Đăng ký ngay"
-                    onChange={(e) =>
-                      updateSettingsState((prev) => ({
-                        ...prev,
-                        announcement: { ...prev.announcement, ctaTextVi: e.target.value },
-                      }))
-                    }
-                  />
-                  <Input
-                    value={settings.announcement.ctaTextEn}
-                    placeholder="Enroll Now"
-                    onChange={(e) =>
-                      updateSettingsState((prev) => ({
-                        ...prev,
-                        announcement: { ...prev.announcement, ctaTextEn: e.target.value },
-                      }))
-                    }
-                  />
-                </div>
-              </FormField>
-
-              <FormField label="Liên kết khi bấm vào nút CTA">
-                <Input
-                  value={settings.announcement.ctaUrl}
-                  placeholder="/contact"
-                  onChange={(e) =>
-                    updateSettingsState((prev) => ({
-                      ...prev,
-                      announcement: { ...prev.announcement, ctaUrl: e.target.value },
-                    }))
-                  }
-                />
-              </FormField>
             </div>
 
-            {/* Live Announcement Banner Preview */}
+            {/* Live Announcement Marquee Banner Preview */}
             {settings.announcement.showAnnouncementBar && (
-              <div style={{ marginTop: '1rem' }}>
-                <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
-                  👀 Giao diện hiển thị thực tế:
+              <div style={{ marginTop: '1.25rem' }}>
+                <h4 style={{ fontSize: '0.88rem', color: '#94a3b8', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Activity size={14} color="#F58220" /> Giao diện hiển thị thực tế (Chữ chạy tự động từ phải sang trái):
                 </h4>
-                <div className={styles.announcementPreviewBanner}>
-                  <span>{settings.announcement.textVi || 'Nội dung thông báo ưu đãi...'}</span>
-                  {settings.announcement.ctaTextVi && (
-                    <button type="button" className={styles.announcementPreviewBtn}>
-                      {settings.announcement.ctaTextVi}
-                    </button>
-                  )}
+                <div
+                  style={{
+                    background: 'linear-gradient(90deg, #F58220 0%, #ff9e42 50%, #F58220 100%)',
+                    color: '#ffffff',
+                    height: '42px',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    width: '100%',
+                    userSelect: 'none',
+                    boxShadow: '0 2px 8px rgba(245, 130, 32, 0.25)',
+                  }}
+                >
+                  <div className={styles.marqueeTrackPreview}>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
+                      {settings.announcement.textVi || 'Nhập nội dung thông báo...'} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp; {settings.announcement.textVi || 'Nhập nội dung thông báo...'}
+                    </span>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
+                      {settings.announcement.textVi || 'Nhập nội dung thông báo...'} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp; {settings.announcement.textVi || 'Nhập nội dung thông báo...'}
+                    </span>
+                  </div>
                 </div>
               </div>
             )}

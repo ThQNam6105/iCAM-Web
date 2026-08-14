@@ -499,6 +499,23 @@
   }
 }
 
+.marqueeTrackPreview {
+  display: flex;
+  width: max-content;
+  animation: marqueePreviewTicker 24s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+@keyframes marqueePreviewTicker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .unsavedText {
   font-size: 0.9rem;
   font-weight: 600;

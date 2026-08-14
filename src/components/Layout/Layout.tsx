@@ -84,21 +84,29 @@ export const Layout: React.FC = () => {
       <ProjectInfoBadge />
 
       <header className={styles.header}>
-        {/* Top Announcement Bar from System Settings */}
+        {/* Top Announcement Bar from System Settings (Marquee Ticker Right to Left) */}
         {settings.announcement.showAnnouncementBar && (
-          <div className={styles.topAnnouncementBar}>
-            <span>
-              {language === 'en'
-                ? settings.announcement.textEn || settings.announcement.textVi
-                : settings.announcement.textVi}
-            </span>
-            {settings.announcement.ctaTextVi && (
-              <Link to={settings.announcement.ctaUrl || '/contact'} className={styles.topAnnouncementCta}>
+          <div className={styles.topAnnouncementBar} title="Di chuột để tạm dừng chữ chạy">
+            <div className={styles.marqueeTrack}>
+              <span className={styles.marqueeContent}>
                 {language === 'en'
-                  ? settings.announcement.ctaTextEn || settings.announcement.ctaTextVi
-                  : settings.announcement.ctaTextVi}
-              </Link>
-            )}
+                  ? settings.announcement.textEn || settings.announcement.textVi
+                  : settings.announcement.textVi}
+                &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
+                {language === 'en'
+                  ? settings.announcement.textEn || settings.announcement.textVi
+                  : settings.announcement.textVi}
+              </span>
+              <span className={styles.marqueeContent}>
+                {language === 'en'
+                  ? settings.announcement.textEn || settings.announcement.textVi
+                  : settings.announcement.textVi}
+                &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
+                {language === 'en'
+                  ? settings.announcement.textEn || settings.announcement.textVi
+                  : settings.announcement.textVi}
+              </span>
+            </div>
           </div>
         )}
         <nav className={styles.navContainer}>
