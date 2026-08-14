@@ -107,13 +107,17 @@ export const AdminSettings: React.FC = () => {
   // Save Settings Trigger
   const handleSave = async () => {
     setSaving(true);
-    const { success, error } = await settingsService.updateSystemSettings(settings);
+    const { success, warning, error } = await settingsService.updateSystemSettings(settings);
     setSaving(false);
 
     if (success) {
       setInitialSettings(JSON.parse(JSON.stringify(settings)));
       setIsDirty(false);
-      showToast('✓ Đã lưu thay đổi cấu hình hệ thống!', 'success');
+      if (warning) {
+        showToast(warning, 'info');
+      } else {
+        showToast('✓ Đã lưu thay đổi cấu hình hệ thống!', 'success');
+      }
     } else {
       showToast(error || '⚠ Không thể lưu cấu hình. Vui lòng thử lại.', 'error');
     }

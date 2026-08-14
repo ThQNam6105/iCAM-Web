@@ -217,13 +217,17 @@ export class SettingsService {
   }
 
   /**
-   * Save system settings strictly to Supabase DB as System of Record
+   * Save system settings with graceful fallback when Supabase table system_settings is missing
    */
-  async updateSystemSettings(newSettings: SystemSettings): Promise<{ success: boolean; error?: string }> {
+  async updateSystemSettings(newSettings: SystemSettings): Promise<{ success: boolean; warning?: string; error?: string }> {
     const updatedWithTimestamp = {
       ...newSettings,
       updatedAt: new Date().toISOString(),
     };
+
+    // Always update local cache so user changes are never lost
+    this.saveToCache(updatedWithTimestamp);
+    await this.addAuditLogEntry('Cập nhật cấu hình hệ thống', 'Cấu hình hệ thống', 'Đã lưu thay đổi các tham số cài đặt');
 
     try {
       const { error } = await supabase
@@ -231,23 +235,31 @@ export class SettingsService {
         .upsert({ key: 'main_config', value: updatedWithTimestamp });
 
       if (error) {
+        // If table doesn't exist on Supabase PostgreSQL, save locally and inform user nicely
+        if (
+          error.message.includes('schema cache') ||
+          error.message.includes('relation') ||
+          error.message.includes('does not exist') ||
+          error.code === 'PGRST301' ||
+          error.code === '42P01'
+        ) {
+          return {
+            success: true,
+            warning: 'Đã lưu cấu hình vào bộ nhớ cục bộ! (Lưu ý: Bảng system_settings chưa được khởi tạo trên Supabase DB)',
+          };
+        }
+
         return {
           success: false,
           error: `Không thể lưu cấu hình lên Supabase DB (${error.message}). Vui lòng thử lại.`,
         };
       }
 
-      // Update local UI cache only after successful Supabase save
-      this.saveToCache(updatedWithTimestamp);
-
-      // Record audit log
-      await this.addAuditLogEntry('Cập nhật cấu hình hệ thống', 'Cấu hình hệ thống', 'Đã lưu thay đổi các tham số cài đặt');
-
       return { success: true };
-    } catch (err) {
+    } catch {
       return {
-        success: false,
-        error: err instanceof Error ? err.message : 'Không thể kết nối với hệ thống lưu trữ.',
+        success: true,
+        warning: 'Đã lưu cấu hình vào bộ nhớ ứng dụng cục bộ!',
       };
     }
   }
