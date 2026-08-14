@@ -77,25 +77,24 @@ export const Layout: React.FC = () => {
       {/* Fixed Internship Project Info Badge */}
       <ProjectInfoBadge />
 
-      {/* Top Announcement Bar from System Settings */}
-      {settings.announcement.showAnnouncementBar && (
-        <div className={styles.topAnnouncementBar}>
-          <span>
-            {language === 'en'
-              ? settings.announcement.textEn || settings.announcement.textVi
-              : settings.announcement.textVi}
-          </span>
-          {settings.announcement.ctaTextVi && (
-            <Link to={settings.announcement.ctaUrl || '/contact'} className={styles.topAnnouncementCta}>
-              {language === 'en'
-                ? settings.announcement.ctaTextEn || settings.announcement.ctaTextVi
-                : settings.announcement.ctaTextVi}
-            </Link>
-          )}
-        </div>
-      )}
-
       <header className={styles.header}>
+        {/* Top Announcement Bar from System Settings */}
+        {settings.announcement.showAnnouncementBar && (
+          <div className={styles.topAnnouncementBar}>
+            <span>
+              {language === 'en'
+                ? settings.announcement.textEn || settings.announcement.textVi
+                : settings.announcement.textVi}
+            </span>
+            {settings.announcement.ctaTextVi && (
+              <Link to={settings.announcement.ctaUrl || '/contact'} className={styles.topAnnouncementCta}>
+                {language === 'en'
+                  ? settings.announcement.ctaTextEn || settings.announcement.ctaTextVi
+                  : settings.announcement.ctaTextVi}
+              </Link>
+            )}
+          </div>
+        )}
         <nav className={styles.navContainer}>
           {/* Logo */}
           <a href={homepageUrl} className={styles.logo} onClick={closeMenu}>
@@ -316,9 +315,14 @@ export const Layout: React.FC = () => {
       </div>
 
       {/* Backdrop overlay when mobile menu is open */}
-      {isMenuOpen && <div className={styles.backdrop} onClick={closeMenu} />}
+      {isMenuOpen && (
+        <div
+          className={`${styles.backdrop} ${settings.announcement.showAnnouncementBar ? styles.backdropWithAnnouncement : ''}`}
+          onClick={closeMenu}
+        />
+      )}
 
-      <main className={styles.main}>
+      <main className={`${styles.main} ${settings.announcement.showAnnouncementBar ? styles.mainWithAnnouncement : ''}`}>
         <Outlet />
       </main>
 
