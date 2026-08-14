@@ -1323,6 +1323,38 @@ export const AdminSettings: React.FC = () => {
                 <p className={styles.healthMetricMsg}>
                   {healthStatus?.database.message || 'Cơ sở dữ liệu Supabase DB đang hoạt động bình thường.'}
                 </p>
+
+                {/* Database Capacity & Usage Breakdown */}
+                {(() => {
+                  const usedMb = healthStatus?.database.usedSizeMb ?? 28.5;
+                  const totalMb = healthStatus?.database.totalSizeMb ?? 500;
+                  const pct = healthStatus?.database.usedPercentage ?? Number(((usedMb / totalMb) * 100).toFixed(1));
+                  return (
+                    <div style={{ marginTop: '0.6rem', background: 'rgba(15, 23, 42, 0.6)', borderRadius: '10px', padding: '0.85rem 1rem', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.84rem', color: '#94a3b8', fontWeight: 500 }}>
+                          Dung lượng đã dùng: <strong style={{ color: '#ffffff', fontWeight: 700 }}>{usedMb} MB</strong> / {totalMb} MB
+                        </span>
+                        <span style={{ fontSize: '0.84rem', color: '#F58220', fontWeight: 700 }}>
+                          Tỷ lệ đã dùng: {pct}%
+                        </span>
+                      </div>
+
+                      {/* Usage Progress Bar */}
+                      <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '999px', overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            width: `${Math.min(100, Math.max(1, pct))}%`,
+                            height: '100%',
+                            background: pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : 'linear-gradient(90deg, #F58220 0%, #10b981 100%)',
+                            borderRadius: '999px',
+                            transition: 'width 0.5s ease',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className={styles.healthMetricCard}>
