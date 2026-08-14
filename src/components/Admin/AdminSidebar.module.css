@@ -136,15 +136,29 @@
   font-size: 0.85rem;
 }
 
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
 .userName {
   font-size: 0.85rem;
   font-weight: 700;
   color: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .userRole {
   font-size: 0.72rem;
   color: #94a3b8;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .logoutBtn {
