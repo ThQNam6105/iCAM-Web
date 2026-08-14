@@ -197,6 +197,20 @@ const DEFAULT_AUDIT_LOGS: AuditLogEntry[] = [
 ];
 
 export class SettingsService {
+  public ensureDefaults(settings: SystemSettings): SystemSettings {
+    const copy: SystemSettings = JSON.parse(JSON.stringify(settings || DEFAULT_SYSTEM_SETTINGS));
+    if (!copy.seo) {
+      copy.seo = { ...DEFAULT_SYSTEM_SETTINGS.seo };
+    }
+    if (!copy.seo.faviconUrl) {
+      copy.seo.faviconUrl = icanLogo;
+    }
+    if (!copy.seo.socialShareImageUrl) {
+      copy.seo.socialShareImageUrl = bannerBg;
+    }
+    return copy;
+  }
+
   /**
    * Fetch system settings with Supabase DB as System of Record
    */
@@ -209,7 +223,7 @@ export class SettingsService {
         .maybeSingle();
 
       if (!error && data?.value) {
-        const loaded: SystemSettings = data.value;
+        const loaded: SystemSettings = this.ensureDefaults(data.value);
         this.saveToCache(loaded);
         return { settings: loaded, fromSupabase: true };
       }
@@ -224,11 +238,11 @@ export class SettingsService {
 
     const cached = this.getFromCache();
     if (cached) {
-      return { settings: cached, fromSupabase: false };
+      return { settings: this.ensureDefaults(cached), fromSupabase: false };
     }
 
     return {
-      settings: DEFAULT_SYSTEM_SETTINGS,
+      settings: this.ensureDefaults(DEFAULT_SYSTEM_SETTINGS),
       fromSupabase: false,
       error: 'Không thể kết nối với hệ thống lưu trữ Supabase. Đang hiển thị thiết lập mặc định.',
     };

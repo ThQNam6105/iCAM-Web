@@ -150,7 +150,7 @@ export const AdminSettings: React.FC = () => {
       },
     }));
 
-    showToast(`Đã chọn ảnh thành côngtừ Thư viện Media!`, 'success');
+    showToast(`Đã chọn ảnh thành công từ Thư viện Media!`, 'success');
   };
 
   // Run Health Check Diagnostics
