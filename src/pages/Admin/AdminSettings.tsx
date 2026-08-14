@@ -598,7 +598,6 @@ export const AdminSettings: React.FC = () => {
                 label="Tiêu đề trang (SEO Title - Tiếng Việt)"
                 required
                 helperText="Tiêu đề chính hiển thị trên tab trình duyệt và kết quả Google"
-                technicalDetails="Metadata <title> & OpenGraph og:title tag"
               >
                 <Input
                   value={settings.seo.websiteTitleVi}
@@ -614,7 +613,6 @@ export const AdminSettings: React.FC = () => {
               <FormField
                 label="Tiêu đề trang (SEO Title - Tiếng Anh)"
                 helperText="Tiêu đề hiển thị khi người dùng chọn giao diện Tiếng Anh"
-                technicalDetails="Metadata <title> (English version)"
               >
                 <Input
                   value={settings.seo.websiteTitleEn}
@@ -631,7 +629,6 @@ export const AdminSettings: React.FC = () => {
                 label="Mô tả website (SEO Description - Tiếng Việt)"
                 required
                 helperText="Đoạn giới thiệu ngắn gọn thể hiện chất lượng đào tạo của trung tâm"
-                technicalDetails="Metadata <meta name='description'> & og:description tag"
               >
                 <textarea
                   className={styles.textarea}
@@ -648,7 +645,6 @@ export const AdminSettings: React.FC = () => {
               <FormField
                 label="Mô tả website (SEO Description - Tiếng Anh)"
                 helperText="Đoạn mô tả hiển thị bằng Tiếng Anh khi đổi ngôn ngữ"
-                technicalDetails="Metadata <meta name='description'> (English version)"
               >
                 <textarea
                   className={styles.textarea}
@@ -668,7 +664,6 @@ export const AdminSettings: React.FC = () => {
               <FormField
                 label="Ảnh Favicon trang web"
                 helperText="Biểu tượng vuông (1:1) hiển thị góc tab trình duyệt (.ico, .png, .svg)"
-                technicalDetails="Link rel='icon' & shortcut icon tags"
               >
                 <div className={styles.mediaSelectBox}>
                   {settings.seo.faviconUrl ? (
@@ -699,7 +694,6 @@ export const AdminSettings: React.FC = () => {
               <FormField
                 label="Ảnh hiển thị khi chia sẻ (Social Share Image)"
                 helperText="Ảnh hình chữ nhật (16:9 / 1200x630) hiển thị khi gửi link qua Zalo, Facebook"
-                technicalDetails="OpenGraph og:image & twitter:image tags"
               >
                 <div className={styles.mediaSelectBox}>
                   {settings.seo.socialShareImageUrl ? (
@@ -959,7 +953,6 @@ export const AdminSettings: React.FC = () => {
             <FormField
               label="Mã đo lường Google Analytics (Measurement ID)"
               helperText="Có định dạng G-XXXXXXXXXX được cấp từ tài khoản Google Analytics"
-              technicalDetails="Mã GA4 tự động gắn thẻ gtag.js vào thẻ <head> của website"
             >
               <Input
                 value={settings.analytics.gaMeasurementId}
