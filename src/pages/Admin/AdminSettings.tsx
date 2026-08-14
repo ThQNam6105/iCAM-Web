@@ -614,6 +614,7 @@ export const AdminSettings: React.FC = () => {
               <FormField
                 label="Tiêu đề trang (SEO Title - Tiếng Anh)"
                 helperText="Tiêu đề hiển thị khi người dùng chọn giao diện Tiếng Anh"
+                technicalDetails="Metadata <title> (English version)"
               >
                 <Input
                   value={settings.seo.websiteTitleEn}
@@ -646,7 +647,8 @@ export const AdminSettings: React.FC = () => {
 
               <FormField
                 label="Mô tả website (SEO Description - Tiếng Anh)"
-                helperText="Đoạn mô tả hiển thị bằng Tiếng Anh"
+                helperText="Đoạn mô tả hiển thị bằng Tiếng Anh khi đổi ngôn ngữ"
+                technicalDetails="Metadata <meta name='description'> (English version)"
               >
                 <textarea
                   className={styles.textarea}
@@ -662,14 +664,15 @@ export const AdminSettings: React.FC = () => {
             </div>
 
             {/* Media Library Selector Controls */}
-            <div className={styles.grid2Col} style={{ marginTop: '1rem' }}>
+            <div className={styles.grid2Col} style={{ marginTop: '1.25rem' }}>
               <FormField
                 label="Ảnh Favicon trang web"
-                helperText="Biểu tượng nhỏ hiển thị ở góc màn hình tab trình duyệt"
+                helperText="Biểu tượng vuông (1:1) hiển thị góc tab trình duyệt (.ico, .png, .svg)"
+                technicalDetails="Link rel='icon' & shortcut icon tags"
               >
                 <div className={styles.mediaSelectBox}>
                   {settings.seo.faviconUrl ? (
-                    <img src={settings.seo.faviconUrl} alt="Favicon" className={styles.mediaThumbPreview} />
+                    <img src={settings.seo.faviconUrl} alt="Favicon" className={styles.faviconThumbPreview} />
                   ) : (
                     <div className={styles.mediaThumbPlaceholder}>
                       <ImageIcon size={24} />
@@ -685,7 +688,9 @@ export const AdminSettings: React.FC = () => {
                       Chọn từ Thư viện Media
                     </Button>
                     {settings.seo.faviconUrl && (
-                      <span className={styles.mediaSelectUrl}>{settings.seo.faviconUrl.split('/').pop()}</span>
+                      <span className={styles.mediaSelectUrl} title={settings.seo.faviconUrl.split('/').pop()}>
+                        {settings.seo.faviconUrl.split('/').pop()}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -693,11 +698,12 @@ export const AdminSettings: React.FC = () => {
 
               <FormField
                 label="Ảnh hiển thị khi chia sẻ (Social Share Image)"
-                helperText="Ảnh lớn xuất hiện khi bạn gửi link website qua Zalo, Facebook hoặc tin nhắn"
+                helperText="Ảnh hình chữ nhật (16:9 / 1200x630) hiển thị khi gửi link qua Zalo, Facebook"
+                technicalDetails="OpenGraph og:image & twitter:image tags"
               >
                 <div className={styles.mediaSelectBox}>
                   {settings.seo.socialShareImageUrl ? (
-                    <img src={settings.seo.socialShareImageUrl} alt="Social Share" className={styles.mediaThumbPreview} />
+                    <img src={settings.seo.socialShareImageUrl} alt="Social Share" className={styles.socialThumbPreview} />
                   ) : (
                     <div className={styles.mediaThumbPlaceholder}>
                       <ImageIcon size={24} />
@@ -713,7 +719,9 @@ export const AdminSettings: React.FC = () => {
                       Chọn từ Thư viện Media
                     </Button>
                     {settings.seo.socialShareImageUrl && (
-                      <span className={styles.mediaSelectUrl}>{settings.seo.socialShareImageUrl.split('/').pop()}</span>
+                      <span className={styles.mediaSelectUrl} title={settings.seo.socialShareImageUrl.split('/').pop()}>
+                        {settings.seo.socialShareImageUrl.split('/').pop()}
+                      </span>
                     )}
                   </div>
                 </div>
