@@ -494,11 +494,34 @@
   transition: width 0.3s ease, background-color 0.3s ease;
 }
 
-/* Audit Log Table */
+/* Audit Log Table Container with Custom Scrollbar */
 .tableContainer {
+  max-height: 320px;
+  overflow-y: auto;
   overflow-x: auto;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 130, 32, 0.5) rgba(15, 23, 42, 0.6);
+}
+
+.tableContainer::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 999px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background: rgba(245, 130, 32, 0.4);
+  border-radius: 999px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background: #F58220;
 }
 
 .table {
@@ -509,11 +532,15 @@
 }
 
 .table th {
-  background: rgba(15, 23, 42, 0.8);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #091a36;
   color: #94a3b8;
   font-weight: 600;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .table td {
