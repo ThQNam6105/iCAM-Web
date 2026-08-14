@@ -1410,21 +1410,21 @@ export const AdminSettings: React.FC = () => {
               </div>
             </div>
 
-            <form onSubmit={handleChangePasswordSubmit} className={styles.grid2Col}>
-              <FormField label="Mật khẩu hiện tại" required>
+            <form onSubmit={handleChangePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '640px' }}>
+              <FormField label="Mật khẩu hiện tại" required helperText="Nhập mật khẩu bạn đang dùng để đăng nhập">
                 <Input
                   type="password"
                   value={currentPassword}
+                  placeholder="••••••••"
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
               </FormField>
 
-              <div />
-
-              <FormField label="Mật khẩu mới" required helperText="Cần ít nhất 8 ký tự">
+              <FormField label="Mật khẩu mới" required helperText="Mật khẩu mới cần có ít nhất 8 ký tự">
                 <Input
                   type="password"
                   value={newPassword}
+                  placeholder="••••••••"
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
                 {newPassword && (
@@ -1447,15 +1447,16 @@ export const AdminSettings: React.FC = () => {
                 )}
               </FormField>
 
-              <FormField label="Xác nhận mật khẩu mới" required>
+              <FormField label="Xác nhận mật khẩu mới" required helperText="Nhập lại chính xác mật khẩu mới ở trên">
                 <Input
                   type="password"
                   value={confirmPassword}
+                  placeholder="••••••••"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </FormField>
 
-              <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ marginTop: '0.5rem' }}>
                 <Button variant="primary" type="submit" icon={<Lock size={16} />}>
                   Cập nhật mật khẩu
                 </Button>
