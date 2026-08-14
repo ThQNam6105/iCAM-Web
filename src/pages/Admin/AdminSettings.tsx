@@ -101,8 +101,15 @@ export const AdminSettings: React.FC = () => {
     }
   }, []);
 
+  React.useLayoutEffect(() => {
+    if (!loading) {
+      checkTabScroll();
+      const timer = setTimeout(checkTabScroll, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, activeTab, checkTabScroll]);
+
   useEffect(() => {
-    checkTabScroll();
     window.addEventListener('resize', checkTabScroll);
     return () => window.removeEventListener('resize', checkTabScroll);
   }, [checkTabScroll]);
