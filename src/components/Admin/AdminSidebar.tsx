@@ -28,8 +28,8 @@ export const AdminSidebar: React.FC = () => {
       <div className={styles.brandHeader}>
         <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
         <div className={styles.brandText}>
-          <h2 className={styles.brandTitle}>iCANCAM CMS</h2>
-          <span className={styles.brandSubtitle}>Admin Portal v2.0</span>
+          <h2 className={styles.brandTitle}>TRANG QUẢN TRỊ</h2>
+          <span className={styles.brandSubtitle}>Admin Portal</span>
         </div>
       </div>
 
