@@ -327,11 +327,17 @@ export class MediaRepository {
       // Fallback
     }
 
-    // Fallback URL generation
-    const objectUrl = URL.createObjectURL(file instanceof File ? file : new File([file], filename));
+    // Fallback URL generation: Convert file to persistent Base64 Data URL so it never expires
+    const base64Url = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(URL.createObjectURL(file instanceof File ? file : new File([file], filename)));
+      reader.readAsDataURL(file);
+    });
+
     return {
       storagePath,
-      publicUrl: objectUrl,
+      publicUrl: base64Url,
     };
   }
 

@@ -1,4 +1,6 @@
 import type { SystemSettings } from './settingsService';
+import icanLogo from '../assets/ican.png';
+import bannerBg from '../assets/banner-bg.jpg';
 
 /**
  * Dynamically synchronize system SEO settings to browser HTML <head>
@@ -18,8 +20,11 @@ export const applySEOMetadata = (settings: SystemSettings, language: 'vi' | 'en'
     ? settings.seo?.websiteDescEn || settings.seo?.websiteDescVi || 'International standard English training center.'
     : settings.seo?.websiteDescVi || 'Trung tâm đào tạo Tiếng Anh chuẩn quốc tế hàng đầu tại Hóc Môn và Quận 12.';
 
-  const faviconUrl = settings.seo?.faviconUrl || '';
-  const socialShareImageUrl = settings.seo?.socialShareImageUrl || 'https://thieunamicancam.online/og-default.jpg';
+  const rawFavicon = settings.seo?.faviconUrl || '';
+  const faviconUrl = (!rawFavicon || rawFavicon.startsWith('blob:')) ? icanLogo : rawFavicon;
+
+  const rawSocial = settings.seo?.socialShareImageUrl || '';
+  const socialShareImageUrl = (!rawSocial || rawSocial.startsWith('blob:')) ? bannerBg : rawSocial;
   const siteName = settings.websiteInfo?.displayName || 'iCANCAM English Center';
 
   // Apply Document Title
@@ -56,8 +61,15 @@ export const applySEOMetadata = (settings: SystemSettings, language: 'vi' | 'en'
 
   // Favicon & Touch Icon
   if (faviconUrl) {
-    setLinkTag('icon', faviconUrl);
-    setLinkTag('shortcut icon', faviconUrl);
+    let iconType = 'image/png';
+    if (faviconUrl.includes('.ico') || faviconUrl.startsWith('data:image/x-icon') || faviconUrl.startsWith('data:image/vnd.microsoft.icon')) {
+      iconType = 'image/x-icon';
+    } else if (faviconUrl.includes('.svg') || faviconUrl.startsWith('data:image/svg+xml')) {
+      iconType = 'image/svg+xml';
+    }
+
+    setLinkTag('icon', faviconUrl, iconType);
+    setLinkTag('shortcut icon', faviconUrl, iconType);
     setLinkTag('apple-touch-icon', faviconUrl);
   }
 

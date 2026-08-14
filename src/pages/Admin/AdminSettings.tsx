@@ -28,6 +28,8 @@ import {
 import { Button, Select, Input, Badge, Switch, FormField } from '../../components/Admin/UI';
 import { MediaSelectorModal } from '../../components/Admin/MediaSelectorModal';
 import { useToast } from '../../components/Toast/Toast';
+import icanLogo from '../../assets/ican.png';
+import bannerBg from '../../assets/banner-bg.jpg';
 import { applySEOMetadata } from '../../services/seoService';
 import type { MediaItem } from '../../types/media';
 import styles from './AdminSettings.module.css';
@@ -666,8 +668,19 @@ export const AdminSettings: React.FC = () => {
                 helperText="Biểu tượng vuông (1:1) hiển thị góc tab trình duyệt (.ico, .png, .svg)"
               >
                 <div className={styles.mediaSelectBox}>
-                  {settings.seo.faviconUrl ? (
-                    <img src={settings.seo.faviconUrl} alt="Favicon" className={styles.faviconThumbPreview} />
+                  {settings.seo.faviconUrl && !settings.seo.faviconUrl.startsWith('blob:') ? (
+                    <img
+                      src={settings.seo.faviconUrl}
+                      alt="Favicon"
+                      className={styles.faviconThumbPreview}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = icanLogo;
+                        updateSettingsState((prev) => ({
+                          ...prev,
+                          seo: { ...prev.seo, faviconUrl: icanLogo },
+                        }));
+                      }}
+                    />
                   ) : (
                     <div className={styles.mediaThumbPlaceholder}>
                       <ImageIcon size={24} />
@@ -684,7 +697,7 @@ export const AdminSettings: React.FC = () => {
                     </Button>
                     {settings.seo.faviconUrl && (
                       <span className={styles.mediaSelectUrl} title={settings.seo.faviconUrl.split('/').pop()}>
-                        {settings.seo.faviconUrl.split('/').pop()}
+                        {settings.seo.faviconUrl.startsWith('data:') ? 'favicon_uploaded.ico' : settings.seo.faviconUrl.split('/').pop()}
                       </span>
                     )}
                   </div>
@@ -696,8 +709,19 @@ export const AdminSettings: React.FC = () => {
                 helperText="Ảnh hình chữ nhật (16:9 / 1200x630) hiển thị khi gửi link qua Zalo, Facebook"
               >
                 <div className={styles.mediaSelectBox}>
-                  {settings.seo.socialShareImageUrl ? (
-                    <img src={settings.seo.socialShareImageUrl} alt="Social Share" className={styles.socialThumbPreview} />
+                  {settings.seo.socialShareImageUrl && !settings.seo.socialShareImageUrl.startsWith('blob:') ? (
+                    <img
+                      src={settings.seo.socialShareImageUrl}
+                      alt="Social Share"
+                      className={styles.socialThumbPreview}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = bannerBg;
+                        updateSettingsState((prev) => ({
+                          ...prev,
+                          seo: { ...prev.seo, socialShareImageUrl: bannerBg },
+                        }));
+                      }}
+                    />
                   ) : (
                     <div className={styles.mediaThumbPlaceholder}>
                       <ImageIcon size={24} />
@@ -714,7 +738,7 @@ export const AdminSettings: React.FC = () => {
                     </Button>
                     {settings.seo.socialShareImageUrl && (
                       <span className={styles.mediaSelectUrl} title={settings.seo.socialShareImageUrl.split('/').pop()}>
-                        {settings.seo.socialShareImageUrl.split('/').pop()}
+                        {settings.seo.socialShareImageUrl.startsWith('data:') ? 'social_share_uploaded.png' : settings.seo.socialShareImageUrl.split('/').pop()}
                       </span>
                     )}
                   </div>

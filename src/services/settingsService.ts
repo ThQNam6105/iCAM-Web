@@ -202,10 +202,17 @@ export class SettingsService {
     if (!copy.seo) {
       copy.seo = { ...DEFAULT_SYSTEM_SETTINGS.seo };
     }
-    if (!copy.seo.faviconUrl) {
+
+    const isValidUrl = (url?: string) => {
+      if (!url) return false;
+      if (url.startsWith('blob:')) return false;
+      return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:') || url.includes('assets');
+    };
+
+    if (!isValidUrl(copy.seo.faviconUrl)) {
       copy.seo.faviconUrl = icanLogo;
     }
-    if (!copy.seo.socialShareImageUrl) {
+    if (!isValidUrl(copy.seo.socialShareImageUrl)) {
       copy.seo.socialShareImageUrl = bannerBg;
     }
     return copy;
