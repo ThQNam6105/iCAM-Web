@@ -1015,14 +1015,15 @@ export const AdminSettings: React.FC = () => {
                       const activeTexts = (settings.announcement.items || [])
                         .filter((i) => i.isActive && i.textVi.trim())
                         .map((i) => i.textVi);
-                      const combined = activeTexts.length > 0 ? activeTexts.join('    •    ') : 'Nhập nội dung thông báo...';
+                      const SEPARATOR = ' \u00A0\u00A0\u00A0\u00A0\u2022\u00A0\u00A0\u00A0\u00A0 ';
+                      const combined = activeTexts.length > 0 ? activeTexts.join(SEPARATOR) + SEPARATOR : 'Nhập nội dung thông báo...' + SEPARATOR;
                       return (
                         <>
-                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
-                            {combined} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
+                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: 0 }}>
+                            {combined}
                           </span>
-                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: '4rem' }}>
-                            {combined} &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
+                          <span style={{ fontSize: '0.92rem', fontWeight: 700, whiteSpace: 'nowrap', paddingRight: 0 }}>
+                            {combined}
                           </span>
                         </>
                       );

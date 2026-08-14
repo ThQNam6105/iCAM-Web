@@ -88,7 +88,9 @@ export const Layout: React.FC = () => {
   }, [settings.announcement, language]);
 
   const announcementTickerString = React.useMemo(() => {
-    return activeAnnouncements.join('    •    ');
+    if (activeAnnouncements.length === 0) return '';
+    const SEPARATOR = ' \u00A0\u00A0\u00A0\u00A0\u2022\u00A0\u00A0\u00A0\u00A0 ';
+    return activeAnnouncements.join(SEPARATOR) + SEPARATOR;
   }, [activeAnnouncements]);
 
   return (
@@ -103,11 +105,9 @@ export const Layout: React.FC = () => {
             <div className={styles.marqueeTrack}>
               <span className={styles.marqueeContent}>
                 {announcementTickerString}
-                &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
               </span>
               <span className={styles.marqueeContent}>
                 {announcementTickerString}
-                &nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;
               </span>
             </div>
           </div>
