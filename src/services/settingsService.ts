@@ -16,9 +16,11 @@ export interface WebsiteInfoSettings {
   centerName: string;
   displayName: string;
   slogan: string;
+  sloganEn?: string;
   primaryEmail: string;
   primaryHotline: string;
   businessHours: string;
+  businessHoursEn?: string;
   facebookUrl: string;
   youtubeUrl: string;
   tiktokUrl: string;
@@ -120,9 +122,11 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
     centerName: 'Hệ thống Trung tâm Ngoại ngữ iCANCAM',
     displayName: 'iCANCAM English Center',
     slogan: 'PASSION FOR SUCCESS - Đam mê dẫn lối thành công',
+    sloganEn: 'PASSION FOR SUCCESS - Empowering Your Future',
     primaryEmail: 'info@icancam.edu.vn',
     primaryHotline: '0903 123 456',
     businessHours: 'Thứ 2 - Chủ Nhật: 08:00 - 21:00',
+    businessHoursEn: 'Monday - Sunday: 08:00 - 21:00',
     facebookUrl: 'https://facebook.com/icancam.edu.vn',
     youtubeUrl: 'https://www.youtube.com/@anhnguicancam3597',
     tiktokUrl: 'https://tiktok.com/@icancam.english',
@@ -220,6 +224,15 @@ const DEFAULT_AUDIT_LOGS: AuditLogEntry[] = [
 export class SettingsService {
   public ensureDefaults(settings: SystemSettings): SystemSettings {
     const copy: SystemSettings = JSON.parse(JSON.stringify(settings || DEFAULT_SYSTEM_SETTINGS));
+    if (!copy.websiteInfo) {
+      copy.websiteInfo = { ...DEFAULT_SYSTEM_SETTINGS.websiteInfo };
+    }
+    if (!copy.websiteInfo.sloganEn) {
+      copy.websiteInfo.sloganEn = 'PASSION FOR SUCCESS - Empowering Your Future';
+    }
+    if (!copy.websiteInfo.businessHoursEn) {
+      copy.websiteInfo.businessHoursEn = 'Monday - Sunday: 08:00 - 21:00';
+    }
     if (!copy.seo) {
       copy.seo = { ...DEFAULT_SYSTEM_SETTINGS.seo };
     }

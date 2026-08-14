@@ -387,7 +387,11 @@ export const Layout: React.FC = () => {
               </NavLink>
 
               {/* Slogan */}
-              <p className={styles.footerSlogan}>{settings.websiteInfo.slogan || 'PASSION FOR SUCCESS'}</p>
+              <p className={styles.footerSlogan}>
+                {language === 'en'
+                  ? settings.websiteInfo.sloganEn || settings.websiteInfo.slogan || 'PASSION FOR SUCCESS'
+                  : settings.websiteInfo.slogan || 'PASSION FOR SUCCESS - Đam mê dẫn lối thành công'}
+              </p>
 
               {/* Company Description */}
               <p className={styles.footerDescription}>
@@ -413,8 +417,9 @@ export const Layout: React.FC = () => {
                 <div className={styles.infoItem}>
                   <Clock className={styles.infoIcon} size={18} />
                   <span>
-                    {settings.websiteInfo.businessHours ||
-                      (language === 'en' ? 'Monday – Sunday: 08:00 – 21:00' : 'Thứ 2 – Chủ Nhật: 08:00 – 21:00')}
+                    {language === 'en'
+                      ? settings.websiteInfo.businessHoursEn || settings.websiteInfo.businessHours || 'Monday - Sunday: 08:00 - 21:00'
+                      : settings.websiteInfo.businessHours || 'Thứ 2 - Chủ Nhật: 08:00 - 21:00'}
                   </span>
                 </div>
               </div>

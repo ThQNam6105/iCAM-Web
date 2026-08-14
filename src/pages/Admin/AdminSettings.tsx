@@ -373,8 +373,8 @@ export const AdminSettings: React.FC = () => {
               </FormField>
 
               <FormField
-                label="Slogan / Khẩu hiệu"
-                helperText="Thông điệp thể hiện sứ mệnh đào tạo của trung tâm"
+                label="Slogan khẩu hiệu (Tiếng Việt)"
+                helperText="Khẩu hiệu thương hiệu hiển thị tại footer trang chủ"
               >
                 <Input
                   value={settings.websiteInfo.slogan}
@@ -382,6 +382,22 @@ export const AdminSettings: React.FC = () => {
                     updateSettingsState((prev) => ({
                       ...prev,
                       websiteInfo: { ...prev.websiteInfo, slogan: e.target.value },
+                    }))
+                  }
+                />
+              </FormField>
+
+              <FormField
+                label="Slogan khẩu hiệu (Tiếng Anh)"
+                helperText="Hiển thị khi chuyển sang giao diện Tiếng Anh"
+              >
+                <Input
+                  value={settings.websiteInfo.sloganEn || ''}
+                  placeholder="PASSION FOR SUCCESS - Empowering Your Future"
+                  onChange={(e) =>
+                    updateSettingsState((prev) => ({
+                      ...prev,
+                      websiteInfo: { ...prev.websiteInfo, sloganEn: e.target.value },
                     }))
                   }
                 />
@@ -421,15 +437,32 @@ export const AdminSettings: React.FC = () => {
               </FormField>
 
               <FormField
-                label="Giờ làm việc chung"
-                helperText="Khung giờ tiếp phụ huynh & tư vấn viên trực thuộc"
+                label="Giờ làm việc chung (Tiếng Việt)"
+                helperText="Khung giờ tiếp phụ huynh & tư vấn viên (Tiếng Việt)"
               >
                 <Input
                   value={settings.websiteInfo.businessHours}
+                  placeholder="Thứ 2 - Chủ Nhật: 08:00 - 21:00"
                   onChange={(e) =>
                     updateSettingsState((prev) => ({
                       ...prev,
                       websiteInfo: { ...prev.websiteInfo, businessHours: e.target.value },
+                    }))
+                  }
+                />
+              </FormField>
+
+              <FormField
+                label="Giờ làm việc chung (Tiếng Anh)"
+                helperText="Hiển thị khi chuyển sang giao diện Tiếng Anh"
+              >
+                <Input
+                  value={settings.websiteInfo.businessHoursEn || ''}
+                  placeholder="Monday - Sunday: 08:00 - 21:00"
+                  onChange={(e) =>
+                    updateSettingsState((prev) => ({
+                      ...prev,
+                      websiteInfo: { ...prev.websiteInfo, businessHoursEn: e.target.value },
                     }))
                   }
                 />
