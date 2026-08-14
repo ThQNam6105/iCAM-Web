@@ -428,10 +428,10 @@
   white-space: nowrap;
 }
 
-/* Health Check Metric Cards */
+/* Health Check Metric Cards (Vertical Single Column Layout) */
 .healthGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
@@ -439,10 +439,16 @@
   background: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.35rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.healthMetricCard:hover {
+  background: rgba(15, 23, 42, 0.7);
+  border-color: rgba(245, 130, 32, 0.3);
 }
 
 .healthMetricHeader {
