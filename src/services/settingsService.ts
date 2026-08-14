@@ -1,4 +1,6 @@
 import { supabase } from './supabaseClient';
+import icanLogo from '../assets/ican.png';
+import bannerBg from '../assets/banner-bg.jpg';
 
 export interface BranchLocation {
   id: string;
@@ -146,8 +148,8 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
     websiteTitleEn: 'iCANCAM English Center | Young Learners & IELTS Preparation',
     websiteDescVi: 'Trung tâm đào tạo Tiếng Anh chuẩn quốc tế hàng đầu tại Hóc Môn và Quận 12. Phương pháp giảng dạy 4Ls & LETI tiên tiến giúp học viên tự tin bứt phá điểm số.',
     websiteDescEn: 'International standard English training center in Hoc Mon and District 12. Advanced 4Ls & LETI teaching methodologies for confident learning.',
-    faviconUrl: '',
-    socialShareImageUrl: '',
+    faviconUrl: icanLogo,
+    socialShareImageUrl: bannerBg,
   },
   announcement: {
     allowConsultation: true,
@@ -386,6 +388,16 @@ export class SettingsService {
         if (parsed.websiteInfo) {
           if (!parsed.websiteInfo.youtubeUrl || parsed.websiteInfo.youtubeUrl.includes('@icancam')) {
             parsed.websiteInfo.youtubeUrl = 'https://www.youtube.com/@anhnguicancam3597';
+            modified = true;
+          }
+        }
+        if (parsed.seo) {
+          if (!parsed.seo.faviconUrl) {
+            parsed.seo.faviconUrl = icanLogo;
+            modified = true;
+          }
+          if (!parsed.seo.socialShareImageUrl) {
+            parsed.seo.socialShareImageUrl = bannerBg;
             modified = true;
           }
         }
