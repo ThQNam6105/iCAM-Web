@@ -1,10 +1,11 @@
 import logoImg from '../../assets/ican.png';
 import footerLogo from '../../assets/footer-logo.jpg';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { User, LogOut, Menu, X, ChevronUp, MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { settingsService, type SystemSettings, DEFAULT_SYSTEM_SETTINGS } from '../../services/settingsService';
 import styles from './Layout.module.css';
 import { ProjectInfoBadge } from '../ProjectInfoBadge/ProjectInfoBadge';
 
@@ -13,7 +14,20 @@ export const Layout: React.FC = () => {
   const { language, toggleLanguage, t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [settings, setSettings] = useState<SystemSettings>(DEFAULT_SYSTEM_SETTINGS);
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    let isMounted = true;
+    settingsService.getSystemSettings().then(({ settings: loadedSettings }) => {
+      if (isMounted) {
+        setSettings(loadedSettings);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -53,10 +67,33 @@ export const Layout: React.FC = () => {
   const base = import.meta.env.BASE_URL;
   const homepageUrl = base.endsWith('/') ? base : `${base}/`;
 
+  const activeBranchAddress =
+    settings.branches.find((b) => b.isActive)?.address ||
+    settings.branches[0]?.address ||
+    '344 A Tổ 13 KP 1, Trung Mỹ Tây, Hóc Môn & Quận 12, TP.HCM';
+
   return (
     <div className={styles.layout}>
       {/* Fixed Internship Project Info Badge */}
       <ProjectInfoBadge />
+
+      {/* Top Announcement Bar from System Settings */}
+      {settings.announcement.showAnnouncementBar && (
+        <div className={styles.topAnnouncementBar}>
+          <span>
+            {language === 'en'
+              ? settings.announcement.textEn || settings.announcement.textVi
+              : settings.announcement.textVi}
+          </span>
+          {settings.announcement.ctaTextVi && (
+            <Link to={settings.announcement.ctaUrl || '/contact'} className={styles.topAnnouncementCta}>
+              {language === 'en'
+                ? settings.announcement.ctaTextEn || settings.announcement.ctaTextVi
+                : settings.announcement.ctaTextVi}
+            </Link>
+          )}
+        </div>
+      )}
 
       <header className={styles.header}>
         <nav className={styles.navContainer}>
@@ -262,21 +299,16 @@ export const Layout: React.FC = () => {
               {t.nav.contact}
             </NavLink>
           </li>
+
           {user && (
-            <li className={styles.mobileUserSection}>
-              <div className={styles.userBadge}>
-                <User size={14} />
-                <span>{t.nav.welcome}, {user.name}</span>
+            <li className={styles.mobileUserItem}>
+              <div className={styles.mobileUserInfo}>
+                <User size={16} />
+                <span>{user.name}</span>
               </div>
-              <button
-                onClick={() => {
-                  logout();
-                  closeMenu();
-                }}
-                className="btn-secondary"
-                style={{ width: '100%', marginTop: '1rem', justifyContent: 'center' }}
-              >
-                <LogOut size={14} /> {t.nav.logout}
+              <button onClick={logout} className={styles.mobileLogoutBtn}>
+                <LogOut size={16} />
+                <span>{t.nav.logout}</span>
               </button>
             </li>
           )}
@@ -302,7 +334,7 @@ export const Layout: React.FC = () => {
               </NavLink>
 
               {/* Slogan */}
-              <p className={styles.footerSlogan}>PASSION FOR SUCCESS</p>
+              <p className={styles.footerSlogan}>{settings.websiteInfo.slogan || 'PASSION FOR SUCCESS'}</p>
 
               {/* Company Description */}
               <p className={styles.footerDescription}>
@@ -315,28 +347,35 @@ export const Layout: React.FC = () => {
               <div className={styles.footerCompanyInfo}>
                 <div className={styles.infoItem}>
                   <MapPin className={styles.infoIcon} size={18} />
-                  <span>344 A Tổ 13 KP 1, Trung Mỹ Tây, Hóc Môn & Quận 12, TP.HCM</span>
+                  <span>{activeBranchAddress}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <Phone className={styles.infoIcon} size={18} />
-                  <span>0909 123 456</span>
+                  <span>{settings.websiteInfo.primaryHotline || '0903 123 456'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <Mail className={styles.infoIcon} size={18} />
-                  <span>thieunam2005@gmail.com</span>
+                  <span>{settings.websiteInfo.primaryEmail || 'info@icancam.edu.vn'}</span>
                 </div>
                 <div className={styles.infoItem}>
                   <Clock className={styles.infoIcon} size={18} />
                   <div className={styles.hoursText}>
-                    <span style={{ fontWeight: 600 }}>{language === 'en' ? 'Monday – Sunday' : 'Thứ 2 – Chủ Nhật'}</span>
-                    <span className={styles.hoursDetail}>08:00 – 21:00</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {language === 'en' ? 'Monday – Sunday' : 'Thứ 2 – Chủ Nhật'}
+                    </span>
+                    <span className={styles.hoursDetail}>
+                      {settings.websiteInfo.businessHours || '08:00 – 21:00'}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Social Media Row (Non-clickable icons) */}
+              {/* Social Media Row (Dynamic Clickable External Links) */}
               <div className={styles.socialRow}>
-                <div
+                <a
+                  href={settings.websiteInfo.facebookUrl || 'https://facebook.com/icancam.edu.vn'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={styles.socialIconBtn}
                   aria-label="Facebook"
                   data-tooltip="Facebook"
@@ -344,8 +383,11 @@ export const Layout: React.FC = () => {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
-                </div>
-                <div
+                </a>
+                <a
+                  href={settings.websiteInfo.youtubeUrl || 'https://youtube.com/@icancam'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={styles.socialIconBtn}
                   aria-label="YouTube"
                   data-tooltip="YouTube"
@@ -353,8 +395,11 @@ export const Layout: React.FC = () => {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>
-                </div>
-                <div
+                </a>
+                <a
+                  href={settings.websiteInfo.tiktokUrl || 'https://tiktok.com/@icancam.english'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={styles.socialIconBtn}
                   aria-label="TikTok"
                   data-tooltip="TikTok"
@@ -362,14 +407,17 @@ export const Layout: React.FC = () => {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-5.2-1.74 2.89 2.89 0 0 1 2.31-1.37V9.11a6.34 6.34 0 1 0 6.34 6.34V9.67a8.16 8.16 0 0 0 4.77 1.52V7.74a4.85 4.85 0 0 1-1-1.05z"/>
                   </svg>
-                </div>
-                <div
+                </a>
+                <a
+                  href={settings.websiteInfo.zaloUrl || 'https://zalo.me/0903123456'}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={styles.socialIconBtn}
                   aria-label="Zalo OA"
                   data-tooltip="Zalo OA"
                 >
                   <span style={{ fontWeight: 800, fontSize: '11px', letterSpacing: '-0.5px' }}>Zalo</span>
-                </div>
+                </a>
               </div>
             </div>
 
@@ -464,7 +512,7 @@ export const Layout: React.FC = () => {
 
         {/* Zalo Shortcut */}
         <a
-          href="http://zaloapp.com/qr/p/1eek3rblfox15"
+          href={settings.websiteInfo.zaloUrl || 'https://zalo.me/0903123456'}
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.zaloBtn}`}
@@ -477,7 +525,7 @@ export const Layout: React.FC = () => {
 
         {/* Messenger Shortcut */}
         <a
-          href="https://m.me/tqnam6105"
+          href={settings.websiteInfo.facebookUrl || 'https://facebook.com/icancam.edu.vn'}
           target="_blank"
           rel="noopener noreferrer"
           className={`${styles.contactShortcutBtn} ${styles.messengerBtn}`}
@@ -495,9 +543,9 @@ export const Layout: React.FC = () => {
           </svg>
         </a>
 
-        {/* Gmail Shortcut */}
+        {/* Gmail / Primary Email Shortcut */}
         <a
-          href="mailto:thieunam2005@gmail.com"
+          href={`mailto:${settings.websiteInfo.primaryEmail || 'info@icancam.edu.vn'}`}
           className={`${styles.contactShortcutBtn} ${styles.gmailBtn}`}
           data-tooltip={t.shortcuts.email}
         >
@@ -520,4 +568,3 @@ export const Layout: React.FC = () => {
 };
 
 export default Layout;
-
