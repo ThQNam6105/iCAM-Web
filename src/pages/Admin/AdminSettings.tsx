@@ -1304,10 +1304,12 @@ export const AdminSettings: React.FC = () => {
                   <span className={styles.healthMetricTitle}>
                     <Globe size={18} style={{ color: '#3b82f6' }} /> Trang web công khai
                   </span>
-                  <Badge variant="success">✓ Hoạt động bình thường</Badge>
+                  <Badge variant={healthStatus?.website.status === 'error' ? 'danger' : 'success'}>
+                    {healthStatus?.website.status === 'error' ? '⚠ KHÔNG ỔN ĐỊNH' : '✓ ỔN ĐỊNH'}
+                  </Badge>
                 </div>
                 <p className={styles.healthMetricMsg}>
-                  {healthStatus?.website.message || 'Trang web công khai đang phản hồi bình thường.'}
+                  {healthStatus?.website.message || 'Trang web công khai đang phản hồi ổn định.'}
                 </p>
               </div>
 
@@ -1317,11 +1319,11 @@ export const AdminSettings: React.FC = () => {
                     <Activity size={18} style={{ color: '#F58220' }} /> Cơ sở dữ liệu (Supabase DB)
                   </span>
                   <Badge variant={healthStatus?.database.status === 'error' ? 'danger' : 'success'}>
-                    {healthStatus?.database.status === 'error' ? '⚠ Cần kiểm tra' : '✓ Đang kết nối'}
+                    {healthStatus?.database.status === 'error' ? '⚠ KHÔNG ỔN ĐỊNH' : '✓ ỔN ĐỊNH'}
                   </Badge>
                 </div>
                 <p className={styles.healthMetricMsg}>
-                  {healthStatus?.database.message || 'Cơ sở dữ liệu Supabase DB đang hoạt động bình thường.'}
+                  {healthStatus?.database.message || 'Cơ sở dữ liệu Supabase DB đang phản hồi ổn định.'}
                 </p>
 
                 {/* Database Capacity & Usage Breakdown */}
@@ -1363,7 +1365,7 @@ export const AdminSettings: React.FC = () => {
                     <ImageIcon size={18} style={{ color: '#8b5cf6' }} /> Thư viện Media (Storage)
                   </span>
                   <Badge variant={healthStatus?.storage.status === 'error' ? 'danger' : 'success'}>
-                    {healthStatus?.storage.status === 'error' ? '⚠ Cần kiểm tra' : '✓ Đang hoạt động'}
+                    {healthStatus?.storage.status === 'error' ? '⚠ KHÔNG ỔN ĐỊNH' : '✓ ỔN ĐỊNH'}
                   </Badge>
                 </div>
                 <p className={styles.healthMetricMsg}>
@@ -1376,7 +1378,9 @@ export const AdminSettings: React.FC = () => {
                   <span className={styles.healthMetricTitle}>
                     <Shield size={18} style={{ color: '#10b981' }} /> Bảo mật & Auth
                   </span>
-                  <Badge variant="success">✓ Đang bảo vệ</Badge>
+                  <Badge variant={healthStatus?.auth.status === 'error' ? 'danger' : 'success'}>
+                    {healthStatus?.auth.status === 'error' ? '⚠ KHÔNG ỔN ĐỊNH' : '✓ ỔN ĐỊNH'}
+                  </Badge>
                 </div>
                 <p className={styles.healthMetricMsg}>
                   {healthStatus?.auth.message || 'Hệ thống xác thực và phiên làm việc hoạt động an toàn.'}
