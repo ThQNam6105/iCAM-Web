@@ -82,7 +82,11 @@ export const Select: React.FC<SelectProps> = ({
   };
 
   return (
-    <div className={`${styles.selectWrapper} ${fullWidth ? styles.fullWidth : ''} ${className}`} ref={wrapperRef}>
+    <div
+      className={`${styles.selectWrapper} ${fullWidth ? styles.fullWidth : ''} ${className} ${isOpen ? styles.selectWrapperOpen : ''}`}
+      style={{ zIndex: isOpen ? 1000 : undefined }}
+      ref={wrapperRef}
+    >
       <button
         type="button"
         tabIndex={disabled ? -1 : 0}
