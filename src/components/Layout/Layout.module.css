@@ -56,6 +56,8 @@
 
 .singleSlideText {
   position: absolute;
+  top: 50%;
+  left: 0;
   white-space: nowrap;
   font-size: 0.92rem;
   font-weight: 700;
@@ -64,7 +66,8 @@
   will-change: transform;
   display: inline-flex;
   align-items: center;
-  animation: slideSingleAcross 7.5s linear forwards;
+  transform: translateY(-50%);
+  animation: slideSingleAcross 8s linear forwards;
 }
 
 .topAnnouncementBar:hover .singleSlideText {
@@ -73,10 +76,10 @@
 
 @keyframes slideSingleAcross {
   0% {
-    transform: translateX(100vw);
+    transform: translate3d(100vw, -50%, 0);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translate3d(-100%, -50%, 0);
   }
 }
 

@@ -91,11 +91,27 @@ export const Layout: React.FC = () => {
   const [isAnnWaiting, setIsAnnWaiting] = React.useState(false);
   const [annSlideKey, setAnnSlideKey] = React.useState(0);
 
+  const annContainerRef = React.useRef<HTMLDivElement>(null);
+  const annTextRef = React.useRef<HTMLSpanElement>(null);
+  const [slideDuration, setSlideDuration] = React.useState<number>(8);
+
   React.useEffect(() => {
     setCurrentAnnIndex(0);
     setIsAnnWaiting(false);
     setAnnSlideKey((prev) => prev + 1);
   }, [activeAnnouncements.length, language]);
+
+  const currentAnnText = activeAnnouncements[currentAnnIndex] || activeAnnouncements[0] || '';
+
+  React.useLayoutEffect(() => {
+    if (annContainerRef.current && annTextRef.current) {
+      const containerW = annContainerRef.current.offsetWidth || window.innerWidth;
+      const textW = annTextRef.current.offsetWidth || 400;
+      const totalDist = containerW + textW;
+      const duration = Math.max(4, totalDist / 160);
+      setSlideDuration(duration);
+    }
+  }, [currentAnnIndex, currentAnnText, annSlideKey]);
 
   const handleAnnAnimationEnd = React.useCallback(() => {
     setIsAnnWaiting(true);
@@ -106,8 +122,6 @@ export const Layout: React.FC = () => {
     }, 2000);
   }, [activeAnnouncements.length]);
 
-  const currentAnnText = activeAnnouncements[currentAnnIndex] || activeAnnouncements[0] || '';
-
   return (
     <div className={styles.layout}>
       {/* Fixed Internship Project Info Badge */}
@@ -116,11 +130,13 @@ export const Layout: React.FC = () => {
       <header className={styles.header}>
         {/* Top Announcement Bar from System Settings (Sequential 1-by-1 Slide with 2s Pause) */}
         {settings.announcement.showAnnouncementBar && activeAnnouncements.length > 0 && (
-          <div className={styles.topAnnouncementBar} title="Di chuột để tạm dừng chữ chạy">
+          <div ref={annContainerRef} className={styles.topAnnouncementBar} title="Di chuột để tạm dừng chữ chạy">
             {!isAnnWaiting && currentAnnText && (
               <span
+                ref={annTextRef}
                 key={`${annSlideKey}-${currentAnnIndex}`}
                 className={styles.singleSlideText}
+                style={{ animationDuration: `${slideDuration}s` }}
                 onAnimationEnd={handleAnnAnimationEnd}
               >
                 {currentAnnText}
