@@ -13,8 +13,6 @@ import {
   Pin,
   HelpCircle,
   X,
-  Maximize2,
-  Minimize2,
 } from 'lucide-react';
 import styles from './FAQ.module.css';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -94,14 +92,6 @@ export const FAQ: React.FC = () => {
     } else {
       setOpenIds([...openIds, id]);
     }
-  };
-
-  const handleOpenAll = () => {
-    setOpenIds(filteredFaqs.map((f) => f.id));
-  };
-
-  const handleCloseAll = () => {
-    setOpenIds([]);
   };
 
   const filteredFaqs = useMemo(() => {
@@ -236,17 +226,8 @@ export const FAQ: React.FC = () => {
       {/* 2. ACCORDION FAQ CONTENT SECTION */}
       <section className={styles.accordionSection}>
         <div className={styles.container}>
-          {/* Controls Bar: Expand All / Collapse All & Ask Question */}
+          {/* Ask Question Bar */}
           <div className={styles.controlsBar}>
-            <div className={styles.controlGroup}>
-              <button type="button" onClick={handleOpenAll} className={styles.expandBtn}>
-                <Maximize2 size={14} /> {isEn ? 'Expand All' : 'Mở tất cả'}
-              </button>
-              <button type="button" onClick={handleCloseAll} className={styles.expandBtn}>
-                <Minimize2 size={14} /> {isEn ? 'Collapse All' : 'Thu gọn tất cả'}
-              </button>
-            </div>
-
             <button
               type="button"
               onClick={() => setIsAskModalOpen(true)}
