@@ -15,6 +15,7 @@ import {
   type UserQuestionItem,
   getStatusBadgeLabel,
   updateUserQuestionStatus,
+  deleteUserQuestion,
 } from '../../services/questionService';
 import { Button } from './UI';
 import styles from './QuestionReviewModal.module.css';
@@ -59,7 +60,7 @@ export const QuestionReviewModal: React.FC<QuestionReviewModalProps> = ({
   };
 
   const handleReject = () => {
-    updateUserQuestionStatus(question.id, 'rejected', internalNotes);
+    deleteUserQuestion(question.id);
     onStatusUpdated();
     onClose();
   };
