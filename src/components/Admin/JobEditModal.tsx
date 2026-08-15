@@ -263,139 +263,133 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             </div>
           </div>
 
-          {/* SECTION 1: MÔ TẢ CÔNG VIỆC (JOB DESCRIPTION - VI & EN SIDE-BY-SIDE) */}
-          <div className={styles.rowTwo}>
-            <div className={styles.inputGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>🇻🇳 Mô tả công việc (Tiếng Việt)</label>
-                <button
-                  type="button"
-                  className={styles.bulletBtn}
-                  onClick={() => addBulletPoint(description, setDescription)}
-                >
-                  <List size={14} /> • Thêm gạch đầu dòng
-                </button>
-              </div>
-              <textarea
-                rows={4}
-                placeholder="Mô tả chi tiết nhiệm vụ (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={(e) => handleKeyDownBullet(e, description, setDescription)}
-                className={styles.textarea}
-              />
+          {/* SECTION 1: MÔ TẢ CÔNG VIỆC */}
+          <div className={styles.inputGroup}>
+            <div className={styles.labelHeader}>
+              <label className={styles.label}>Mô tả công việc (Tiếng Việt)</label>
+              <button
+                type="button"
+                className={styles.bulletBtn}
+                onClick={() => addBulletPoint(description, setDescription)}
+              >
+                <List size={14} /> • Thêm gạch đầu dòng
+              </button>
             </div>
-
-            <div className={styles.inputGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>🇬🇧 Job Description (English)</label>
-                <button
-                  type="button"
-                  className={styles.bulletBtn}
-                  onClick={() => addBulletPoint(descriptionEn, setDescriptionEn)}
-                >
-                  <List size={14} /> • Add Bullet Point
-                </button>
-              </div>
-              <textarea
-                rows={4}
-                placeholder="Detailed duties and responsibilities in English..."
-                value={descriptionEn}
-                onChange={(e) => setDescriptionEn(e.target.value)}
-                onKeyDown={(e) => handleKeyDownBullet(e, descriptionEn, setDescriptionEn)}
-                className={styles.textarea}
-              />
-            </div>
+            <textarea
+              rows={4}
+              placeholder="Mô tả chi tiết nhiệm vụ (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={(e) => handleKeyDownBullet(e, description, setDescription)}
+              className={styles.textarea}
+            />
           </div>
 
-          {/* SECTION 2: YÊU CẦU ỨNG VIÊN (REQUIREMENTS - VI & EN SIDE-BY-SIDE) */}
-          <div className={styles.rowTwo}>
-            <div className={styles.inputGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>🇻🇳 Yêu cầu ứng viên (Tiếng Việt)</label>
-                <button
-                  type="button"
-                  className={styles.bulletBtn}
-                  onClick={() => addBulletPoint(requirements, setRequirements)}
-                >
-                  <List size={14} /> • Thêm gạch đầu dòng
-                </button>
-              </div>
-              <textarea
-                rows={4}
-                placeholder="Bằng cấp, kỹ năng, kinh nghiệm (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
-                value={requirements}
-                onChange={(e) => setRequirements(e.target.value)}
-                onKeyDown={(e) => handleKeyDownBullet(e, requirements, setRequirements)}
-                className={styles.textarea}
-              />
+          <div className={styles.inputGroup}>
+            <div className={styles.labelHeader}>
+              <label className={styles.label}>Mô tả công việc (Tiếng Anh)</label>
+              <button
+                type="button"
+                className={styles.bulletBtn}
+                onClick={() => addBulletPoint(descriptionEn, setDescriptionEn)}
+              >
+                <List size={14} /> • Thêm gạch đầu dòng
+              </button>
             </div>
-
-            <div className={styles.inputGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>🇬🇧 Candidate Requirements (English)</label>
-                <button
-                  type="button"
-                  className={styles.bulletBtn}
-                  onClick={() => addBulletPoint(requirementsEn, setRequirementsEn)}
-                >
-                  <List size={14} /> • Add Bullet Point
-                </button>
-              </div>
-              <textarea
-                rows={4}
-                placeholder="Degrees, skills, language certificates, and experience in English..."
-                value={requirementsEn}
-                onChange={(e) => setRequirementsEn(e.target.value)}
-                onKeyDown={(e) => handleKeyDownBullet(e, requirementsEn, setRequirementsEn)}
-                className={styles.textarea}
-              />
-            </div>
+            <textarea
+              rows={4}
+              placeholder="Detailed duties and responsibilities in English..."
+              value={descriptionEn}
+              onChange={(e) => setDescriptionEn(e.target.value)}
+              onKeyDown={(e) => handleKeyDownBullet(e, descriptionEn, setDescriptionEn)}
+              className={styles.textarea}
+            />
           </div>
 
-          {/* SECTION 3: QUYỀN LỢI ĐƯỢC HƯỞNG (BENEFITS - VI & EN SIDE-BY-SIDE) */}
-          <div className={styles.rowTwo}>
-            <div className={styles.inputGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>🇻🇳 Quyền lợi được hưởng (Tiếng Việt)</label>
-                <button
-                  type="button"
-                  className={styles.bulletBtn}
-                  onClick={() => addBulletPoint(benefits, setBenefits)}
-                >
-                  <List size={14} /> • Thêm gạch đầu dòng
-                </button>
-              </div>
-              <textarea
-                rows={4}
-                placeholder="Chế độ bảo hiểm, thưởng, nghỉ mát (bấm các mẫu bên dưới để chèn nhanh)..."
-                value={benefits}
-                onChange={(e) => setBenefits(e.target.value)}
-                onKeyDown={(e) => handleKeyDownBullet(e, benefits, setBenefits)}
-                className={styles.textarea}
-              />
+          {/* SECTION 2: YÊU CẦU ỨNG VIÊN */}
+          <div className={styles.inputGroup}>
+            <div className={styles.labelHeader}>
+              <label className={styles.label}>Yêu cầu ứng viên (Tiếng Việt)</label>
+              <button
+                type="button"
+                className={styles.bulletBtn}
+                onClick={() => addBulletPoint(requirements, setRequirements)}
+              >
+                <List size={14} /> • Thêm gạch đầu dòng
+              </button>
             </div>
+            <textarea
+              rows={4}
+              placeholder="Bằng cấp, kỹ năng, kinh nghiệm (bấm 'Thêm gạch đầu dòng' hoặc gõ '• ')..."
+              value={requirements}
+              onChange={(e) => setRequirements(e.target.value)}
+              onKeyDown={(e) => handleKeyDownBullet(e, requirements, setRequirements)}
+              className={styles.textarea}
+            />
+          </div>
 
-            <div className={styles.inputGroup}>
-              <div className={styles.labelHeader}>
-                <label className={styles.label}>🇬🇧 Job Benefits (English)</label>
-                <button
-                  type="button"
-                  className={styles.bulletBtn}
-                  onClick={() => addBulletPoint(benefitsEn, setBenefitsEn)}
-                >
-                  <List size={14} /> • Add Bullet Point
-                </button>
-              </div>
-              <textarea
-                rows={4}
-                placeholder="Insurances, performance bonuses, training roadmaps in English..."
-                value={benefitsEn}
-                onChange={(e) => setBenefitsEn(e.target.value)}
-                onKeyDown={(e) => handleKeyDownBullet(e, benefitsEn, setBenefitsEn)}
-                className={styles.textarea}
-              />
+          <div className={styles.inputGroup}>
+            <div className={styles.labelHeader}>
+              <label className={styles.label}>Yêu cầu ứng viên (Tiếng Anh)</label>
+              <button
+                type="button"
+                className={styles.bulletBtn}
+                onClick={() => addBulletPoint(requirementsEn, setRequirementsEn)}
+              >
+                <List size={14} /> • Thêm gạch đầu dòng
+              </button>
             </div>
+            <textarea
+              rows={4}
+              placeholder="Degrees, skills, language certificates, and experience in English..."
+              value={requirementsEn}
+              onChange={(e) => setRequirementsEn(e.target.value)}
+              onKeyDown={(e) => handleKeyDownBullet(e, requirementsEn, setRequirementsEn)}
+              className={styles.textarea}
+            />
+          </div>
+
+          {/* SECTION 3: QUYỀN LỢI ĐƯỢC HƯỞNG */}
+          <div className={styles.inputGroup}>
+            <div className={styles.labelHeader}>
+              <label className={styles.label}>Quyền lợi được hưởng (Tiếng Việt)</label>
+              <button
+                type="button"
+                className={styles.bulletBtn}
+                onClick={() => addBulletPoint(benefits, setBenefits)}
+              >
+                <List size={14} /> • Thêm gạch đầu dòng
+              </button>
+            </div>
+            <textarea
+              rows={4}
+              placeholder="Chế độ bảo hiểm, thưởng, nghỉ mát..."
+              value={benefits}
+              onChange={(e) => setBenefits(e.target.value)}
+              onKeyDown={(e) => handleKeyDownBullet(e, benefits, setBenefits)}
+              className={styles.textarea}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <div className={styles.labelHeader}>
+              <label className={styles.label}>Quyền lợi được hưởng (Tiếng Anh)</label>
+              <button
+                type="button"
+                className={styles.bulletBtn}
+                onClick={() => addBulletPoint(benefitsEn, setBenefitsEn)}
+              >
+                <List size={14} /> • Thêm gạch đầu dòng
+              </button>
+            </div>
+            <textarea
+              rows={4}
+              placeholder="Insurances, performance bonuses, training roadmaps in English..."
+              value={benefitsEn}
+              onChange={(e) => setBenefitsEn(e.target.value)}
+              onKeyDown={(e) => handleKeyDownBullet(e, benefitsEn, setBenefitsEn)}
+              className={styles.textarea}
+            />
           </div>
 
           <div className={styles.actions}>
