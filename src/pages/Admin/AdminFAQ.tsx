@@ -11,6 +11,9 @@ import {
   Pin,
   Clock,
   Eye,
+  ThumbsUp,
+  ThumbsDown,
+  CheckCircle2,
 } from 'lucide-react';
 import {
   type FaqItem,
@@ -131,7 +134,7 @@ export const AdminFAQ: React.FC = () => {
 
   const handleTogglePin = (faq: FaqItem) => {
     updateFaq(faq.id, { isPinned: !faq.isPinned });
-    showToast(faq.isPinned ? 'Đã bỏ ghim câu hỏi!' : 'Đã ghim câu hỏi lên ưu tiên trang FAQ! 📌', 'info');
+    showToast(faq.isPinned ? 'Đã bỏ ghim câu hỏi!' : 'Đã ghim câu hỏi lên ưu tiên trang FAQ!', 'info');
     reloadData();
   };
 
@@ -289,8 +292,9 @@ export const AdminFAQ: React.FC = () => {
                           fontWeight: 600,
                           color: badge.color,
                           background: badge.bgColor,
-                          padding: '0.2rem 0.6rem',
+                          padding: '0.25rem 0.65rem',
                           borderRadius: '6px',
+                          border: `1px solid ${badge.color}40`,
                         }}
                       >
                         {badge.label}
@@ -338,7 +342,9 @@ export const AdminFAQ: React.FC = () => {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th className={styles.th} style={{ width: '40px' }}>📌</th>
+                <th className={styles.th} style={{ width: '45px', textAlign: 'center' }}>
+                  <Pin size={15} color="#94a3b8" />
+                </th>
                 <th className={styles.th}>Câu hỏi & Câu trả lời</th>
                 <th className={styles.th}>Danh mục</th>
                 <th className={styles.th}>Đánh giá</th>
@@ -383,9 +389,13 @@ export const AdminFAQ: React.FC = () => {
                     </td>
 
                     <td className={styles.td}>
-                      <div style={{ fontSize: '0.82rem', display: 'flex', gap: '0.75rem' }}>
-                        <span style={{ color: '#10b981' }}>👍 {faq.helpfulCount}</span>
-                        <span style={{ color: '#ef4444' }}>👎 {faq.unhelpfulCount}</span>
+                      <div style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <span style={{ color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <ThumbsUp size={13} /> {faq.helpfulCount}
+                        </span>
+                        <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <ThumbsDown size={13} /> {faq.unhelpfulCount}
+                        </span>
                       </div>
                     </td>
 
@@ -393,19 +403,36 @@ export const AdminFAQ: React.FC = () => {
                       <span
                         style={{
                           fontSize: '0.75rem',
-                          fontWeight: 600,
-                          padding: '0.2rem 0.6rem',
+                          fontWeight: 700,
+                          padding: '0.25rem 0.65rem',
                           borderRadius: '6px',
-                          color: faq.status === 'published' ? '#10b981' : faq.status === 'draft' ? '#f59e0b' : '#6b7280',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          color: faq.status === 'published' ? '#10b981' : faq.status === 'draft' ? '#f59e0b' : '#94a3b8',
                           background:
                             faq.status === 'published'
                               ? 'rgba(16, 185, 129, 0.15)'
                               : faq.status === 'draft'
                               ? 'rgba(245, 158, 11, 0.15)'
-                              : 'rgba(107, 114, 128, 0.15)',
+                              : 'rgba(148, 163, 184, 0.15)',
+                          border:
+                            faq.status === 'published'
+                              ? '1px solid rgba(16, 185, 129, 0.3)'
+                              : faq.status === 'draft'
+                              ? '1px solid rgba(245, 158, 11, 0.3)'
+                              : '1px solid rgba(148, 163, 184, 0.3)',
                         }}
                       >
-                        {faq.status === 'published' ? 'Công khai' : faq.status === 'draft' ? 'Bản nháp' : 'Lưu trữ'}
+                        {faq.status === 'published' ? (
+                          <>
+                            <CheckCircle2 size={12} /> Công khai
+                          </>
+                        ) : faq.status === 'draft' ? (
+                          'Bản nháp'
+                        ) : (
+                          'Lưu trữ'
+                        )}
                       </span>
                     </td>
 
