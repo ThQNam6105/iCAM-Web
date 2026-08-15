@@ -108,12 +108,12 @@ export const AdminFAQ: React.FC = () => {
   }, [userQuestionsList, searchQuery, selectedInboxStatus]);
 
   // Handlers
-  const handleSaveFaq = (data: Partial<FaqItem>) => {
+  const handleSaveFaq = async (data: Partial<FaqItem>) => {
     if (editingFaq) {
-      updateFaq(editingFaq.id, data);
+      await updateFaq(editingFaq.id, data);
       showToast('Cập nhật bài FAQ thành công! ✓', 'success');
     } else {
-      createFaq(
+      await createFaq(
         data as Omit<FaqItem, 'id' | 'createdAt' | 'updatedAt' | 'helpfulCount' | 'unhelpfulCount'>
       );
       showToast('Tạo bài FAQ mới thành công! ✓', 'success');
@@ -123,17 +123,17 @@ export const AdminFAQ: React.FC = () => {
     reloadData();
   };
 
-  const handleConfirmDeleteFaq = () => {
+  const handleConfirmDeleteFaq = async () => {
     if (deleteFaqCandidateId) {
-      deleteFaq(deleteFaqCandidateId);
+      await deleteFaq(deleteFaqCandidateId);
       showToast('Đã xóa bài FAQ khỏi hệ thống!', 'info');
       setDeleteFaqCandidateId(null);
       reloadData();
     }
   };
 
-  const handleTogglePin = (faq: FaqItem) => {
-    updateFaq(faq.id, { isPinned: !faq.isPinned });
+  const handleTogglePin = async (faq: FaqItem) => {
+    await updateFaq(faq.id, { isPinned: !faq.isPinned });
     showToast(faq.isPinned ? 'Đã bỏ ghim câu hỏi!' : 'Đã ghim câu hỏi lên ưu tiên trang FAQ!', 'info');
     reloadData();
   };

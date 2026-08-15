@@ -219,6 +219,7 @@ export const saveCareers = (list: CareersItem[]) => {
 };
 
 export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
+  const localList = getAllCareers();
   try {
     const { data, error } = await supabase.from('careers_posts').select('*').order('created_at', { ascending: false });
     if (!error && data) {
@@ -250,8 +251,26 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
           };
         });
 
-        saveCareers(careersFromDb);
-        return careersFromDb;
+        // Merge: Keep local edit if local updatedAt is newer than DB timestamp
+        const mergedList = [...careersFromDb];
+        localList.forEach((localItem) => {
+          const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
+          const localTime = new Date(localItem.updatedAt || 0).getTime();
+
+          if (dbIdx === -1) {
+            mergedList.unshift(localItem);
+            syncCareerToSupabase(localItem);
+          } else {
+            const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
+            if (localTime > dbTime) {
+              mergedList[dbIdx] = localItem;
+              syncCareerToSupabase(localItem);
+            }
+          }
+        });
+
+        saveCareers(mergedList);
+        return mergedList;
       } else {
         // Seed initial data to Supabase once if DB is empty
         for (const job of INITIAL_CAREERS) {
@@ -300,7 +319,7 @@ const syncCareerToSupabase = async (job: CareersItem) => {
   }
 };
 
-export const createCareer = (data: Omit<CareersItem, 'id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>): CareersItem => {
+export const createCareer = async (data: Omit<CareersItem, 'id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>): Promise<CareersItem> => {
   const list = getAllCareers();
   const now = new Date().toISOString();
   const created: CareersItem = {
@@ -312,12 +331,12 @@ export const createCareer = (data: Omit<CareersItem, 'id' | 'createdAt' | 'updat
   };
 
   const updated = [created, ...list];
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-  syncCareerToSupabase(created);
+  saveCareers(updated);
+  await syncCareerToSupabase(created);
   return created;
 };
 
-export const updateCareer = (id: string, data: Partial<CareersItem>): CareersItem | null => {
+export const updateCareer = async (id: string, data: Partial<CareersItem>): Promise<CareersItem | null> => {
   const list = getAllCareers();
   const idx = list.findIndex((j) => j.id === id);
   if (idx === -1) return null;
@@ -329,15 +348,15 @@ export const updateCareer = (id: string, data: Partial<CareersItem>): CareersIte
   };
 
   list[idx] = updated;
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
-  syncCareerToSupabase(updated);
+  saveCareers(list);
+  await syncCareerToSupabase(updated);
   return updated;
 };
 
-export const deleteCareer = (id: string): boolean => {
+export const deleteCareer = async (id: string): Promise<boolean> => {
   const list = getAllCareers();
   const filtered = list.filter((j) => j.id !== id);
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
-  supabase.from('careers_posts').delete().eq('id', id).then();
+  saveCareers(filtered);
+  await supabase.from('careers_posts').delete().eq('id', id);
   return true;
 };

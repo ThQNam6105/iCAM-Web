@@ -309,7 +309,7 @@ const syncFaqToSupabase = async (faq: FaqItem) => {
   }
 };
 
-export const createFaq = (data: Omit<FaqItem, 'id' | 'createdAt' | 'updatedAt' | 'helpfulCount' | 'unhelpfulCount'>): FaqItem => {
+export const createFaq = async (data: Omit<FaqItem, 'id' | 'createdAt' | 'updatedAt' | 'helpfulCount' | 'unhelpfulCount'>): Promise<FaqItem> => {
   const list = getAllFaqs();
   const now = new Date().toISOString();
   const created: FaqItem = {
@@ -323,11 +323,11 @@ export const createFaq = (data: Omit<FaqItem, 'id' | 'createdAt' | 'updatedAt' |
   };
   const updated = [created, ...list];
   saveFaqs(updated);
-  syncFaqToSupabase(created);
+  await syncFaqToSupabase(created);
   return created;
 };
 
-export const updateFaq = (id: string, data: Partial<FaqItem>): FaqItem | null => {
+export const updateFaq = async (id: string, data: Partial<FaqItem>): Promise<FaqItem | null> => {
   const list = getAllFaqs();
   const idx = list.findIndex((f) => f.id === id);
   if (idx === -1) return null;
@@ -342,19 +342,19 @@ export const updateFaq = (id: string, data: Partial<FaqItem>): FaqItem | null =>
 
   list[idx] = updated;
   saveFaqs(list);
-  syncFaqToSupabase(updated);
+  await syncFaqToSupabase(updated);
   return updated;
 };
 
-export const archiveFaq = (id: string): FaqItem | null => {
+export const archiveFaq = async (id: string): Promise<FaqItem | null> => {
   return updateFaq(id, { status: 'archived' });
 };
 
-export const deleteFaq = (id: string): boolean => {
+export const deleteFaq = async (id: string): Promise<boolean> => {
   const list = getAllFaqs();
   const filtered = list.filter((f) => f.id !== id);
   saveFaqs(filtered);
-  supabase.from('faq_items').delete().eq('id', id).then();
+  await supabase.from('faq_items').delete().eq('id', id);
   return true;
 };
 

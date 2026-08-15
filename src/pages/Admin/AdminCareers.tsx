@@ -76,12 +76,12 @@ export const AdminCareers: React.FC = () => {
     return { total, openCount, closedCount, totalApps };
   }, [allJobs]);
 
-  const handleSaveJob = (data: Partial<CareersItem>) => {
+  const handleSaveJob = async (data: Partial<CareersItem>) => {
     if (editingJob) {
-      updateCareer(editingJob.id, data);
+      await updateCareer(editingJob.id, data);
       showToast('Cập nhật vị trí tuyển dụng thành công! ✓', 'success');
     } else {
-      createCareer(
+      await createCareer(
         data as Omit<CareersItem, 'id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>
       );
       showToast('Tạo vị trí tuyển dụng mới thành công! ✓', 'success');
@@ -89,9 +89,9 @@ export const AdminCareers: React.FC = () => {
     loadJobs();
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteCandidateId) {
-      deleteCareer(deleteCandidateId);
+      await deleteCareer(deleteCandidateId);
       showToast('Đã xóa vị trí tuyển dụng khỏi hệ thống!', 'info');
       setDeleteCandidateId(null);
       loadJobs();
