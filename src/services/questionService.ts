@@ -47,8 +47,8 @@ export const INITIAL_USER_QUESTIONS: UserQuestionItem[] = [
     categoryId: 'cat_method',
     categoryName: 'Phương Pháp & Lớp Học',
     status: 'pending',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'q_102',
@@ -59,8 +59,8 @@ export const INITIAL_USER_QUESTIONS: UserQuestionItem[] = [
     categoryId: 'cat_ielts',
     categoryName: 'Luyện Thi IELTS',
     status: 'pending',
-    createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'q_103',
@@ -72,8 +72,8 @@ export const INITIAL_USER_QUESTIONS: UserQuestionItem[] = [
     categoryName: 'Học Phí & Ưu Đãi',
     status: 'private_answered',
     internalNotes: 'Đã gọi điện tư vấn chính sách đóng trọn gói giảm 15% + tặng balo iCANCAM.',
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 18).toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   },
 ];
 
@@ -125,6 +125,7 @@ export const getStatusBadgeLabel = (status: UserQuestionStatus, isEn: boolean = 
   }
 };
 
+// QUESTION INBOX MANAGEMENT
 export const getAllUserQuestions = (): UserQuestionItem[] => {
   try {
     const raw = localStorage.getItem(QUESTIONS_STORAGE_KEY);
@@ -160,20 +161,22 @@ export const fetchUserQuestionsFromSupabase = async (): Promise<UserQuestionItem
         assignedTo: item.assigned_to,
       }));
 
-      // Preserve local edits if local timestamp is newer
+      // Single source of truth merge
       const mergedList = [...questionsFromDb];
       localList.forEach((localItem) => {
+        const isSeed = INITIAL_USER_QUESTIONS.some((s) => s.id === localItem.id);
         const dbIdx = mergedList.findIndex((db) => db.id === localItem.id);
-        if (dbIdx !== -1) {
+
+        if (dbIdx === -1 && !isSeed) {
+          mergedList.unshift(localItem);
+          syncUserQuestionToSupabase(localItem);
+        } else if (dbIdx !== -1 && !isSeed) {
           const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
           const localTime = new Date(localItem.updatedAt || 0).getTime();
           if (localTime > dbTime) {
             mergedList[dbIdx] = localItem;
             syncUserQuestionToSupabase(localItem);
           }
-        } else {
-          mergedList.unshift(localItem);
-          syncUserQuestionToSupabase(localItem);
         }
       });
 

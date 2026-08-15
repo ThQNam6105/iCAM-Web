@@ -63,9 +63,9 @@ export const INITIAL_FAQS: FaqItem[] = [
     displayOrder: 1,
     helpfulCount: 142,
     unhelpfulCount: 3,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    publishedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    publishedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'faq_2',
@@ -79,9 +79,9 @@ export const INITIAL_FAQS: FaqItem[] = [
     displayOrder: 2,
     helpfulCount: 98,
     unhelpfulCount: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    publishedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    publishedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'faq_3',
@@ -95,9 +95,9 @@ export const INITIAL_FAQS: FaqItem[] = [
     displayOrder: 1,
     helpfulCount: 215,
     unhelpfulCount: 4,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    publishedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    publishedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'faq_4',
@@ -111,9 +111,9 @@ export const INITIAL_FAQS: FaqItem[] = [
     displayOrder: 2,
     helpfulCount: 110,
     unhelpfulCount: 2,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    publishedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    publishedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'faq_5',
@@ -127,9 +127,9 @@ export const INITIAL_FAQS: FaqItem[] = [
     displayOrder: 1,
     helpfulCount: 86,
     unhelpfulCount: 1,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    publishedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    publishedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'faq_6',
@@ -143,9 +143,9 @@ export const INITIAL_FAQS: FaqItem[] = [
     displayOrder: 1,
     helpfulCount: 94,
     unhelpfulCount: 0,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    publishedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    publishedAt: '2026-01-01T00:00:00.000Z',
   },
 ];
 
@@ -261,31 +261,39 @@ export const fetchFaqsFromSupabase = async (): Promise<FaqItem[]> => {
           displayOrder: item.display_order || 1,
           helpfulCount: item.helpful_count || 0,
           unhelpfulCount: item.unhelpful_count || 0,
-          createdAt: item.created_at,
-          updatedAt: item.updated_at,
+          createdAt: item.created_at || '2026-01-01T00:00:00.000Z',
+          updatedAt: item.updated_at || '2026-01-01T00:00:00.000Z',
           publishedAt: item.published_at,
         };
       });
 
-      // Preserve local edits if local timestamp is newer
+      // Single source of truth merge
       const mergedList = [...faqsFromDb];
       localList.forEach((localItem) => {
+        const isCustomCreated = !INITIAL_FAQS.some((seed) => seed.id === localItem.id);
         const dbIdx = mergedList.findIndex((db) => db.id === localItem.id);
-        if (dbIdx !== -1) {
+
+        if (dbIdx === -1 && isCustomCreated) {
+          mergedList.unshift(localItem);
+          syncFaqToSupabase(localItem);
+        } else if (dbIdx !== -1 && isCustomCreated) {
           const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
           const localTime = new Date(localItem.updatedAt || 0).getTime();
           if (localTime > dbTime) {
             mergedList[dbIdx] = localItem;
             syncFaqToSupabase(localItem);
           }
-        } else {
-          mergedList.push(localItem);
-          syncFaqToSupabase(localItem);
         }
       });
 
       saveFaqs(mergedList);
       return mergedList;
+    } else if (!error && data && data.length === 0) {
+      // Seed initial data to Supabase once if DB is empty
+      for (const faq of INITIAL_FAQS) {
+        await syncFaqToSupabase(faq);
+      }
+      return INITIAL_FAQS;
     }
   } catch (err) {
     console.warn('Supabase faq_items table offline or not created yet:', err);
