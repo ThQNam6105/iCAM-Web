@@ -239,6 +239,7 @@ export const saveFaqs = (faqs: FaqItem[]) => {
 };
 
 export const fetchFaqsFromSupabase = async (): Promise<FaqItem[]> => {
+  const localList = getAllFaqs();
   try {
     const { data, error } = await supabase.from('faq_items').select('*').order('display_order', { ascending: true });
     if (!error && data) {
@@ -267,8 +268,24 @@ export const fetchFaqsFromSupabase = async (): Promise<FaqItem[]> => {
           };
         });
 
-        saveFaqs(faqsFromDb);
-        return faqsFromDb;
+        // Smart merge: Keep local item ONLY if local updatedAt is strictly newer than DB timestamp
+        const mergedList = [...faqsFromDb];
+        localList.forEach((localItem) => {
+          const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
+          const localTime = new Date(localItem.updatedAt || 0).getTime();
+
+          if (dbIdx === -1) {
+            mergedList.unshift(localItem);
+          } else {
+            const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
+            if (localTime > dbTime) {
+              mergedList[dbIdx] = localItem;
+            }
+          }
+        });
+
+        saveFaqs(mergedList);
+        return mergedList;
       } else {
         for (const faq of INITIAL_FAQS) {
           await syncFaqToSupabase(faq);
