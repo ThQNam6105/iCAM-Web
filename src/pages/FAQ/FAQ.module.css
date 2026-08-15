@@ -100,9 +100,10 @@
 .searchBoxWrapper {
   position: relative;
   max-width: 680px;
-  margin: 0 auto 2.5rem auto;
+  margin: 0 auto 2rem auto;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .searchIcon {
@@ -184,11 +185,69 @@
   box-shadow: 0 6px 20px rgba(245, 130, 32, 0.35);
 }
 
+/* Controls Bar (Expand / Collapse All & Ask Question) */
+.controlsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.expandBtn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #09265F;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.expandBtn:hover {
+  border-color: #F58220;
+  color: #F58220;
+  background: rgba(245, 130, 32, 0.05);
+}
+
+.askHeaderBtn {
+  background: linear-gradient(135deg, #F58220 0%, #e07112 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(245, 130, 32, 0.3);
+  transition: all 0.25s;
+}
+
+.askHeaderBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(245, 130, 32, 0.4);
+}
+
 /* ==========================================
    ACCORDION FAQ LIST SECTION
    ========================================== */
 .accordionSection {
-  padding: 4.5rem 0;
+  padding: 4rem 0;
   background: #FFF8F0;
   width: 100%;
 }
@@ -243,6 +302,13 @@
   min-width: 0;
 }
 
+.metaHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 .badgeCategory {
   background: rgba(245, 130, 32, 0.12);
   border: 1px solid rgba(245, 130, 32, 0.25);
@@ -254,6 +320,19 @@
   border-radius: 9999px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.pinnedBadge {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  color: #8b5cf6;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .questionText {
@@ -297,99 +376,153 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+.answerContent {
+  white-space: pre-line;
+}
+
+/* Helpful Voting Bar */
+.voteBar {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  color: #64748b;
+}
+
+.voteButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.voteBtn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+}
+
+.voteBtn:hover {
+  background: #ffffff;
+  border-color: #F58220;
+  color: #F58220;
+}
+
+.voteBtnActive {
+  background: rgba(245, 130, 32, 0.12) !important;
+  border-color: #F58220 !important;
+  color: #F58220 !important;
+}
+
+/* Highlight Match */
+.highlightMatch {
+  background-color: #fef08a;
+  color: #854d0e;
+  padding: 0 0.2rem;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+/* Recovery No Results Card */
 .noResultsCard {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 3.5rem 2rem;
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 24px;
   border: 1px dashed #cbd5e1;
   width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
 .noResultsCard h3 {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #09265F !important;
   margin: 1rem 0 0.5rem 0;
 }
 
 .noResultsCard p {
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: #64748b;
+  max-width: 540px;
+  margin: 0 auto 2rem auto;
 }
 
-/* ==========================================
-   FAQ HIGHLIGHT PILLARS
-   ========================================== */
-.pillarsSection {
-  padding: 5rem 0;
-  background: #ffffff;
-  width: 100%;
+.recoveryBtnRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.sectionHeader {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 3rem auto;
-}
-
-.sectionTag {
-  display: inline-flex;
+.recoveryAskBtn {
+  background: #F58220;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(245, 130, 32, 0.1);
-  color: #F58220;
+  box-shadow: 0 4px 14px rgba(245, 130, 32, 0.3);
+  transition: all 0.2s;
+}
+
+.recoveryAskBtn:hover {
+  background: #e07112;
+  transform: translateY(-2px);
+}
+
+.recoveryCallBtn {
+  background: #09265F;
+  color: #ffffff;
   font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.4rem 1.1rem;
-  border-radius: 9999px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.85rem;
-  border: 1px solid rgba(245, 130, 32, 0.2);
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
 }
 
-.sectionTitle {
-  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-  font-weight: 800;
-  color: #09265F !important;
-  line-height: 1.3;
+.recoveryCallBtn:hover {
+  background: #0f347d;
+  transform: translateY(-2px);
 }
 
-.pillarsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  width: 100%;
+.recoveryZaloBtn {
+  background: #0068FF;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
 }
 
-.pillarCard {
-  background: #f8fafc;
-  border-radius: 18px;
-  padding: 2.25rem 1.75rem;
-  border: 1px solid #e2e8f0;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.pillarCard:hover {
-  background: #ffffff;
-  border-color: #F58220;
-  box-shadow: 0 15px 35px rgba(245, 130, 32, 0.1);
-  transform: translateY(-5px);
-}
-
-.pillarCard h3 {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #09265F;
-  margin: 1rem 0 0.6rem 0;
-}
-
-.pillarCard p {
-  font-size: 0.92rem;
-  color: #64748b;
-  line-height: 1.6;
+.recoveryZaloBtn:hover {
+  background: #0056d6;
+  transform: translateY(-2px);
 }
 
 /* ==========================================
