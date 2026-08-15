@@ -217,8 +217,9 @@ export const Careers: React.FC = () => {
 
   React.useEffect(() => {
     const loadDynamic = () => {
-      fetchCareersFromSupabase().then(() => {
-        const openJobs = getAllCareers().filter((j) => j.status === 'open');
+      fetchCareersFromSupabase().then((fetchedJobs) => {
+        const jobsToUse = fetchedJobs && fetchedJobs.length > 0 ? fetchedJobs : getAllCareers();
+        const openJobs = jobsToUse.filter((j) => j.status === 'open');
         setDynamicJobs(openJobs);
       });
     };

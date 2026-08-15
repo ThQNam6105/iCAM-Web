@@ -270,6 +270,12 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
 
       saveCareers(mergedList);
       return mergedList;
+    } else if (!error && data && data.length === 0) {
+      // Seed initial data to Supabase once if DB is empty
+      for (const job of INITIAL_CAREERS) {
+        await syncCareerToSupabase(job);
+      }
+      return INITIAL_CAREERS;
     }
   } catch (err) {
     console.warn('Supabase careers_posts table offline or not created yet:', err);
