@@ -120,6 +120,46 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
     }
   };
 
+  const handlePasteAutoBullet = (
+    e: React.ClipboardEvent<HTMLTextAreaElement>,
+    currentVal: string,
+    setter: (val: string) => void
+  ) => {
+    const pastedText = e.clipboardData.getData('text');
+    if (!pastedText) return;
+
+    if (pastedText.includes('\n') || pastedText.includes('\r')) {
+      e.preventDefault();
+      const formattedPasted = pastedText
+        .split(/\r?\n/)
+        .map((line) => {
+          const cleaned = line.replace(/^[-*•\s]+/, '').trim();
+          return cleaned ? `• ${cleaned}` : '';
+        })
+        .filter((line, idx, arr) => line !== '' || idx < arr.length - 1)
+        .join('\n');
+
+      const selectionStart = e.currentTarget.selectionStart;
+      const selectionEnd = e.currentTarget.selectionEnd;
+
+      const before = currentVal.substring(0, selectionStart);
+      const after = currentVal.substring(selectionEnd);
+
+      const prefix = before && !before.endsWith('\n') ? '\n' : '';
+      const newVal = `${before}${prefix}${formattedPasted}${after}`;
+
+      setter(newVal);
+
+      const newCursorPos = before.length + prefix.length + formattedPasted.length;
+      setTimeout(() => {
+        if (e.currentTarget) {
+          e.currentTarget.selectionStart = newCursorPos;
+          e.currentTarget.selectionEnd = newCursorPos;
+        }
+      }, 0);
+    }
+  };
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
@@ -281,11 +321,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <label className={styles.label}>Mô tả công việc (Tiếng Việt)</label>
             <textarea
               rows={4}
-              placeholder="Nhập mô tả công việc (tự động chèn • khi bấm Enter xuống dòng)..."
+              placeholder="Nhập mô tả công việc (tự động chèn • khi bấm Enter hoặc khi dán văn bản xuống dòng)..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               onFocus={() => handleFocusAutoBullet(description, setDescription)}
               onKeyDown={(e) => handleKeyDownAutoBullet(e, description, setDescription)}
+              onPaste={(e) => handlePasteAutoBullet(e, description, setDescription)}
               className={styles.textarea}
             />
           </div>
@@ -294,11 +335,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <label className={styles.label}>Mô tả công việc (Tiếng Anh)</label>
             <textarea
               rows={4}
-              placeholder="Enter job description in English (auto-inserts • on Enter)..."
+              placeholder="Enter job description in English (auto-inserts • on Enter or Paste)..."
               value={descriptionEn}
               onChange={(e) => setDescriptionEn(e.target.value)}
               onFocus={() => handleFocusAutoBullet(descriptionEn, setDescriptionEn)}
               onKeyDown={(e) => handleKeyDownAutoBullet(e, descriptionEn, setDescriptionEn)}
+              onPaste={(e) => handlePasteAutoBullet(e, descriptionEn, setDescriptionEn)}
               className={styles.textarea}
             />
           </div>
@@ -308,11 +350,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <label className={styles.label}>Yêu cầu ứng viên (Tiếng Việt)</label>
             <textarea
               rows={4}
-              placeholder="Nhập yêu cầu ứng viên (tự động chèn • khi bấm Enter xuống dòng)..."
+              placeholder="Nhập yêu cầu ứng viên (tự động chèn • khi bấm Enter hoặc khi dán văn bản xuống dòng)..."
               value={requirements}
               onChange={(e) => setRequirements(e.target.value)}
               onFocus={() => handleFocusAutoBullet(requirements, setRequirements)}
               onKeyDown={(e) => handleKeyDownAutoBullet(e, requirements, setRequirements)}
+              onPaste={(e) => handlePasteAutoBullet(e, requirements, setRequirements)}
               className={styles.textarea}
             />
           </div>
@@ -321,11 +364,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <label className={styles.label}>Yêu cầu ứng viên (Tiếng Anh)</label>
             <textarea
               rows={4}
-              placeholder="Enter candidate requirements in English (auto-inserts • on Enter)..."
+              placeholder="Enter candidate requirements in English (auto-inserts • on Enter or Paste)..."
               value={requirementsEn}
               onChange={(e) => setRequirementsEn(e.target.value)}
               onFocus={() => handleFocusAutoBullet(requirementsEn, setRequirementsEn)}
               onKeyDown={(e) => handleKeyDownAutoBullet(e, requirementsEn, setRequirementsEn)}
+              onPaste={(e) => handlePasteAutoBullet(e, requirementsEn, setRequirementsEn)}
               className={styles.textarea}
             />
           </div>
@@ -335,11 +379,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <label className={styles.label}>Quyền lợi được hưởng (Tiếng Việt)</label>
             <textarea
               rows={4}
-              placeholder="Nhập quyền lợi được hưởng (tự động chèn • khi bấm Enter xuống dòng)..."
+              placeholder="Nhập quyền lợi được hưởng (tự động chèn • khi bấm Enter hoặc khi dán văn bản xuống dòng)..."
               value={benefits}
               onChange={(e) => setBenefits(e.target.value)}
               onFocus={() => handleFocusAutoBullet(benefits, setBenefits)}
               onKeyDown={(e) => handleKeyDownAutoBullet(e, benefits, setBenefits)}
+              onPaste={(e) => handlePasteAutoBullet(e, benefits, setBenefits)}
               className={styles.textarea}
             />
           </div>
@@ -348,11 +393,12 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
             <label className={styles.label}>Quyền lợi được hưởng (Tiếng Anh)</label>
             <textarea
               rows={4}
-              placeholder="Enter job benefits in English (auto-inserts • on Enter)..."
+              placeholder="Enter job benefits in English (auto-inserts • on Enter or Paste)..."
               value={benefitsEn}
               onChange={(e) => setBenefitsEn(e.target.value)}
               onFocus={() => handleFocusAutoBullet(benefitsEn, setBenefitsEn)}
               onKeyDown={(e) => handleKeyDownAutoBullet(e, benefitsEn, setBenefitsEn)}
+              onPaste={(e) => handlePasteAutoBullet(e, benefitsEn, setBenefitsEn)}
               className={styles.textarea}
             />
           </div>
