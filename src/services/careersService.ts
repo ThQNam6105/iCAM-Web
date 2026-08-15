@@ -3,25 +3,48 @@ import { supabase } from './supabaseClient';
 export type JobStatus = 'open' | 'closed' | 'draft';
 export type JobType = 'Full-time' | 'Part-time' | 'Internship';
 
+export interface DepartmentItem {
+  id: string;
+  name: string;
+  nameEn?: string;
+  description?: string;
+  color?: string;
+}
+
 export interface CareersItem {
   id: string;
   title: string;
   titleEn?: string;
   department: string;
+  departmentEn?: string;
   location: string;
+  locationEn?: string;
   type: JobType;
   salary: string;
+  salaryEn?: string;
   deadline: string;
   status: JobStatus;
   description: string;
+  descriptionEn?: string;
   requirements: string;
+  requirementsEn?: string;
   benefits: string;
+  benefitsEn?: string;
   applicationsCount: number;
   createdAt: string;
   updatedAt: string;
 }
 
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_careers_v1';
+const DEPARTMENTS_STORAGE_KEY = 'icancam_dynamic_departments_v1';
+
+export const INITIAL_DEPARTMENTS: DepartmentItem[] = [
+  { id: 'dept_1', name: 'Khối Đào Tạo', nameEn: 'Academic Department', color: '#3b82f6' },
+  { id: 'dept_2', name: 'Khối Tư Vấn & Tuyển Sinh', nameEn: 'Admissions & Course Consultants', color: '#F58220' },
+  { id: 'dept_3', name: 'Khối Marketing', nameEn: 'Marketing Department', color: '#ec4899' },
+  { id: 'dept_4', name: 'Khối Hành Chính & Nhân Sự', nameEn: 'Admin & HR Department', color: '#8b5cf6' },
+  { id: 'dept_5', name: 'Khối Vận Hành & Học Vụ', nameEn: 'Operations & Student Affairs', color: '#10b981' },
+];
 
 export const INITIAL_CAREERS: CareersItem[] = [
   {
@@ -29,14 +52,20 @@ export const INITIAL_CAREERS: CareersItem[] = [
     title: 'Giáo Viên Tiếng Anh Trẻ Em (Kids English Teacher)',
     titleEn: 'Kids English Teacher',
     department: 'Khối Đào Tạo',
+    departmentEn: 'Academic Department',
     location: 'Cơ sở Hóc Môn & Quận 12',
+    locationEn: 'Hoc Mon & District 12 Campuses',
     type: 'Full-time',
     salary: '12.000.000đ - 18.000.000đ',
+    salaryEn: '12,000,000VND - 18,000,000VND',
     deadline: '31/08/2026',
     status: 'open',
-    description: 'Giảng dạy các lớp Tiếng Anh Trẻ Em (Junior & Teens) theo giáo trình 21st Century Learning của iCANCAM.',
-    requirements: 'Tốt nghiệp Đại học Sư phạm Ngoại ngữ hoặc Ngôn ngữ Anh. Có chứng chỉ IELTS >= 7.0 hoặc TESOL/CELTA.',
-    benefits: 'Bảo hiểm đầy đủ, thưởng hiệu suất hàng tháng, cơ hội thăng tiến Trưởng nhóm chuyên môn.',
+    description: '• Giảng dạy các lớp Tiếng Anh Trẻ Em (Junior & Teens) theo giáo trình 21st Century Learning của iCANCAM.\n• Theo dõi sát sao tiến độ học tập và tương tác báo cáo cùng phụ huynh.',
+    descriptionEn: '• Teach Kids & Teens English classes following iCANCAM 21st Century Learning curriculum.\n• Closely monitor student progress and communicate proactively with parents.',
+    requirements: '• Tốt nghiệp Đại học Sư phạm Ngoại ngữ hoặc Ngôn ngữ Anh.\n• Có chứng chỉ IELTS >= 7.0 hoặc TESOL/CELTA.\n• Phát âm chuẩn, giàu năng lượng và yêu trẻ.',
+    requirementsEn: '• Bachelor degree in English Pedagogy or English Linguistics.\n• Valid IELTS >= 7.0 or TESOL/CELTA certification.\n• Standard pronunciation, energetic demeanor, and passion for teaching children.',
+    benefits: '• Bảo hiểm xã hội & y tế đầy đủ 100% theo quy định.\n• Thưởng hiệu suất giảng dạy hàng tháng & thưởng lễ tết.\n• Cơ hội thăng tiến Trưởng nhóm chuyên môn hoặc Quản lý Đào tạo.\n• Khóa tập huấn Masterclass 4Ls + LETI hàng năm từ chuyên gia.',
+    benefitsEn: '• 100% full social and health insurance per regulations.\n• Monthly teaching performance bonuses & holiday bonuses.\n• Clear career advancement path to Academic Team Lead or Manager.\n• Annual 4Ls + LETI Masterclass training from international experts.',
     applicationsCount: 14,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -46,14 +75,20 @@ export const INITIAL_CAREERS: CareersItem[] = [
     title: 'Chuyên Viên Tư Vấn Tuyển Sinh (Course Consultant)',
     titleEn: 'Course Consultant',
     department: 'Khối Tư Vấn & Tuyển Sinh',
+    departmentEn: 'Admissions & Course Consultants',
     location: 'Cơ sở Quận 12',
+    locationEn: 'District 12 Campus',
     type: 'Full-time',
     salary: '10.000.000đ - 20.000.000đ (Lương cứng + Hoa hồng)',
+    salaryEn: '10,000,000VND - 20,000,000VND (Base salary + Commission)',
     deadline: '15/09/2026',
     status: 'open',
-    description: 'Tư vấn lộ trình học Tiếng Anh & IELTS cho phụ huynh và học sinh tại cơ sở iCANCAM.',
-    requirements: 'Giao tiếp tốt, tự tin, ưu tiên ứng viên có kinh nghiệm tư vấn trong lĩnh vực giáo dục.',
-    benefits: 'Hoa hồng hấp dẫn theo doanh số, môi trường làm việc năng động, đào tạo kỹ năng mềm.',
+    description: '• Tư vấn lộ trình học Tiếng Anh & IELTS cho phụ huynh và học sinh tại cơ sở iCANCAM.\n• Chăm sóc phụ huynh hiện tại và hỗ trợ giải đáp thắc mắc học phí.',
+    descriptionEn: '• Advise parents and students on English & IELTS learning roadmaps at iCANCAM campuses.\n• Support existing parents and answer course fee inquiries.',
+    requirements: '• Giao tiếp tốt, tự tin, khả năng thuyết phục cao.\n• Ưu tiên ứng viên có kinh nghiệm tư vấn trong lĩnh vực giáo dục.',
+    requirementsEn: '• Strong communication skills, self-confident, persuasive mindset.\n• Priority given to candidates with prior education consulting experience.',
+    benefits: '• Hoa hồng hấp dẫn theo doanh số tuyển sinh hàng tháng.\n• Môi trường làm việc năng động, đào tạo kỹ năng tư vấn chuyên nghiệp.\n• Thưởng vượt chỉ tiêu doanh số hàng quý.',
+    benefitsEn: '• Attractive monthly admissions sales commissions.\n• Dynamic workplace environment with professional sales training.\n• Quarterly target achievement bonuses.',
     applicationsCount: 8,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -63,20 +98,71 @@ export const INITIAL_CAREERS: CareersItem[] = [
     title: 'Trợ Giảng Lớp IELTS (IELTS Teaching Assistant)',
     titleEn: 'IELTS Teaching Assistant',
     department: 'Khối Đào Tạo',
+    departmentEn: 'Academic Department',
     location: 'Cơ sở Hóc Môn',
+    locationEn: 'Hoc Mon Campus',
     type: 'Part-time',
     salary: '50.000đ - 80.000đ / Giờ',
+    salaryEn: '50,000VND - 80,000VND / Hour',
     deadline: '30/09/2026',
     status: 'open',
-    description: 'Hỗ trợ giáo viên nước ngoài và bản ngữ quản lý lớp học, kiểm tra bài tập về nhà của học viên.',
-    requirements: 'Sinh viên chuyên ngành Ngoại ngữ. Chứng chỉ IELTS >= 6.5.',
-    benefits: 'Lịch làm việc linh hoạt, nâng cao kỹ năng sư phạm, cấp chứng nhận kinh nghiệm.',
+    description: '• Hỗ trợ giáo viên nước ngoài và bản ngữ quản lý lớp học.\n• Kiểm tra bài tập về nhà và chấm bài Writing/Speaking cho học viên.',
+    descriptionEn: '• Assist foreign and native teachers in classroom management.\n• Check homework assignments and grade Writing/Speaking practice tasks.',
+    requirements: '• Sinh viên chuyên ngành Ngoại ngữ hoặc Sư phạm.\n• Chứng chỉ IELTS >= 6.5.',
+    requirementsEn: '• Foreign language or Education university students.\n• IELTS certificate >= 6.5.',
+    benefits: '• Lịch làm việc linh hoạt phù hợp với lịch học.\n• Nâng cao kỹ năng sư phạm & làm việc trực tiếp với giáo viên bản ngữ.\n• Cấp chứng nhận kinh nghiệm làm việc sau 6 tháng.',
+    benefitsEn: '• Flexible working shifts tailored to student schedules.\n• Enhance pedagogical skills working alongside native speakers.\n• Experience certificate granted after 6 months.',
     applicationsCount: 22,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
 ];
 
+// DEPARTMENTS CRUD
+export const getAllDepartments = (): DepartmentItem[] => {
+  try {
+    const raw = localStorage.getItem(DEPARTMENTS_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(INITIAL_DEPARTMENTS));
+    return INITIAL_DEPARTMENTS;
+  } catch {
+    return INITIAL_DEPARTMENTS;
+  }
+};
+
+export const saveDepartments = (list: DepartmentItem[]) => {
+  localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(list));
+};
+
+export const createDepartment = (dept: Omit<DepartmentItem, 'id'>): DepartmentItem => {
+  const list = getAllDepartments();
+  const newDept: DepartmentItem = {
+    id: `dept_${Date.now()}`,
+    ...dept,
+  };
+  const updated = [...list, newDept];
+  saveDepartments(updated);
+  return newDept;
+};
+
+export const updateDepartment = (id: string, data: Partial<DepartmentItem>): DepartmentItem | null => {
+  const list = getAllDepartments();
+  const idx = list.findIndex((d) => d.id === id);
+  if (idx === -1) return null;
+  const updated = { ...list[idx], ...data };
+  list[idx] = updated;
+  saveDepartments(list);
+  return updated;
+};
+
+export const deleteDepartment = (id: string): boolean => {
+  const list = getAllDepartments();
+  const filtered = list.filter((d) => d.id !== id);
+  saveDepartments(filtered);
+  return true;
+};
+
+// CAREERS CRUD
 export const getAllCareers = (): CareersItem[] => {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -97,14 +183,20 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
         title: item.title,
         titleEn: item.title_en,
         department: item.department,
+        departmentEn: item.department_en,
         location: item.location,
+        locationEn: item.location_en,
         type: item.type as JobType,
         salary: item.salary,
+        salaryEn: item.salary_en,
         deadline: item.deadline,
         status: item.status as JobStatus,
         description: item.description,
+        descriptionEn: item.description_en,
         requirements: item.requirements,
+        requirementsEn: item.requirements_en,
         benefits: item.benefits,
+        benefitsEn: item.benefits_en,
         applicationsCount: item.applications_count || 0,
         createdAt: item.created_at,
         updatedAt: item.updated_at,
@@ -126,14 +218,20 @@ const syncCareerToSupabase = async (job: CareersItem) => {
       title: job.title,
       title_en: job.titleEn,
       department: job.department,
+      department_en: job.departmentEn,
       location: job.location,
+      location_en: job.locationEn,
       type: job.type,
       salary: job.salary,
+      salary_en: job.salaryEn,
       deadline: job.deadline,
       status: job.status,
       description: job.description,
+      description_en: job.descriptionEn,
       requirements: job.requirements,
+      requirements_en: job.requirementsEn,
       benefits: job.benefits,
+      benefits_en: job.benefitsEn,
       applications_count: job.applicationsCount,
       created_at: job.createdAt,
       updated_at: job.updatedAt,

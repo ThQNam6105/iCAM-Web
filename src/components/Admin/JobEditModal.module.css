@@ -15,12 +15,13 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
   width: 100%;
-  max-width: 750px;
+  max-width: 780px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   color: #ffffff;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
 }
 
 .header {
@@ -43,9 +44,16 @@
   border: none;
   color: #94a3b8;
   cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .closeBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
 
@@ -55,6 +63,39 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+.langTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0.35rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.langTabBtn {
+  flex: 1;
+  padding: 0.55rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.86rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+}
+
+.langTabBtnActive {
+  background: #F58220;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 130, 32, 0.3);
 }
 
 .rowTwo {
@@ -125,6 +166,48 @@
   border-color: #F58220;
 }
 
+.benefitPresets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  padding: 0.85rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 12px;
+  border: 1px dashed rgba(245, 130, 32, 0.35);
+}
+
+.presetTitle {
+  width: 100%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #F58220;
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.presetPill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.presetPill:hover {
+  background: rgba(245, 130, 32, 0.25);
+  border-color: #F58220;
+  color: #ffffff;
+}
+
 .actions {
   display: flex;
   align-items: center;
@@ -132,37 +215,4 @@
   gap: 0.75rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.cancelBtn {
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  white-space: nowrap;
-}
-
-.saveBtn {
-  background: #F58220;
-  color: #ffffff;
-  border: none;
-  padding: 0 1.5rem;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  white-space: nowrap;
-  gap: 0.4rem;
 }
