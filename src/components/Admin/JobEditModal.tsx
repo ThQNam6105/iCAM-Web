@@ -47,9 +47,45 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
   useEffect(() => {
     const depts = getAllDepartments();
     setDepartments(depts);
-    if (!jobToEdit && depts.length > 0) {
-      setDepartment(depts[0].name);
-      setDepartmentEn(depts[0].nameEn || depts[0].name);
+
+    if (isOpen) {
+      if (jobToEdit) {
+        setTitle(jobToEdit.title || '');
+        setTitleEn(jobToEdit.titleEn || '');
+        setDepartment(jobToEdit.department || (depts.length > 0 ? depts[0].name : 'Khối Đào Tạo'));
+        setDepartmentEn(jobToEdit.departmentEn || '');
+        setLocation(jobToEdit.location || 'Cơ sở Hóc Môn & Quận 12');
+        setLocationEn(jobToEdit.locationEn || 'Hoc Mon & District 12 Campuses');
+        setType(jobToEdit.type || 'Full-time');
+        setSalary(jobToEdit.salary || '12.000.000đ - 18.000.000đ');
+        setSalaryEn(jobToEdit.salaryEn || '12,000,000VND - 18,000,000VND');
+        setDeadline(jobToEdit.deadline || '30/09/2026');
+        setStatus(jobToEdit.status || 'open');
+        setDescription(jobToEdit.description || '');
+        setDescriptionEn(jobToEdit.descriptionEn || '');
+        setRequirements(jobToEdit.requirements || '');
+        setRequirementsEn(jobToEdit.requirementsEn || '');
+        setBenefits(jobToEdit.benefits || '');
+        setBenefitsEn(jobToEdit.benefitsEn || '');
+      } else {
+        setTitle('');
+        setTitleEn('');
+        setDepartment(depts.length > 0 ? depts[0].name : 'Khối Đào Tạo');
+        setDepartmentEn(depts.length > 0 ? depts[0].nameEn || depts[0].name : 'Academic Department');
+        setLocation('Cơ sở Hóc Môn & Quận 12');
+        setLocationEn('Hoc Mon & District 12 Campuses');
+        setType('Full-time');
+        setSalary('12.000.000đ - 18.000.000đ');
+        setSalaryEn('12,000,000VND - 18,000,000VND');
+        setDeadline('30/09/2026');
+        setStatus('open');
+        setDescription('');
+        setDescriptionEn('');
+        setRequirements('');
+        setRequirementsEn('');
+        setBenefits('');
+        setBenefitsEn('');
+      }
     }
   }, [jobToEdit, isOpen]);
 

@@ -218,29 +218,32 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
   try {
     const { data, error } = await supabase.from('careers_posts').select('*').order('created_at', { ascending: false });
     if (!error && data && data.length > 0) {
-      const careersFromDb: CareersItem[] = data.map((item) => ({
-        id: item.id,
-        title: item.title,
-        titleEn: item.title_en,
-        department: item.department,
-        departmentEn: item.department_en,
-        location: item.location,
-        locationEn: item.location_en,
-        type: item.type as JobType,
-        salary: item.salary,
-        salaryEn: item.salary_en,
-        deadline: item.deadline,
-        status: item.status as JobStatus,
-        description: item.description,
-        descriptionEn: item.description_en,
-        requirements: item.requirements,
-        requirementsEn: item.requirements_en,
-        benefits: item.benefits,
-        benefitsEn: item.benefits_en,
-        applicationsCount: item.applications_count || 0,
-        createdAt: item.created_at,
-        updatedAt: item.updated_at,
-      }));
+      const careersFromDb: CareersItem[] = data.map((item) => {
+        const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
+        return {
+          id: item.id,
+          title: item.title,
+          titleEn: item.title_en || seed?.titleEn,
+          department: item.department,
+          departmentEn: item.department_en || seed?.departmentEn,
+          location: item.location,
+          locationEn: item.location_en || seed?.locationEn,
+          type: item.type as JobType,
+          salary: item.salary,
+          salaryEn: item.salary_en || seed?.salaryEn,
+          deadline: item.deadline,
+          status: item.status as JobStatus,
+          description: item.description,
+          descriptionEn: item.description_en || seed?.descriptionEn,
+          requirements: item.requirements,
+          requirementsEn: item.requirements_en || seed?.requirementsEn,
+          benefits: item.benefits,
+          benefitsEn: item.benefits_en || seed?.benefitsEn,
+          applicationsCount: item.applications_count || 0,
+          createdAt: item.created_at,
+          updatedAt: item.updated_at,
+        };
+      });
 
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(careersFromDb));
       return careersFromDb;
