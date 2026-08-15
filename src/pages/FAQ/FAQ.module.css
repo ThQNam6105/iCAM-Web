@@ -687,31 +687,120 @@
 
 @media (max-width: 768px) {
   .heroSection {
-    padding: 4rem 1rem 3rem 1rem;
+    padding: 3.5rem 1rem 2.5rem 1rem;
+  }
+
+  .heroTitle {
+    font-size: 1.85rem;
+    white-space: normal;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .searchBoxWrapper {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .searchInput {
+    padding: 0.9rem 2.75rem 0.9rem 2.75rem;
+    font-size: 0.92rem;
+    border-radius: 14px;
+  }
+
+  .filterBar {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 0.25rem 0.25rem 0.75rem 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .filterBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filterBtn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    padding: 0.5rem 1.1rem;
   }
 
   .container {
     padding: 0 16px;
   }
 
+  .controlsBar {
+    width: 100%;
+  }
+
+  .askHeaderBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
   .pillarsGrid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
   .accordionHeader {
-    padding: 1.25rem 1.25rem;
-  }
-
-  .accordionBody {
-    padding: 1rem 1.25rem 1.25rem 1.25rem;
+    padding: 1.1rem 1rem;
+    gap: 0.75rem;
   }
 
   .questionText {
-    font-size: 1.02rem;
+    font-size: 0.98rem;
+    line-height: 1.4;
+  }
+
+  .accordionBody {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .voteBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .recoveryBtnRow {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .recoveryAskBtn,
+  .recoveryCallBtn,
+  .recoveryZaloBtn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
   .ctaCard {
-    padding: 3rem 1.5rem;
+    padding: 2.75rem 1.25rem;
+    border-radius: 20px;
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .primaryCtaBtn,
+  .secondaryCtaBtn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
   }
 }
 
@@ -721,10 +810,10 @@
   }
 
   .accordionHeader {
-    padding: 1rem;
+    padding: 0.9rem 0.85rem;
   }
 
   .questionText {
-    font-size: 0.98rem;
+    font-size: 0.94rem;
   }
 }

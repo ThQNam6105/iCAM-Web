@@ -97,9 +97,9 @@ export const FAQ: React.FC = () => {
   const filteredFaqs = useMemo(() => {
     return faqs.filter((item) => {
       const matchesCategory = activeCategory === 'all' || item.categoryId === activeCategory;
-      const qText = isEn ? item.questionEn : item.questionVi;
-      const aText = isEn ? item.answerEn : item.answerVi;
-      const catText = isEn ? item.categoryNameEn || '' : item.categoryNameVi || '';
+      const qText = isEn && item.questionEn?.trim() ? item.questionEn : item.questionVi;
+      const aText = isEn && item.answerEn?.trim() ? item.answerEn : item.answerVi;
+      const catText = isEn && item.categoryNameEn?.trim() ? item.categoryNameEn : item.categoryNameVi || '';
 
       const queryLower = searchQuery.toLowerCase().trim();
       const matchesSearch =
@@ -214,7 +214,7 @@ export const FAQ: React.FC = () => {
                 className={`${styles.filterBtn} ${activeCategory === cat.id ? styles.activeFilter : ''}`}
                 onClick={() => setActiveCategory(cat.id)}
               >
-                {isEn ? cat.nameEn : cat.nameVi}
+                {isEn && cat.nameEn ? cat.nameEn : cat.nameVi}
               </button>
             ))}
           </div>
@@ -243,9 +243,9 @@ export const FAQ: React.FC = () => {
             {filteredFaqs.length > 0 ? (
               filteredFaqs.map((item) => {
                 const isOpen = openIds.includes(item.id);
-                const qText = isEn ? item.questionEn : item.questionVi;
-                const aText = isEn ? item.answerEn : item.answerVi;
-                const catText = isEn ? item.categoryNameEn : item.categoryNameVi;
+                const qText = isEn && item.questionEn?.trim() ? item.questionEn : item.questionVi;
+                const aText = isEn && item.answerEn?.trim() ? item.answerEn : item.answerVi;
+                const catText = isEn && item.categoryNameEn?.trim() ? item.categoryNameEn : item.categoryNameVi || '';
                 const userVote = votedMap[item.id];
 
                 return (
