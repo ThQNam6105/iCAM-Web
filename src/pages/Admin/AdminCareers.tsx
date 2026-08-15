@@ -51,12 +51,6 @@ export const AdminCareers: React.FC = () => {
   useEffect(() => {
     loadJobs();
     fetchCareersFromSupabase().then(() => loadJobs());
-
-    const interval = setInterval(() => {
-      fetchCareersFromSupabase().then(() => loadJobs());
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const filteredJobs = useMemo(() => {
