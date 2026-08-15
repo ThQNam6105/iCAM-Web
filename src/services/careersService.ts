@@ -279,7 +279,7 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
   return getAllCareers();
 };
 
-const syncCareerToSupabase = async (job: CareersItem) => {
+const syncCareerToSupabase = async (job: CareersItem): Promise<{ success: boolean; error?: string }> => {
   try {
     const { error } = await supabase.from('careers_posts').upsert({
       id: job.id,
@@ -306,13 +306,18 @@ const syncCareerToSupabase = async (job: CareersItem) => {
     });
     if (error) {
       console.error('Supabase careers_posts upsert error:', error.message, error.details, error.hint);
+      return { success: false, error: error.message };
     }
-  } catch (err) {
+    return { success: true };
+  } catch (err: any) {
     console.error('Supabase career sync exception:', err);
+    return { success: false, error: err?.message || 'Network or connection failure' };
   }
 };
 
-export const createCareer = async (data: Omit<CareersItem, 'id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>): Promise<CareersItem> => {
+export const createCareer = async (
+  data: Omit<CareersItem, 'id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>
+): Promise<{ success: boolean; data?: CareersItem; error?: string }> => {
   const list = getAllCareers();
   const now = new Date().toISOString();
   const created: CareersItem = {
@@ -323,16 +328,23 @@ export const createCareer = async (data: Omit<CareersItem, 'id' | 'createdAt' | 
     updatedAt: now,
   };
 
-  const updated = [created, ...list];
-  saveCareers(updated);
-  await syncCareerToSupabase(created);
-  return created;
+  const syncRes = await syncCareerToSupabase(created);
+  if (!syncRes.success) {
+    return { success: false, error: syncRes.error };
+  }
+
+  const updatedList = [created, ...list];
+  saveCareers(updatedList);
+  return { success: true, data: created };
 };
 
-export const updateCareer = async (id: string, data: Partial<CareersItem>): Promise<CareersItem | null> => {
+export const updateCareer = async (
+  id: string,
+  data: Partial<CareersItem>
+): Promise<{ success: boolean; data?: CareersItem; error?: string }> => {
   const list = getAllCareers();
   const idx = list.findIndex((j) => j.id === id);
-  if (idx === -1) return null;
+  if (idx === -1) return { success: false, error: 'Job position not found' };
 
   const updated: CareersItem = {
     ...list[idx],
@@ -340,16 +352,28 @@ export const updateCareer = async (id: string, data: Partial<CareersItem>): Prom
     updatedAt: new Date().toISOString(),
   };
 
+  const syncRes = await syncCareerToSupabase(updated);
+  if (!syncRes.success) {
+    return { success: false, error: syncRes.error };
+  }
+
   list[idx] = updated;
   saveCareers(list);
-  await syncCareerToSupabase(updated);
-  return updated;
+  return { success: true, data: updated };
 };
 
-export const deleteCareer = async (id: string): Promise<boolean> => {
-  const list = getAllCareers();
-  const filtered = list.filter((j) => j.id !== id);
-  saveCareers(filtered);
-  await supabase.from('careers_posts').delete().eq('id', id);
-  return true;
+export const deleteCareer = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error } = await supabase.from('careers_posts').delete().eq('id', id);
+    if (error) {
+      console.error('Supabase delete career error:', error.message);
+      return { success: false, error: error.message };
+    }
+    const list = getAllCareers();
+    const filtered = list.filter((j) => j.id !== id);
+    saveCareers(filtered);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Network or connection failure' };
+  }
 };

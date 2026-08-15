@@ -13,7 +13,7 @@ import styles from './JobEditModal.module.css';
 interface JobEditModalProps {
   isOpen: boolean;
   jobToEdit?: CareersItem | null;
-  onSave: (data: Partial<CareersItem>) => void;
+  onSave: (data: Partial<CareersItem>) => Promise<boolean> | void;
   onClose: () => void;
 }
 
@@ -24,6 +24,7 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
   onClose,
 }) => {
   const [departments, setDepartments] = useState<DepartmentItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form Fields
   const [title, setTitle] = useState(jobToEdit?.title || '');
@@ -99,28 +100,37 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      title,
-      titleEn,
-      department,
-      departmentEn: departmentEn || department,
-      location,
-      locationEn: locationEn || location,
-      type,
-      salary,
-      salaryEn: salaryEn || salary,
-      deadline,
-      status,
-      description,
-      descriptionEn,
-      requirements,
-      requirementsEn,
-      benefits,
-      benefitsEn,
-    });
-    onClose();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const result = await onSave({
+        title,
+        titleEn,
+        department,
+        departmentEn: departmentEn || department,
+        location,
+        locationEn: locationEn || location,
+        type,
+        salary,
+        salaryEn: salaryEn || salary,
+        deadline,
+        status,
+        description,
+        descriptionEn,
+        requirements,
+        requirementsEn,
+        benefits,
+        benefitsEn,
+      });
+
+      if (result !== false) {
+        onClose();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleKeyDownAutoBullet = (
@@ -440,11 +450,11 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
           </div>
 
           <div className={styles.actions}>
-            <Button type="button" variant="secondary" size="md" onClick={onClose}>
+            <Button type="button" variant="secondary" size="md" onClick={onClose} disabled={isSubmitting}>
               Hủy bỏ
             </Button>
-            <Button type="submit" variant="primary" size="md" icon={<Save size={16} />}>
-              {jobToEdit ? 'Lưu thay đổi' : 'Đăng vị trí mới'}
+            <Button type="submit" variant="primary" size="md" icon={<Save size={16} />} disabled={isSubmitting}>
+              {isSubmitting ? 'Đang lưu...' : jobToEdit ? 'Lưu thay đổi' : 'Đăng vị trí mới'}
             </Button>
           </div>
         </form>

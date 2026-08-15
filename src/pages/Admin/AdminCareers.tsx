@@ -73,23 +73,36 @@ export const AdminCareers: React.FC = () => {
     return { total, openCount, closedCount, totalApps };
   }, [allJobs]);
 
-  const handleSaveJob = async (data: Partial<CareersItem>) => {
+  const handleSaveJob = async (data: Partial<CareersItem>): Promise<boolean> => {
     if (editingJob) {
-      await updateCareer(editingJob.id, data);
-      showToast('Cập nhật vị trí tuyển dụng thành công! ✓', 'success');
+      const res = await updateCareer(editingJob.id, data);
+      if (!res.success) {
+        showToast(`⚠️ Không thể lưu Supabase Database: ${res.error || 'Lỗi kết nối'}`, 'error');
+        return false;
+      }
+      showToast('Cập nhật vị trí tuyển dụng thành công lên Supabase Database! ✓', 'success');
     } else {
-      await createCareer(
+      const res = await createCareer(
         data as Omit<CareersItem, 'id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>
       );
-      showToast('Tạo vị trí tuyển dụng mới thành công! ✓', 'success');
+      if (!res.success) {
+        showToast(`⚠️ Không thể tạo vị trí tuyển dụng: ${res.error || 'Lỗi kết nối'}`, 'error');
+        return false;
+      }
+      showToast('Tạo vị trí tuyển dụng mới thành công lên Supabase Database! ✓', 'success');
     }
     loadJobs();
+    return true;
   };
 
   const handleConfirmDelete = async () => {
     if (deleteCandidateId) {
-      await deleteCareer(deleteCandidateId);
-      showToast('Đã xóa vị trí tuyển dụng khỏi hệ thống!', 'info');
+      const res = await deleteCareer(deleteCandidateId);
+      if (!res.success) {
+        showToast(`⚠️ Lỗi xóa trên Supabase Database: ${res.error || 'Lỗi kết nối'}`, 'error');
+        return;
+      }
+      showToast('Đã xóa vị trí tuyển dụng khỏi Supabase Database thành công!', 'info');
       setDeleteCandidateId(null);
       loadJobs();
     }
