@@ -251,7 +251,7 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
           };
         });
 
-        // Merge: Keep local edit if local updatedAt is newer than DB timestamp
+        // Merge: Keep local edit if local updatedAt is equal or newer than DB timestamp
         const mergedList = [...careersFromDb];
         localList.forEach((localItem) => {
           const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
@@ -262,7 +262,7 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
             syncCareerToSupabase(localItem);
           } else {
             const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
-            if (localTime > dbTime) {
+            if (localTime >= dbTime) {
               mergedList[dbIdx] = localItem;
               syncCareerToSupabase(localItem);
             }
@@ -291,25 +291,25 @@ const syncCareerToSupabase = async (job: CareersItem) => {
     const { error } = await supabase.from('careers_posts').upsert({
       id: job.id,
       title: job.title,
-      title_en: job.titleEn,
+      title_en: job.titleEn || job.title,
       department: job.department,
-      department_en: job.departmentEn,
+      department_en: job.departmentEn || job.department,
       location: job.location,
-      location_en: job.locationEn,
-      type: job.type,
+      location_en: job.locationEn || job.location,
+      type: job.type || 'Full-time',
       salary: job.salary,
-      salary_en: job.salaryEn,
-      deadline: job.deadline,
-      status: job.status,
-      description: job.description,
-      description_en: job.descriptionEn,
-      requirements: job.requirements,
-      requirements_en: job.requirementsEn,
-      benefits: job.benefits,
-      benefits_en: job.benefitsEn,
-      applications_count: job.applicationsCount,
-      created_at: job.createdAt,
-      updated_at: job.updatedAt,
+      salary_en: job.salaryEn || job.salary,
+      deadline: job.deadline || '30/09/2026',
+      status: job.status || 'open',
+      description: job.description || '',
+      description_en: job.descriptionEn || job.description || '',
+      requirements: job.requirements || '',
+      requirements_en: job.requirementsEn || job.requirements || '',
+      benefits: job.benefits || '',
+      benefits_en: job.benefitsEn || job.benefits || '',
+      applications_count: job.applicationsCount || 0,
+      created_at: job.createdAt || new Date().toISOString(),
+      updated_at: job.updatedAt || new Date().toISOString(),
     });
     if (error) {
       console.error('Supabase careers_posts upsert error:', error.message, error.details, error.hint);
