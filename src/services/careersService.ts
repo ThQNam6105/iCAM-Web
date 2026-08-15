@@ -252,21 +252,13 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
           };
         });
 
-        // Smart merge: Keep local edit if local updatedAt is strictly newer than DB timestamp
+        // Supabase is master for all DB rows. Only preserve local items not in DB yet (offline additions)
         const mergedList = [...careersFromDb];
         localList.forEach((localItem) => {
           const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
-          const localTime = new Date(localItem.updatedAt || 0).getTime();
-
           if (dbIdx === -1) {
             mergedList.unshift(localItem);
             syncCareerToSupabase(localItem);
-          } else {
-            const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
-            if (localTime > dbTime) {
-              mergedList[dbIdx] = localItem;
-              syncCareerToSupabase(localItem);
-            }
           }
         });
 
