@@ -251,7 +251,6 @@ export const AdminFAQ: React.FC = () => {
               { value: 'pending', label: 'Chờ xử lý' },
               { value: 'private_answered', label: 'Đã trả lời riêng' },
               { value: 'published', label: 'Đã đăng thành FAQ' },
-              { value: 'rejected', label: 'Từ chối' },
               { value: 'archived', label: 'Đã lưu trữ' },
             ]}
             value={selectedInboxStatus}

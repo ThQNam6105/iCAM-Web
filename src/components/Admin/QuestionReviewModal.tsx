@@ -17,6 +17,7 @@ import {
   updateUserQuestionStatus,
   deleteUserQuestion,
 } from '../../services/questionService';
+import { useToast } from '../Toast/Toast';
 import { Button } from './UI';
 import styles from './QuestionReviewModal.module.css';
 
@@ -35,6 +36,7 @@ export const QuestionReviewModal: React.FC<QuestionReviewModalProps> = ({
   onStatusUpdated,
   onConvertToFaq,
 }) => {
+  const { showToast } = useToast();
   const [internalNotes, setInternalNotes] = useState(question?.internalNotes || '');
 
   React.useEffect(() => {
@@ -49,6 +51,7 @@ export const QuestionReviewModal: React.FC<QuestionReviewModalProps> = ({
 
   const handlePrivateAnswer = () => {
     updateUserQuestionStatus(question.id, 'private_answered', internalNotes);
+    showToast('Đã đánh giá câu hỏi là Đã trả lời riêng! ✓', 'success');
     onStatusUpdated();
     onClose();
   };
@@ -61,6 +64,7 @@ export const QuestionReviewModal: React.FC<QuestionReviewModalProps> = ({
 
   const handleReject = () => {
     deleteUserQuestion(question.id);
+    showToast('Đã từ chối và xóa khỏi hộp thư!', 'info');
     onStatusUpdated();
     onClose();
   };
