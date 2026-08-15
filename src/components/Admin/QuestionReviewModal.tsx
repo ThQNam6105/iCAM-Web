@@ -7,7 +7,6 @@ import {
   Globe,
   Archive,
   Ban,
-  Info,
   CheckCircle2,
   Calendar,
 } from 'lucide-react';
@@ -135,15 +134,6 @@ export const QuestionReviewModal: React.FC<QuestionReviewModalProps> = ({
             </div>
           </div>
 
-          <div className={styles.guidanceAlert}>
-            <Info size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <strong>Hướng dẫn xử lý câu hỏi:</strong>
-              <br />
-              • Để <strong>"Trả lời riêng"</strong>: Quý thầy cô/nhân viên vui lòng sử dụng thông tin liên hệ ở trên (SĐT / Zalo / Email) để liên hệ trực tiếp tư vấn cho khách hàng. Hệ thống không tạo tin nhắn giả.
-              <br />• Để <strong>"Đăng thành FAQ"</strong>: Bấm nút bên dưới để chuyển câu hỏi này thành bài tri thức công khai song ngữ cho toàn bộ phụ huynh tham khảo.
-            </div>
-          </div>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Ghi chú nội bộ xử lý (Chỉ lưu trong Admin):</label>
