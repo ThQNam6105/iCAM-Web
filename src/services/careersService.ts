@@ -220,7 +220,6 @@ export const saveCareers = (list: CareersItem[]) => {
 };
 
 export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
-  const localList = getAllCareers();
   try {
     const { data, error } = await supabase.from('careers_posts').select('*').order('created_at', { ascending: false });
     if (!error && data) {
@@ -247,31 +246,12 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
             benefits: item.benefits,
             benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
             applicationsCount: item.applications_count || 0,
-            createdAt: item.created_at || '2026-01-01T00:00:00.000Z',
-            updatedAt: item.updated_at || '2026-01-01T00:00:00.000Z',
+            createdAt: item.created_at || '2026-08-16T02:30:00.000Z',
+            updatedAt: item.updated_at || '2026-08-16T02:30:00.000Z',
           };
         });
-
-        // Merge: Keep local edit if local updatedAt is equal or newer than DB timestamp
-        const mergedList = [...careersFromDb];
-        localList.forEach((localItem) => {
-          const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
-          const localTime = new Date(localItem.updatedAt || 0).getTime();
-
-          if (dbIdx === -1) {
-            mergedList.unshift(localItem);
-            syncCareerToSupabase(localItem);
-          } else {
-            const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
-            if (localTime >= dbTime) {
-              mergedList[dbIdx] = localItem;
-              syncCareerToSupabase(localItem);
-            }
-          }
-        });
-
-        saveCareers(mergedList);
-        return mergedList;
+        saveCareers(careersFromDb);
+        return careersFromDb;
       } else {
         // Seed initial data to Supabase once if DB is empty
         for (const job of INITIAL_CAREERS) {
