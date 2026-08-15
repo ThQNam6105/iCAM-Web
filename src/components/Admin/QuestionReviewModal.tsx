@@ -59,6 +59,7 @@ export const QuestionReviewModal: React.FC<QuestionReviewModalProps> = ({
   const handleConvertToFaqClick = () => {
     updateUserQuestionStatus(question.id, 'published', internalNotes);
     onStatusUpdated();
+    onClose();
     onConvertToFaq(question.question);
   };
 
