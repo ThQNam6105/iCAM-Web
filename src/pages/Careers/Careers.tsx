@@ -238,28 +238,38 @@ export const Careers: React.FC = () => {
       .filter((s) => s.length > 0);
   };
 
-  const mappedDynamic: Job[] = dynamicJobs.map((j, idx) => ({
-    id: 1000 + idx,
-    category: j.department.includes('Đào Tạo') ? 'academic' : j.department.includes('Tuyển Sinh') ? 'sales' : 'ops',
-    categoryLabelVi: j.department.toUpperCase(),
-    categoryLabelEn: (j.departmentEn || j.department).toUpperCase(),
-    titleVi: j.title,
-    titleEn: j.titleEn || j.title,
-    departmentVi: j.department,
-    departmentEn: j.departmentEn || j.department,
-    typeVi: j.type,
-    typeEn: j.type,
-    locationVi: j.location,
-    locationEn: j.locationEn || j.location,
-    salaryVi: j.salary,
-    salaryEn: j.salaryEn || j.salary,
-    descVi: j.description,
-    descEn: j.descriptionEn || j.description,
-    requirementsVi: parseBulletItems(j.requirements),
-    requirementsEn: parseBulletItems(j.requirementsEn || j.requirements),
-    benefitsVi: parseBulletItems(j.benefits),
-    benefitsEn: parseBulletItems(j.benefitsEn || j.benefits),
-  }));
+  const mappedDynamic: Job[] = dynamicJobs.map((j, idx) => {
+    const deptEn = j.departmentEn || (
+      j.department.includes('Đào Tạo') ? 'Academic Department' :
+      j.department.includes('Tuyển Sinh') ? 'Admissions & Course Consultants' :
+      j.department.includes('Marketing') ? 'Marketing Department' :
+      j.department.includes('Hành Chính') ? 'Admin & HR Department' :
+      j.department.includes('Vận Hành') ? 'Operations Department' : j.department
+    );
+
+    return {
+      id: 1000 + idx,
+      category: j.department.includes('Đào Tạo') ? 'academic' : j.department.includes('Tuyển Sinh') ? 'sales' : 'ops',
+      categoryLabelVi: j.department.toUpperCase(),
+      categoryLabelEn: deptEn.toUpperCase(),
+      titleVi: j.title,
+      titleEn: j.titleEn || j.title,
+      departmentVi: j.department,
+      departmentEn: deptEn,
+      typeVi: j.type,
+      typeEn: j.type,
+      locationVi: j.location,
+      locationEn: j.locationEn || j.location,
+      salaryVi: j.salary,
+      salaryEn: j.salaryEn || j.salary,
+      descVi: j.description,
+      descEn: j.descriptionEn || j.description,
+      requirementsVi: parseBulletItems(j.requirements),
+      requirementsEn: parseBulletItems(j.requirementsEn && j.requirementsEn.trim().length > 0 ? j.requirementsEn : j.requirements),
+      benefitsVi: parseBulletItems(j.benefits),
+      benefitsEn: parseBulletItems(j.benefitsEn && j.benefitsEn.trim().length > 0 ? j.benefitsEn : j.benefits),
+    };
+  });
 
   const allCombinedJobs = mappedDynamic.length > 0 ? mappedDynamic : jobsData;
 

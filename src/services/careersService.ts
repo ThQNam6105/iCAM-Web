@@ -122,9 +122,26 @@ export const INITIAL_CAREERS: CareersItem[] = [
 export const getAllDepartments = (): DepartmentItem[] => {
   try {
     const raw = localStorage.getItem(DEPARTMENTS_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-    localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(INITIAL_DEPARTMENTS));
-    return INITIAL_DEPARTMENTS;
+    let list: DepartmentItem[] = [];
+    if (raw) {
+      list = JSON.parse(raw);
+    } else {
+      list = INITIAL_DEPARTMENTS;
+    }
+
+    const updatedList = list.map((item) => {
+      const seed = INITIAL_DEPARTMENTS.find((init) => init.id === item.id);
+      if (seed) {
+        return {
+          ...item,
+          nameEn: item.nameEn || seed.nameEn,
+        };
+      }
+      return item;
+    });
+
+    localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(updatedList));
+    return updatedList;
   } catch {
     return INITIAL_DEPARTMENTS;
   }
@@ -166,9 +183,32 @@ export const deleteDepartment = (id: string): boolean => {
 export const getAllCareers = (): CareersItem[] => {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(INITIAL_CAREERS));
-    return INITIAL_CAREERS;
+    let list: CareersItem[] = [];
+    if (raw) {
+      list = JSON.parse(raw);
+    } else {
+      list = INITIAL_CAREERS;
+    }
+
+    const updatedList = list.map((item) => {
+      const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
+      if (seed) {
+        return {
+          ...item,
+          titleEn: item.titleEn || seed.titleEn,
+          departmentEn: item.departmentEn || seed.departmentEn,
+          locationEn: item.locationEn || seed.locationEn,
+          salaryEn: item.salaryEn || seed.salaryEn,
+          descriptionEn: item.descriptionEn || seed.descriptionEn,
+          requirementsEn: item.requirementsEn || seed.requirementsEn,
+          benefitsEn: item.benefitsEn || seed.benefitsEn,
+        };
+      }
+      return item;
+    });
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedList));
+    return updatedList;
   } catch {
     return INITIAL_CAREERS;
   }
