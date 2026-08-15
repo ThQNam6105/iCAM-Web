@@ -280,30 +280,48 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
 };
 
 const syncCareerToSupabase = async (job: CareersItem): Promise<{ success: boolean; error?: string }> => {
+  const fullPayload: Record<string, any> = {
+    id: job.id,
+    title: job.title,
+    title_en: job.titleEn || job.title,
+    department: job.department,
+    department_en: job.departmentEn || job.department,
+    location: job.location,
+    location_en: job.locationEn || job.location,
+    type: job.type || 'Full-time',
+    salary: job.salary,
+    salary_en: job.salaryEn || job.salary,
+    deadline: job.deadline || '30/09/2026',
+    status: job.status || 'open',
+    description: job.description || '',
+    description_en: job.descriptionEn || job.description || '',
+    requirements: job.requirements || '',
+    requirements_en: job.requirementsEn || job.requirements || '',
+    benefits: job.benefits || '',
+    benefits_en: job.benefitsEn || job.benefits || '',
+    applications_count: job.applicationsCount || 0,
+    created_at: job.createdAt || new Date().toISOString(),
+    updated_at: job.updatedAt || new Date().toISOString(),
+  };
+
   try {
-    const { error } = await supabase.from('careers_posts').upsert({
-      id: job.id,
-      title: job.title,
-      title_en: job.titleEn || job.title,
-      department: job.department,
-      department_en: job.departmentEn || job.department,
-      location: job.location,
-      location_en: job.locationEn || job.location,
-      type: job.type || 'Full-time',
-      salary: job.salary,
-      salary_en: job.salaryEn || job.salary,
-      deadline: job.deadline || '30/09/2026',
-      status: job.status || 'open',
-      description: job.description || '',
-      description_en: job.descriptionEn || job.description || '',
-      requirements: job.requirements || '',
-      requirements_en: job.requirementsEn || job.requirements || '',
-      benefits: job.benefits || '',
-      benefits_en: job.benefitsEn || job.benefits || '',
-      applications_count: job.applicationsCount || 0,
-      created_at: job.createdAt || new Date().toISOString(),
-      updated_at: job.updatedAt || new Date().toISOString(),
-    });
+    let { error } = await supabase.from('careers_posts').upsert(fullPayload);
+
+    if (error && error.message.includes('Could not find')) {
+      // Fallback if optional _en columns are missing in Supabase schema cache
+      const safePayload = { ...fullPayload };
+      delete safePayload.benefits_en;
+      delete safePayload.requirements_en;
+      delete safePayload.description_en;
+      delete safePayload.salary_en;
+      delete safePayload.title_en;
+      delete safePayload.department_en;
+      delete safePayload.location_en;
+
+      const retry = await supabase.from('careers_posts').upsert(safePayload);
+      error = retry.error;
+    }
+
     if (error) {
       console.error('Supabase careers_posts upsert error:', error.message, error.details, error.hint);
       return { success: false, error: error.message };
