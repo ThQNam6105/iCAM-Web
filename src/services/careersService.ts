@@ -253,15 +253,14 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
       // Single source of truth merge
       const mergedList = [...careersFromDb];
       localList.forEach((localItem) => {
-        const isCustomCreated = !INITIAL_CAREERS.some((seed) => seed.id === localItem.id);
         const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
+        const localTime = new Date(localItem.updatedAt || 0).getTime();
 
-        if (dbIdx === -1 && isCustomCreated) {
+        if (dbIdx === -1) {
           mergedList.unshift(localItem);
           syncCareerToSupabase(localItem);
-        } else if (dbIdx !== -1 && isCustomCreated) {
+        } else {
           const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
-          const localTime = new Date(localItem.updatedAt || 0).getTime();
           if (localTime > dbTime) {
             mergedList[dbIdx] = localItem;
             syncCareerToSupabase(localItem);
@@ -269,7 +268,7 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
         }
       });
 
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedList));
+      saveCareers(mergedList);
       return mergedList;
     }
   } catch (err) {
