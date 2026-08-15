@@ -216,10 +216,16 @@ export const Careers: React.FC = () => {
   });
 
   React.useEffect(() => {
-    fetchCareersFromSupabase().then(() => {
-      const openJobs = getAllCareers().filter((j) => j.status === 'open');
-      setDynamicJobs(openJobs);
-    });
+    const loadDynamic = () => {
+      fetchCareersFromSupabase().then(() => {
+        const openJobs = getAllCareers().filter((j) => j.status === 'open');
+        setDynamicJobs(openJobs);
+      });
+    };
+
+    loadDynamic();
+    const interval = setInterval(loadDynamic, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const parseBulletItems = (input: string | string[]): string[] => {

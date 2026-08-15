@@ -67,8 +67,8 @@ export const INITIAL_CAREERS: CareersItem[] = [
     benefits: '• Bảo hiểm xã hội & y tế đầy đủ 100% theo quy định.\n• Thưởng hiệu suất giảng dạy hàng tháng & thưởng lễ tết.\n• Cơ hội thăng tiến Trưởng nhóm chuyên môn hoặc Quản lý Đào tạo.\n• Khóa tập huấn Masterclass 4Ls + LETI hàng năm từ chuyên gia.',
     benefitsEn: '• 100% full social and health insurance per regulations.\n• Monthly teaching performance bonuses & holiday bonuses.\n• Clear career advancement path to Academic Team Lead or Manager.\n• Annual 4Ls + LETI Masterclass training from international experts.',
     applicationsCount: 14,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'job_2',
@@ -90,8 +90,8 @@ export const INITIAL_CAREERS: CareersItem[] = [
     benefits: '• Hoa hồng hấp dẫn theo doanh số tuyển sinh hàng tháng.\n• Môi trường làm việc năng động, đào tạo kỹ năng tư vấn chuyên nghiệp.\n• Thưởng vượt chỉ tiêu doanh số hàng quý.',
     benefitsEn: '• Attractive monthly admissions sales commissions.\n• Dynamic workplace environment with professional sales training.\n• Quarterly target achievement bonuses.',
     applicationsCount: 8,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   },
   {
     id: 'job_3',
@@ -113,8 +113,8 @@ export const INITIAL_CAREERS: CareersItem[] = [
     benefits: '• Lịch làm việc linh hoạt phù hợp với lịch học.\n• Nâng cao kỹ năng sư phạm & làm việc trực tiếp với giáo viên bản ngữ.\n• Cấp chứng nhận kinh nghiệm làm việc sau 6 tháng.',
     benefitsEn: '• Flexible working shifts tailored to student schedules.\n• Enhance pedagogical skills working alongside native speakers.\n• Experience certificate granted after 6 months.',
     applicationsCount: 22,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   },
 ];
 
@@ -214,6 +214,10 @@ export const getAllCareers = (): CareersItem[] => {
   }
 };
 
+export const saveCareers = (list: CareersItem[]) => {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+};
+
 export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
   const localList = getAllCareers();
   try {
@@ -224,43 +228,44 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
         return {
           id: item.id,
           title: item.title,
-          titleEn: item.title_en || seed?.titleEn,
+          titleEn: item.title_en || seed?.titleEn || item.title,
           department: item.department,
-          departmentEn: item.department_en || seed?.departmentEn,
+          departmentEn: item.department_en || seed?.departmentEn || item.department,
           location: item.location,
-          locationEn: item.location_en || seed?.locationEn,
+          locationEn: item.location_en || seed?.locationEn || item.location,
           type: item.type as JobType,
           salary: item.salary,
-          salaryEn: item.salary_en || seed?.salaryEn,
+          salaryEn: item.salary_en || seed?.salaryEn || item.salary,
           deadline: item.deadline,
           status: item.status as JobStatus,
           description: item.description,
-          descriptionEn: item.description_en || seed?.descriptionEn,
+          descriptionEn: item.description_en || seed?.descriptionEn || item.description,
           requirements: item.requirements,
-          requirementsEn: item.requirements_en || seed?.requirementsEn,
+          requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
           benefits: item.benefits,
-          benefitsEn: item.benefits_en || seed?.benefitsEn,
+          benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
           applicationsCount: item.applications_count || 0,
-          createdAt: item.created_at,
-          updatedAt: item.updated_at,
+          createdAt: item.created_at || '2026-01-01T00:00:00.000Z',
+          updatedAt: item.updated_at || '2026-01-01T00:00:00.000Z',
         };
       });
 
-      // Timestamp-based conflict resolution: Keep local edit if local updatedAt is newer!
+      // Single source of truth merge
       const mergedList = [...careersFromDb];
-
       localList.forEach((localItem) => {
+        const isCustomCreated = !INITIAL_CAREERS.some((seed) => seed.id === localItem.id);
         const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
-        if (dbIdx !== -1) {
+
+        if (dbIdx === -1 && isCustomCreated) {
+          mergedList.unshift(localItem);
+          syncCareerToSupabase(localItem);
+        } else if (dbIdx !== -1 && isCustomCreated) {
           const dbTime = new Date(mergedList[dbIdx].updatedAt || 0).getTime();
           const localTime = new Date(localItem.updatedAt || 0).getTime();
           if (localTime > dbTime) {
             mergedList[dbIdx] = localItem;
             syncCareerToSupabase(localItem);
           }
-        } else {
-          mergedList.unshift(localItem);
-          syncCareerToSupabase(localItem);
         }
       });
 

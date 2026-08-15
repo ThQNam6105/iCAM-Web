@@ -84,6 +84,12 @@ export const FAQ: React.FC = () => {
   useEffect(() => {
     loadData();
     fetchFaqsFromSupabase().then(() => loadData());
+
+    const interval = setInterval(() => {
+      fetchFaqsFromSupabase().then(() => loadData());
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const toggleAccordion = (id: string) => {
