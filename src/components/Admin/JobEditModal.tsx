@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, List, Plus, Sparkles } from 'lucide-react';
+import { X, Save, List } from 'lucide-react';
 import {
   type CareersItem,
   type JobStatus,
@@ -16,16 +16,6 @@ interface JobEditModalProps {
   onSave: (data: Partial<CareersItem>) => void;
   onClose: () => void;
 }
-
-const BENEFIT_PRESETS = [
-  { vi: 'Bảo hiểm xã hội & Y tế 100% theo quy định', en: '100% Full social & health insurance per regulations' },
-  { vi: 'Thưởng hiệu suất công việc hàng tháng & thưởng Lễ Tết', en: 'Monthly performance bonuses & Holiday bonuses' },
-  { vi: 'Khóa tập huấn Masterclass 4Ls + LETI hàng năm từ chuyên gia', en: 'Annual 4Ls + LETI Masterclass training from experts' },
-  { vi: 'Cơ hội thăng tiến rõ ràng lên Trưởng nhóm / Quản lý', en: 'Clear career advancement path to Team Lead / Manager' },
-  { vi: 'Du lịch nghỉ dưỡng & Teambuilding hàng năm cùng công ty', en: 'Annual company vacation & Teambuilding trips' },
-  { vi: 'Phụ cấp ăn trưa & hỗ trợ vé xe đầy đủ', en: 'Lunch allowance & full parking support' },
-  { vi: 'Ưu đãi 50%-100% học phí các khóa Tiếng Anh & IELTS cho người thân', en: '50%-100% tuition discount for English & IELTS courses for relatives' },
-];
 
 export const JobEditModal: React.FC<JobEditModalProps> = ({
   isOpen,
@@ -53,10 +43,6 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
   const [requirementsEn, setRequirementsEn] = useState(jobToEdit?.requirementsEn || '');
   const [benefits, setBenefits] = useState(jobToEdit?.benefits || '');
   const [benefitsEn, setBenefitsEn] = useState(jobToEdit?.benefitsEn || '');
-
-  // Custom Benefit Quick-Add Input
-  const [customBenefitVi, setCustomBenefitVi] = useState('');
-  const [customBenefitEn, setCustomBenefitEn] = useState('');
 
   useEffect(() => {
     const depts = getAllDepartments();
@@ -119,33 +105,6 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
         setter(currentVal + '\n• ');
       }
     }
-  };
-
-  const handleAddPresetBenefit = (preset: { vi: string; en: string }) => {
-    // Add to VI
-    const viPrefix = benefits && !benefits.endsWith('\n') ? '\n• ' : '• ';
-    const updatedVi = benefits ? `${benefits}${viPrefix}${preset.vi}` : `• ${preset.vi}`;
-    setBenefits(updatedVi);
-
-    // Add to EN
-    const enPrefix = benefitsEn && !benefitsEn.endsWith('\n') ? '\n• ' : '• ';
-    const updatedEn = benefitsEn ? `${benefitsEn}${enPrefix}${preset.en}` : `• ${preset.en}`;
-    setBenefitsEn(updatedEn);
-  };
-
-  const handleAddCustomBenefit = () => {
-    if (!customBenefitVi.trim()) return;
-
-    const viPrefix = benefits && !benefits.endsWith('\n') ? '\n• ' : '• ';
-    setBenefits(benefits ? `${benefits}${viPrefix}${customBenefitVi.trim()}` : `• ${customBenefitVi.trim()}`);
-
-    if (customBenefitEn.trim()) {
-      const enPrefix = benefitsEn && !benefitsEn.endsWith('\n') ? '\n• ' : '• ';
-      setBenefitsEn(benefitsEn ? `${benefitsEn}${enPrefix}${customBenefitEn.trim()}` : `• ${customBenefitEn.trim()}`);
-    }
-
-    setCustomBenefitVi('');
-    setCustomBenefitEn('');
   };
 
   return (
@@ -436,50 +395,6 @@ export const JobEditModal: React.FC<JobEditModalProps> = ({
                 onKeyDown={(e) => handleKeyDownBullet(e, benefitsEn, setBenefitsEn)}
                 className={styles.textarea}
               />
-            </div>
-          </div>
-
-          {/* Quick Benefit Adder Presets */}
-          <div className={styles.benefitPresets}>
-            <span className={styles.presetTitle}>
-              <Sparkles size={14} /> Chèn nhanh quyền lợi mẫu (Tự động điền đồng thời cả khung Tiếng Việt & Tiếng Anh):
-            </span>
-            {BENEFIT_PRESETS.map((preset, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className={styles.presetPill}
-                onClick={() => handleAddPresetBenefit(preset)}
-                title={`Thêm: ${preset.vi}`}
-              >
-                <Plus size={13} /> {preset.vi}
-              </button>
-            ))}
-          </div>
-
-          {/* Quick Custom Benefit Adder Input */}
-          <div style={{ background: 'rgba(15, 23, 42, 0.5)', padding: '0.85rem 1rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F58220', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
-              <Plus size={14} /> Thêm quyền lợi mới (Custom Benefit Adder)
-            </span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.5rem', alignItems: 'center' }}>
-              <input
-                type="text"
-                placeholder="Quyền lợi (Tiếng Việt)..."
-                value={customBenefitVi}
-                onChange={(e) => setCustomBenefitVi(e.target.value)}
-                className={styles.input}
-              />
-              <input
-                type="text"
-                placeholder="Benefit (English optional)..."
-                value={customBenefitEn}
-                onChange={(e) => setCustomBenefitEn(e.target.value)}
-                className={styles.input}
-              />
-              <Button type="button" variant="secondary" size="sm" onClick={handleAddCustomBenefit}>
-                + Thêm
-              </Button>
             </div>
           </div>
 
