@@ -174,7 +174,7 @@ export const AskQuestionModal: React.FC<AskQuestionModalProps> = ({
           </div>
 
           <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>
-            🔒 {isEn
+            {isEn
               ? 'Your contact information is strictly confidential and will never be published publicly.'
               : 'Thông tin cá nhân & SĐT của bạn được bảo mật tuyệt đối, chỉ dùng để tư vấn trực tiếp.'}
           </p>
