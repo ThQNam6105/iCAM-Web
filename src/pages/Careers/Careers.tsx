@@ -56,21 +56,21 @@ export const Careers: React.FC = () => {
     note: '',
   });
 
-  const [dynamicJobs, setDynamicJobs] = useState<CareersItem[]>(() => {
-    return getAllCareers().filter((j) => j.status === 'open');
-  });
+  const [dynamicJobs, setDynamicJobs] = useState<CareersItem[]>([]);
+
+  const loadData = () => {
+    const publishedOnly = getAllCareers().filter((j) => j.status === 'open');
+    setDynamicJobs(publishedOnly);
+  };
 
   React.useEffect(() => {
-    const loadDynamic = () => {
-      fetchCareersFromSupabase().then((fetchedJobs) => {
-        const jobsToUse = fetchedJobs && fetchedJobs.length > 0 ? fetchedJobs : getAllCareers();
-        const openJobs = jobsToUse.filter((j) => j.status === 'open');
-        setDynamicJobs(openJobs);
-      });
-    };
+    loadData();
+    fetchCareersFromSupabase().then(() => loadData());
 
-    loadDynamic();
-    const interval = setInterval(loadDynamic, 10000);
+    const interval = setInterval(() => {
+      fetchCareersFromSupabase().then(() => loadData());
+    }, 10000);
+
     return () => clearInterval(interval);
   }, []);
 

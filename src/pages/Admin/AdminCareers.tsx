@@ -32,7 +32,7 @@ import styles from './AdminCareers.module.css';
 export const AdminCareers: React.FC = () => {
   const { showToast } = useToast();
 
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [allJobs, setAllJobs] = useState<CareersItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<JobStatus | 'all'>('all');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
@@ -44,17 +44,20 @@ export const AdminCareers: React.FC = () => {
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
 
   const loadJobs = () => {
-    setRefreshKey((prev) => prev + 1);
+    setAllJobs(getAllCareers());
     setDepartmentsList(getAllDepartments());
   };
 
   useEffect(() => {
+    loadJobs();
     fetchCareersFromSupabase().then(() => loadJobs());
-  }, []);
 
-  const allJobs = useMemo(() => {
-    return getAllCareers();
-  }, [refreshKey]);
+    const interval = setInterval(() => {
+      fetchCareersFromSupabase().then(() => loadJobs());
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredJobs = useMemo(() => {
     return allJobs.filter((job) => {
