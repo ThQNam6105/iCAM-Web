@@ -303,7 +303,7 @@ export const fetchFaqsFromSupabase = async (): Promise<FaqItem[]> => {
 
 const syncFaqToSupabase = async (faq: FaqItem) => {
   try {
-    await supabase.from('faq_items').upsert({
+    const { error } = await supabase.from('faq_items').upsert({
       id: faq.id,
       category_id: faq.categoryId,
       question_vi: faq.questionVi,
@@ -319,8 +319,11 @@ const syncFaqToSupabase = async (faq: FaqItem) => {
       updated_at: faq.updatedAt,
       published_at: faq.publishedAt,
     });
+    if (error) {
+      console.error('Supabase faq_items upsert error:', error.message, error.details, error.hint);
+    }
   } catch (err) {
-    console.warn('Supabase faq sync error:', err);
+    console.error('Supabase faq sync exception:', err);
   }
 };
 

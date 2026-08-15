@@ -280,7 +280,7 @@ export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
 
 const syncCareerToSupabase = async (job: CareersItem) => {
   try {
-    await supabase.from('careers_posts').upsert({
+    const { error } = await supabase.from('careers_posts').upsert({
       id: job.id,
       title: job.title,
       title_en: job.titleEn,
@@ -303,8 +303,11 @@ const syncCareerToSupabase = async (job: CareersItem) => {
       created_at: job.createdAt,
       updated_at: job.updatedAt,
     });
+    if (error) {
+      console.error('Supabase careers_posts upsert error:', error.message, error.details, error.hint);
+    }
   } catch (err) {
-    console.warn('Supabase career sync error:', err);
+    console.error('Supabase career sync exception:', err);
   }
 };
 
