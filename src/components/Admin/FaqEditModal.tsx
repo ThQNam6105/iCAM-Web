@@ -157,7 +157,7 @@ export const FaqEditModal: React.FC<FaqEditModalProps> = ({
       <div className={styles.modalContent}>
         <div className={styles.header}>
           <h3 className={styles.title}>
-            {faqToEdit ? 'Chỉnh sửa bài FAQ' : 'Tạo bài FAQ tri thức mới'}
+            {faqToEdit ? 'Chỉnh sửa bài FAQ' : 'Tạo bài FAQ mới'}
           </h3>
           <button type="button" onClick={onClose} className={styles.closeBtn}>
             <X size={20} />
