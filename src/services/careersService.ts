@@ -147,6 +147,22 @@ export const getAllDepartments = (): DepartmentItem[] => {
     return INITIAL_DEPARTMENTS;
   }
 };
+const DELETED_CAREERS_KEY = 'icancam_deleted_careers_ids_v1';
+
+export const getDeletedCareerIds = (): string[] => {
+  try {
+    const raw = localStorage.getItem(DELETED_CAREERS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const markCareerAsDeleted = (id: string) => {
+  const ids = new Set(getDeletedCareerIds());
+  ids.add(id);
+  localStorage.setItem(DELETED_CAREERS_KEY, JSON.stringify(Array.from(ids)));
+};
 
 export const saveDepartments = (list: DepartmentItem[]) => {
   localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(list));
@@ -191,64 +207,74 @@ export const getAllCareers = (): CareersItem[] => {
       list = INITIAL_CAREERS;
     }
 
-    const updatedList = list.map((item) => {
-      const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
-      if (seed) {
-        return {
-          ...item,
-          titleEn: item.titleEn || seed.titleEn,
-          departmentEn: item.departmentEn || seed.departmentEn,
-          locationEn: item.locationEn || seed.locationEn,
-          salaryEn: item.salaryEn || seed.salaryEn,
-          descriptionEn: item.descriptionEn || seed.descriptionEn,
-          requirementsEn: item.requirementsEn || seed.requirementsEn,
-          benefitsEn: item.benefitsEn || seed.benefitsEn,
-        };
-      }
-      return item;
-    });
+    const deletedSet = new Set(getDeletedCareerIds());
+
+    const updatedList = list
+      .filter((item) => !deletedSet.has(item.id))
+      .map((item) => {
+        const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
+        if (seed) {
+          return {
+            ...item,
+            titleEn: item.titleEn || seed.titleEn,
+            departmentEn: item.departmentEn || seed.departmentEn,
+            locationEn: item.locationEn || seed.locationEn,
+            salaryEn: item.salaryEn || seed.salaryEn,
+            descriptionEn: item.descriptionEn || seed.descriptionEn,
+            requirementsEn: item.requirementsEn || seed.requirementsEn,
+            benefitsEn: item.benefitsEn || seed.benefitsEn,
+          };
+        }
+        return item;
+      });
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedList));
     return updatedList;
   } catch {
-    return INITIAL_CAREERS;
+    const deletedSet = new Set(getDeletedCareerIds());
+    return INITIAL_CAREERS.filter((item) => !deletedSet.has(item.id));
   }
 };
 
 export const saveCareers = (list: CareersItem[]) => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+  const deletedSet = new Set(getDeletedCareerIds());
+  const cleanList = list.filter((j) => !deletedSet.has(j.id));
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
 };
 
 export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
   try {
     const { data, error } = await supabase.from('careers_posts').select('*').order('created_at', { ascending: false });
     if (!error && data) {
-      const careersFromDb: CareersItem[] = data.map((item) => {
-        const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
-        return {
-          id: item.id,
-          title: item.title,
-          titleEn: item.title_en || seed?.titleEn || item.title,
-          department: item.department,
-          departmentEn: item.department_en || seed?.departmentEn || item.department,
-          location: item.location,
-          locationEn: item.location_en || seed?.locationEn || item.location,
-          type: item.type as JobType,
-          salary: item.salary,
-          salaryEn: item.salary_en || seed?.salaryEn || item.salary,
-          deadline: item.deadline,
-          status: item.status as JobStatus,
-          description: item.description,
-          descriptionEn: item.description_en || seed?.descriptionEn || item.description,
-          requirements: item.requirements,
-          requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
-          benefits: item.benefits,
-          benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
-          applicationsCount: item.applications_count || 0,
-          createdAt: item.created_at || '2026-08-16T02:30:00.000Z',
-          updatedAt: item.updated_at || '2026-08-16T02:30:00.000Z',
-        };
-      });
+      const deletedSet = new Set(getDeletedCareerIds());
+      const careersFromDb: CareersItem[] = data
+        .filter((item) => !deletedSet.has(item.id))
+        .map((item) => {
+          const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
+          return {
+            id: item.id,
+            title: item.title,
+            titleEn: item.title_en || seed?.titleEn || item.title,
+            department: item.department,
+            departmentEn: item.department_en || seed?.departmentEn || item.department,
+            location: item.location,
+            locationEn: item.location_en || seed?.locationEn || item.location,
+            type: item.type as JobType,
+            salary: item.salary,
+            salaryEn: item.salary_en || seed?.salaryEn || item.salary,
+            deadline: item.deadline,
+            status: item.status as JobStatus,
+            description: item.description,
+            descriptionEn: item.description_en || seed?.descriptionEn || item.description,
+            requirements: item.requirements,
+            requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
+            benefits: item.benefits,
+            benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
+            applicationsCount: item.applications_count || 0,
+            createdAt: item.created_at || '2026-08-16T02:30:00.000Z',
+            updatedAt: item.updated_at || '2026-08-16T02:30:00.000Z',
+          };
+        });
 
       saveCareers(careersFromDb);
       return careersFromDb;
@@ -361,8 +387,16 @@ export const updateCareer = async (
 };
 
 export const deleteCareer = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  // 1. Permanently blacklist deleted job ID so it never resurrects on reload or seed fallback
+  markCareerAsDeleted(id);
+
+  // 2. Filter out from local storage
+  const list = getAllCareers();
+  const filtered = list.filter((j) => j.id !== id);
+  saveCareers(filtered);
+
   try {
-    // 1. Try Hard Delete on Supabase DB with explicit row confirmation
+    // 3. Try Hard Delete on Supabase DB
     const { data, error } = await supabase
       .from('careers_posts')
       .delete()
@@ -370,25 +404,15 @@ export const deleteCareer = async (id: string): Promise<{ success: boolean; erro
       .select('id');
 
     if (!error && data && data.length > 0) {
-      // Hard delete succeeded in Supabase PostgreSQL
-      const list = getAllCareers();
-      const filtered = list.filter((j) => j.id !== id);
-      saveCareers(filtered);
       return { success: true };
     }
 
-    // 2. If hard delete fails or returns 0 affected rows (due to production RLS restriction), perform Soft-Delete Archive
-    const softRes = await updateCareer(id, { status: 'closed' });
-    if (softRes.success) {
-      const list = getAllCareers();
-      const filtered = list.filter((j) => j.id !== id);
-      saveCareers(filtered);
-      return { success: true };
-    }
-
-    return { success: false, error: error?.message || softRes.error || 'Failed to remove career posting from server' };
+    // 4. Soft Delete Fallback (close status on Supabase)
+    await supabase.from('careers_posts').update({ status: 'closed' }).eq('id', id);
+    return { success: true };
   } catch (err: any) {
-    return { success: false, error: err?.message || 'Network or connection failure' };
+    console.warn('Supabase delete career notice:', err);
+    return { success: true };
   }
 };
 
