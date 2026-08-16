@@ -650,6 +650,97 @@
   margin-bottom: 1.5rem;
 }
 
+/* DRAG & DROP PDF UPLOAD STYLES */
+.dropZone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 1.75rem 1rem;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.dropZone:hover,
+.dropZoneDragging {
+  border-color: #F58220;
+  background: #fff7ed;
+  box-shadow: 0 0 0 4px rgba(245, 130, 32, 0.1);
+}
+
+.dropZoneText {
+  font-size: 0.95rem;
+  color: #334155;
+  margin: 0;
+}
+
+.dropZoneText span {
+  color: #F58220;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.dropZoneSubtext {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.pdfFileCard {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+}
+
+.pdfFileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.pdfFileName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #991b1b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdfFileSize {
+  font-size: 0.78rem;
+  color: #b91c1c;
+}
+
+.removePdfBtn {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removePdfBtn:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
 /* RESPONSIVE BREAKPOINTS */
 @media (max-width: 768px) {
   .container {

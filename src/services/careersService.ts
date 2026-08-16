@@ -391,3 +391,275 @@ export const deleteCareer = async (id: string): Promise<{ success: boolean; erro
     return { success: false, error: err?.message || 'Network or connection failure' };
   }
 };
+
+// ==========================================
+// JOB APPLICATIONS SYSTEM (CANDIDATES & HR)
+// ==========================================
+
+export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'archived';
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  jobTitleEn?: string;
+  department: string;
+  jobType: JobType;
+  fullName: string;
+  phone: string;
+  email: string;
+  cvFileName: string;
+  cvFileSize: string;
+  cvFileData: string; // PDF Base64 string / Data URL
+  status: ApplicationStatus;
+  createdAt: string;
+  rejectedAt?: string;
+}
+
+const APPLICATIONS_STORAGE_KEY = 'icancam_career_applications_v1';
+export const SAMPLE_PDF_DATA = 'data:application/pdf;base64,JVBERi0xLjQKJSDi48nNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoxIDAgb2JqCjw8Ci9UeXBlIC9DYXRhbG9nCi9QYWdlcyAyIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovVHlwZSAvUGFnZXMKL0tpZHMgWzMgMCBSXQovQ291bnQgMQo+PgplbmRvYmoKMyAwIG9iago8PAovVHlwZSAvUGFnZQovUGFyZW50IDIgMCBSCi9NZWRpYUJveCBbMCAwIDYxMiA3OTJdCi9SZXNvdXJjZXMgPDwKL0ZvbnQgPDwKL0YxIDQgMCBSCj4+Cj4+Ci9Db250ZW50cyA1IDAgUgo+PgplbmRvYmoKNCAwIG9iago8PAovVHlwZSAvRm9udAovU3VidHlwZSAvVHlwZTEKL0Jhc2VGb250IC9IZWx2ZXRpY2EKPj4KZW5kb2JqCjUgMCBvYmoKPDwKL0xlbmd0aCA3NAo+PgpzdHJlYW0KQlQKL0YxIDI0IFRmCjEwMCA3MDAgVGQKKENWIC0gaUNBTkNBTSBDYW5kaWRhdGUgQXBwbGljYXRpb24gUERGKSBUagpFVAplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA5OSAwMDAwMCBuIAowMDAwMDAwMTU4IDAwMDAwIG4gCjAwMDAwMDAyMTYgMDAwMDAgbiAKMDAwMDAwMDMzNSAwMDAwMCBuIAowMDAwMDAwNDAxIDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgNgovUm9vdCAxIDAgUgo+PgpzdGFydHhyZWYgNTI2CiUlRU9G';
+
+export const INITIAL_APPLICATIONS: JobApplication[] = [
+  {
+    id: 'app_101',
+    jobId: 'job_1',
+    jobTitle: 'Giáo Viên Tiếng Anh Trẻ Em (Kids English Teacher)',
+    jobTitleEn: 'Kids English Teacher',
+    department: 'Khối Đào Tạo',
+    jobType: 'Full-time',
+    fullName: 'Nguyễn Văn An',
+    phone: '0908123456',
+    email: 'nguyenvanan.edu@gmail.com',
+    cvFileName: 'CV_Nguyen_Van_An_English_Teacher.pdf',
+    cvFileSize: '1.2 MB',
+    cvFileData: SAMPLE_PDF_DATA,
+    status: 'pending',
+    createdAt: '2026-08-16T10:15:00.000Z',
+  },
+  {
+    id: 'app_102',
+    jobId: 'job_2',
+    jobTitle: 'Chuyên Viên Tư Vấn Tuyển Sinh (Course Consultant)',
+    jobTitleEn: 'Course Consultant',
+    department: 'Khối Tư Vấn & Tuyển Sinh',
+    jobType: 'Full-time',
+    fullName: 'Trần Thị Mai',
+    phone: '0912987654',
+    email: 'maitran.consultant@gmail.com',
+    cvFileName: 'CV_Tran_Thi_Mai_Course_Consultant.pdf',
+    cvFileSize: '850 KB',
+    cvFileData: SAMPLE_PDF_DATA,
+    status: 'accepted',
+    createdAt: '2026-08-15T14:20:00.000Z',
+  },
+  {
+    id: 'app_103',
+    jobId: 'job_3',
+    jobTitle: 'GIÁO VIÊN ĐỒNG GIẢNG – TRỢ GIẢNG',
+    jobTitleEn: 'Co-Teacher & Teaching Assistant',
+    department: 'TRỢ GIẢNG',
+    jobType: 'Part-time',
+    fullName: 'Lê Hoàng Nam',
+    phone: '0934112233',
+    email: 'hoangnam.ta@gmail.com',
+    cvFileName: 'CV_Le_Hoang_Nam_TA.pdf',
+    cvFileSize: '1.5 MB',
+    cvFileData: SAMPLE_PDF_DATA,
+    status: 'pending',
+    createdAt: '2026-08-16T16:45:00.000Z',
+  },
+  {
+    id: 'app_104',
+    jobId: 'job_1',
+    jobTitle: 'Giáo Viên Tiếng Anh Trẻ Em (Kids English Teacher)',
+    jobTitleEn: 'Kids English Teacher',
+    department: 'Khối Đào Tạo',
+    jobType: 'Full-time',
+    fullName: 'Phạm Đức Huy',
+    phone: '0978665544',
+    email: 'duchuy.english@gmail.com',
+    cvFileName: 'CV_Pham_Duc_Huy.pdf',
+    cvFileSize: '920 KB',
+    cvFileData: SAMPLE_PDF_DATA,
+    status: 'rejected',
+    createdAt: '2026-08-15T09:00:00.000Z',
+    rejectedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago (auto deletes after 3 days)
+  },
+];
+
+// Helper: Auto-cleanup rejected items older than 3 days (3 * 24 * 60 * 60 * 1000 ms)
+const cleanupExpiredRejectedApplications = (apps: JobApplication[]): { cleanedList: JobApplication[]; removedIds: string[] } => {
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const removedIds: string[] = [];
+
+  const cleanedList = apps.filter((app) => {
+    if (app.status === 'rejected' && app.rejectedAt) {
+      const rejectedTime = new Date(app.rejectedAt).getTime();
+      if (now - rejectedTime > THREE_DAYS_MS) {
+        removedIds.push(app.id);
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return { cleanedList, removedIds };
+};
+
+export const getAllApplications = (): JobApplication[] => {
+  try {
+    const raw = localStorage.getItem(APPLICATIONS_STORAGE_KEY);
+    let list: JobApplication[] = [];
+    if (raw) {
+      list = JSON.parse(raw);
+    } else {
+      list = INITIAL_APPLICATIONS;
+    }
+
+    const { cleanedList, removedIds } = cleanupExpiredRejectedApplications(list);
+    if (removedIds.length > 0) {
+      saveApplications(cleanedList);
+      removedIds.forEach((id) => deleteApplicationFromSupabase(id));
+    }
+
+    return cleanedList;
+  } catch {
+    return INITIAL_APPLICATIONS;
+  }
+};
+
+export const saveApplications = (list: JobApplication[]) => {
+  localStorage.setItem(APPLICATIONS_STORAGE_KEY, JSON.stringify(list));
+};
+
+const syncApplicationToSupabase = async (app: JobApplication): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error } = await supabase.from('career_applications').upsert({
+      id: app.id,
+      job_id: app.jobId,
+      job_title: app.jobTitle,
+      job_title_en: app.jobTitleEn || app.jobTitle,
+      department: app.department,
+      job_type: app.jobType || 'Full-time',
+      full_name: app.fullName,
+      phone: app.phone,
+      email: app.email,
+      cv_file_name: app.cvFileName,
+      cv_file_size: app.cvFileSize,
+      cv_file_data: app.cvFileData,
+      status: app.status || 'pending',
+      created_at: app.createdAt || new Date().toISOString(),
+      rejected_at: app.rejectedAt || null,
+    });
+
+    if (error) {
+      console.warn('Supabase career_applications upsert notice:', error.message);
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    console.warn('Supabase application sync exception:', err);
+    return { success: false, error: err?.message || 'Network error' };
+  }
+};
+
+const deleteApplicationFromSupabase = async (id: string) => {
+  try {
+    await supabase.from('career_applications').delete().eq('id', id);
+  } catch (err) {
+    console.warn('Supabase delete application exception:', err);
+  }
+};
+
+export const fetchApplicationsFromSupabase = async (): Promise<JobApplication[]> => {
+  try {
+    const { data, error } = await supabase.from('career_applications').select('*').order('created_at', { ascending: false });
+    if (!error && data && data.length > 0) {
+      const appsFromDb: JobApplication[] = data.map((item) => ({
+        id: item.id,
+        jobId: item.job_id,
+        jobTitle: item.job_title,
+        jobTitleEn: item.job_title_en || item.job_title,
+        department: item.department,
+        jobType: (item.job_type as JobType) || 'Full-time',
+        fullName: item.full_name,
+        phone: item.phone,
+        email: item.email,
+        cvFileName: item.cv_file_name,
+        cvFileSize: item.cv_file_size || '1.0 MB',
+        cvFileData: item.cv_file_data || SAMPLE_PDF_DATA,
+        status: (item.status as ApplicationStatus) || 'pending',
+        createdAt: item.created_at || new Date().toISOString(),
+        rejectedAt: item.rejected_at || undefined,
+      }));
+
+      const { cleanedList, removedIds } = cleanupExpiredRejectedApplications(appsFromDb);
+      if (removedIds.length > 0) {
+        removedIds.forEach((id) => deleteApplicationFromSupabase(id));
+      }
+
+      saveApplications(cleanedList);
+      return cleanedList;
+    }
+  } catch (err) {
+    console.warn('Supabase career_applications table offline or not created yet:', err);
+  }
+  return getAllApplications();
+};
+
+export const submitJobApplication = async (
+  appData: Omit<JobApplication, 'id' | 'createdAt' | 'status'>
+): Promise<{ success: boolean; data?: JobApplication; error?: string }> => {
+  const list = getAllApplications();
+  const newApp: JobApplication = {
+    ...appData,
+    id: `app_${Date.now()}`,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+
+  await syncApplicationToSupabase(newApp);
+
+  const updatedList = [newApp, ...list];
+  saveApplications(updatedList);
+
+  // Increment application count on the job position
+  const allJobsList = getAllCareers();
+  const targetJobIdx = allJobsList.findIndex((j) => j.id === appData.jobId);
+  if (targetJobIdx !== -1) {
+    const updatedCount = (allJobsList[targetJobIdx].applicationsCount || 0) + 1;
+    await updateCareer(appData.jobId, { applicationsCount: updatedCount });
+  }
+
+  return { success: true, data: newApp };
+};
+
+export const updateApplicationStatus = async (
+  id: string,
+  newStatus: ApplicationStatus
+): Promise<{ success: boolean; data?: JobApplication; error?: string }> => {
+  const list = getAllApplications();
+  const idx = list.findIndex((a) => a.id === id);
+  if (idx === -1) return { success: false, error: 'Application not found' };
+
+  const updatedApp: JobApplication = {
+    ...list[idx],
+    status: newStatus,
+    rejectedAt: newStatus === 'rejected' ? new Date().toISOString() : undefined,
+  };
+
+  await syncApplicationToSupabase(updatedApp);
+
+  list[idx] = updatedApp;
+  saveApplications(list);
+  return { success: true, data: updatedApp };
+};
+
+export const deleteApplication = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  await deleteApplicationFromSupabase(id);
+  const list = getAllApplications();
+  const filtered = list.filter((a) => a.id !== id);
+  saveApplications(filtered);
+  return { success: true };
+};

@@ -13,11 +13,15 @@ import {
   X,
   Star,
   Zap,
-  GraduationCap
+  GraduationCap,
+  UploadCloud,
+  FileText,
+  Trash2,
 } from 'lucide-react';
 import styles from './Careers.module.css';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
+import { useToast } from '../../components/Toast/Toast';
 
 interface Job {
   id: number;
@@ -42,10 +46,17 @@ interface Job {
   benefitsEn: string[];
 }
 
-import { fetchCareersFromSupabase, getAllCareers, type CareersItem } from '../../services/careersService';
+import {
+  fetchCareersFromSupabase,
+  getAllCareers,
+  submitJobApplication,
+  type CareersItem,
+} from '../../services/careersService';
 
 export const Careers: React.FC = () => {
   const { language, t } = useLanguage();
+  const { showToast } = useToast();
+
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -55,6 +66,10 @@ export const Careers: React.FC = () => {
     email: '',
     note: '',
   });
+
+  const [pdfFile, setPdfFile] = useState<{ name: string; size: string; dataUrl: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isSubmittingApp, setIsSubmittingApp] = useState(false);
 
   const [dynamicJobs, setDynamicJobs] = useState<CareersItem[]>([]);
 
@@ -129,14 +144,94 @@ export const Careers: React.FC = () => {
     ? allCombinedJobs
     : allCombinedJobs.filter(job => job.category === activeCategory);
 
-  const handleApplySubmit = (e: React.FormEvent) => {
+  const processPdfFile = (file: File) => {
+    if (!file) return;
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('⚠️ Vui lòng chỉ chọn 1 tập tin CV duy nhất với định dạng PDF (.pdf)!', 'error');
+      return;
+    }
+    const sizeInMb = (file.size / (1024 * 1024)).toFixed(2);
+    const sizeStr = `${sizeInMb} MB`;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setPdfFile({
+        name: file.name,
+        size: sizeStr,
+        dataUrl,
+      });
+      showToast('Đã tải lên tập tin CV PDF thành công! ✓', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      if (e.target.files.length > 1) {
+        showToast('⚠️ Chỉ được phép tải lên duy nhất 1 tập tin PDF!', 'error');
+        return;
+      }
+      processPdfFile(e.target.files[0]);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setSubmitted(true);
-    setApplicantData({ fullName: '', phone: '', email: '', note: '' });
-    setTimeout(() => {
-      setSubmitted(false);
-      setSelectedJob(null);
-    }, 4000);
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      if (e.dataTransfer.files.length > 1) {
+        showToast('⚠️ Chỉ được phép tải lên duy nhất 1 tập tin PDF!', 'error');
+        return;
+      }
+      processPdfFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleApplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pdfFile) {
+      showToast('⚠️ Vui lòng tải lên hoặc kéo thả tập tin CV định dạng PDF!', 'error');
+      return;
+    }
+    if (!selectedJob) return;
+
+    const matchedDyn = dynamicJobs.find((dj) => dj.title === selectedJob.titleVi || dj.titleEn === selectedJob.titleEn);
+    const jobId = matchedDyn ? matchedDyn.id : `job_${selectedJob.id}`;
+    const department = matchedDyn ? matchedDyn.department : selectedJob.departmentVi;
+    const jobType = matchedDyn ? matchedDyn.type : 'Full-time';
+
+    setIsSubmittingApp(true);
+    try {
+      const res = await submitJobApplication({
+        jobId,
+        jobTitle: selectedJob.titleVi,
+        jobTitleEn: selectedJob.titleEn,
+        department,
+        jobType,
+        fullName: applicantData.fullName,
+        phone: applicantData.phone,
+        email: applicantData.email,
+        cvFileName: pdfFile.name,
+        cvFileSize: pdfFile.size,
+        cvFileData: pdfFile.dataUrl,
+      });
+
+      if (!res.success) {
+        showToast(`⚠️ Không thể gửi hồ sơ: ${res.error || 'Lỗi mạng'}`, 'error');
+        return;
+      }
+
+      setSubmitted(true);
+      setApplicantData({ fullName: '', phone: '', email: '', note: '' });
+      setPdfFile(null);
+      setTimeout(() => {
+        setSubmitted(false);
+        setSelectedJob(null);
+      }, 4000);
+    } finally {
+      setIsSubmittingApp(false);
+    }
   };
 
   return (
@@ -393,17 +488,52 @@ export const Careers: React.FC = () => {
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>{t.careers.noteLabel}</label>
-                      <textarea
-                        rows={3}
-                        placeholder={t.careers.notePlaceholder}
-                        value={applicantData.note}
-                        onChange={e => setApplicantData({ ...applicantData, note: e.target.value })}
-                      />
+                      <label>Bản CV / Hồ sơ ứng tuyển (Chuẩn định dạng PDF *):</label>
+                      {pdfFile ? (
+                        <div className={styles.pdfFileCard}>
+                          <FileText size={28} color="#ef4444" />
+                          <div className={styles.pdfFileInfo}>
+                            <span className={styles.pdfFileName}>{pdfFile.name}</span>
+                            <span className={styles.pdfFileSize}>{pdfFile.size} • Đã sẵn sàng gửi</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setPdfFile(null)}
+                            className={styles.removePdfBtn}
+                            title="Xóa tệp PDF này"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          className={`${styles.dropZone} ${isDragging ? styles.dropZoneDragging : ''}`}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsDragging(true);
+                          }}
+                          onDragLeave={() => setIsDragging(false)}
+                          onDrop={handleDrop}
+                          onClick={() => document.getElementById('cvPdfInput')?.click()}
+                        >
+                          <input
+                            id="cvPdfInput"
+                            type="file"
+                            accept="application/pdf,.pdf"
+                            style={{ display: 'none' }}
+                            onChange={handleFileChange}
+                          />
+                          <UploadCloud size={36} color="#F58220" />
+                          <p className={styles.dropZoneText}>
+                            Kéo thả tệp <strong>.PDF</strong> vào đây hoặc <span>Tải từ máy tính</span>
+                          </p>
+                          <span className={styles.dropZoneSubtext}>Chỉ chấp nhận duy nhất 01 tập tin chuẩn định dạng PDF</span>
+                        </div>
+                      )}
                     </div>
 
-                    <button type="submit" className={styles.submitApplyBtn}>
-                      <Send size={18} /> {t.careers.submitApplyBtn}
+                    <button type="submit" className={styles.submitApplyBtn} disabled={isSubmittingApp}>
+                      <Send size={18} /> {isSubmittingApp ? 'Đang gửi hồ sơ...' : t.careers.submitApplyBtn}
                     </button>
                   </form>
                 </div>
