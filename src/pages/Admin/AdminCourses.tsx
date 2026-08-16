@@ -622,14 +622,14 @@ export const AdminCourses: React.FC = () => {
                     className={`${styles.langTab} ${activeLangTab === 'vi' ? styles.langTabActive : ''}`}
                     onClick={() => setActiveLangTab('vi')}
                   >
-                    🇻🇳 Nội Dung Tiếng Việt
+                    Nội Dung Tiếng Việt
                   </button>
                   <button
                     type="button"
                     className={`${styles.langTab} ${activeLangTab === 'en' ? styles.langTabActive : ''}`}
                     onClick={() => setActiveLangTab('en')}
                   >
-                    🇬🇧 English Content
+                    English Content
                   </button>
                 </div>
 
