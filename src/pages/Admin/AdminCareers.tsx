@@ -190,9 +190,9 @@ export const AdminCareers: React.FC = () => {
       {/* Header */}
       <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.pageTitle}>Quản lý tuyển dụng (Careers & HR)</h1>
+          <h1 className={styles.pageTitle}>Quản lý tuyển dụng</h1>
           <p className={styles.pageSubtitle}>
-            Quản lý vị trí tuyển dụng, tiếp nhận & xét duyệt hồ sơ ứng viên (CV PDF) tại iCANCAM
+            Quản lý vị trí tuyển dụng, tiếp nhận & xét duyệt hồ sơ ứng viên
           </p>
         </div>
 
@@ -238,7 +238,7 @@ export const AdminCareers: React.FC = () => {
           onClick={() => setActiveTab('applications')}
         >
           <Users size={18} />
-          <span>Danh sách ứng viên nộp CV</span>
+          <span>Danh sách ứng viên</span>
           <span className={styles.tabBadge} style={{ background: stats.pendingApps > 0 ? '#ef4444' : undefined }}>
             {applicationsList.length} {stats.pendingApps > 0 && `(${stats.pendingApps} mới)`}
           </span>
@@ -302,7 +302,7 @@ export const AdminCareers: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statVal}>{stats.acceptedApps}</div>
-                <div className={styles.statLabel}>Đã nhận / Tuyển dụng</div>
+                <div className={styles.statLabel}>Đã tuyển</div>
               </div>
               <UserCheck size={28} color="#22c55e" />
             </div>
@@ -310,7 +310,7 @@ export const AdminCareers: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statVal}>{stats.rejectedApps}</div>
-                <div className={styles.statLabel}>Từ chối (Tự xóa sau 3 ngày)</div>
+                <div className={styles.statLabel}>Từ chối</div>
               </div>
               <UserX size={28} color="#ef4444" />
             </div>
@@ -542,8 +542,8 @@ export const AdminCareers: React.FC = () => {
               options={[
                 { value: 'all', label: 'Tất cả trạng thái' },
                 { value: 'pending', label: 'Đang chờ duyệt' },
-                { value: 'accepted', label: 'Đã nhận tuyển dụng' },
-                { value: 'rejected', label: 'Từ chối (Tự xóa sau 3 ngày)' },
+                { value: 'accepted', label: 'Đã tuyển' },
+                { value: 'rejected', label: 'Từ chối' },
                 { value: 'archived', label: 'Lưu trữ hồ sơ' },
               ]}
               value={selectedAppStatus}
@@ -559,10 +559,10 @@ export const AdminCareers: React.FC = () => {
                 <tr>
                   <th>Thông tin ứng viên</th>
                   <th>Vị trí ứng tuyển & Phòng ban</th>
-                  <th>Tệp CV (PDF)</th>
+                  <th>Tệp CV</th>
                   <th>Thời gian nộp</th>
                   <th>Trạng thái xét duyệt</th>
-                  <th>Thao tác HR</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
 
@@ -638,9 +638,9 @@ export const AdminCareers: React.FC = () => {
                             {app.status === 'pending'
                               ? 'Đang chờ duyệt'
                               : app.status === 'accepted'
-                              ? 'Đã nhận tuyển dụng'
+                              ? 'Đã tuyển'
                               : app.status === 'rejected'
-                              ? 'Từ chối (Tự xóa 3 ngày)'
+                              ? 'Từ chối'
                               : 'Lưu trữ hồ sơ'}
                           </span>
                         </td>
