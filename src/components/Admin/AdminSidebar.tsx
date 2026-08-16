@@ -24,11 +24,11 @@ export const AdminSidebar: React.FC = () => {
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.brand}>
-        <img src={footerLogo} alt="iCANCAM Logo" className={styles.brandLogo} />
+      <div className={styles.brandHeader}>
+        <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
         <div className={styles.brandText}>
           <span className={styles.brandTitle}>iCANCAM Portal</span>
-          <span className={styles.brandSub}>CMS Admin System</span>
+          <span className={styles.brandSubtitle}>CMS Admin System</span>
         </div>
       </div>
 
