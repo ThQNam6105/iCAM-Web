@@ -126,17 +126,44 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  max-height: 650px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #F58220 rgba(255, 255, 255, 0.05);
+}
+
+.tableCard::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.tableCard::-webkit-scrollbar-track {
+  background: rgba(15, 28, 63, 0.5);
+  border-radius: 4px;
+}
+
+.tableCard::-webkit-scrollbar-thumb {
+  background: #F58220;
+  border-radius: 4px;
+}
+
+.tableCard::-webkit-scrollbar-thumb:hover {
+  background: #e07112;
 }
 
 .table {
   width: 100%;
+  min-width: 850px;
   border-collapse: collapse;
   text-align: left;
 }
 
 .table th {
-  background: rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #0f1c3f;
   padding: 1rem 1.25rem;
   font-size: 0.8rem;
   font-weight: 700;

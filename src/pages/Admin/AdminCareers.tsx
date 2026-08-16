@@ -286,7 +286,7 @@ export const AdminCareers: React.FC = () => {
             <div className={styles.statCard}>
               <div>
                 <div className={styles.statVal}>{stats.totalApps}</div>
-                <div className={styles.statLabel}>Tổng số hồ sơ CV</div>
+                <div className={styles.statLabel}>Tổng số hồ sơ</div>
               </div>
               <Users size={28} color="#3b82f6" />
             </div>
