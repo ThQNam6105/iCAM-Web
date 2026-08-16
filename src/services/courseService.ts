@@ -40,8 +40,6 @@ export interface CourseItem {
   levelEn: string;
   targetOutputVi: string;
   targetOutputEn: string;
-  tuitionFee: number;
-  discountFee?: number;
   thumbnailUrl?: string;
   bannerUrl?: string;
   featuresVi: string[];
@@ -75,8 +73,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     levelEn: 'Pre-A1 Starters',
     targetOutputVi: 'Tự tin phát âm chuẩn 44 âm Phonics, giao tiếp 150+ từ vựng & câu đơn giản',
     targetOutputEn: 'Master 44 Phonics sounds, communicate 150+ words & simple sentences',
-    tuitionFee: 3200000,
-    discountFee: 2800000,
     featuresVi: [
       'Phương pháp Phonics chuẩn Mỹ',
       'Học qua bài hát, câu chuyện & kịch tương tác',
@@ -121,8 +117,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     levelEn: 'A1 Movers - A2 Flyers',
     targetOutputVi: 'Đạt 12 - 15 khiên Cambridge Starters/Movers, tự tin giao tiếp phản xạ',
     targetOutputEn: 'Achieve 12 - 15 Cambridge Shields, confident speaking fluency',
-    tuitionFee: 3800000,
-    discountFee: 3400000,
     featuresVi: [
       'Lộ trình Cambridge Young Learners chuẩn quốc tế',
       'Kết hợp phương pháp 4Ls + LETI độc quyền',
@@ -167,8 +161,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     levelEn: 'A2 KET - B1 PET',
     targetOutputVi: 'Đạt chứng chỉ Cambridge KET/PET (B1), tạo đà bứt phá IELTS 5.5+',
     targetOutputEn: 'Pass Cambridge KET/PET (B1), creating momentum for IELTS 5.5+',
-    tuitionFee: 4200000,
-    discountFee: 3800000,
     featuresVi: [
       'Tích hợp chương trình chuyên Anh THCS',
       'Rèn luyện tư duy phản biện Critical Thinking',
@@ -213,8 +205,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     levelEn: 'Target 4.5 - 5.5+',
     targetOutputVi: 'Cam kết bằng hợp đồng đạt IELTS 5.0 - 5.5+',
     targetOutputEn: 'Contractual guarantee to reach IELTS 5.0 - 5.5+',
-    tuitionFee: 6500000,
-    discountFee: 5800000,
     featuresVi: [
       'Giáo trình độc quyền biên soạn bởi Chuyên gia 8.5+ IELTS',
       'Chữa bài Writing & Speaking chi tiết từng tiêu chí',
@@ -259,8 +249,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     levelEn: 'Target 6.5 - 7.5+',
     targetOutputVi: 'Cam kết bằng hợp đồng đạt IELTS 6.5 - 7.5+',
     targetOutputEn: 'Contractual guarantee to reach IELTS 6.5 - 7.5+',
-    tuitionFee: 8500000,
-    discountFee: 7800000,
     featuresVi: [
       'Học cùng cựu Giám khảo IELTS & Chuyên gia 9.0 IELTS',
       'Chấm chữa bài Writing Task 1 & 2 trực tiếp 1-on-1',
@@ -305,8 +293,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     levelEn: 'All levels (Pre-Inter -> Upper)',
     targetOutputVi: 'Tự tin giao tiếp phản xạ trôi chảy trong môi trường làm việc quốc tế',
     targetOutputEn: 'Confident fluent communication in international work environments',
-    tuitionFee: 3900000,
-    discountFee: 3500000,
     featuresVi: [
       'Lịch học linh hoạt Sáng - Tối & Cuối tuần',
       '100% Thời lượng rèn luyện phản xạ Speaking với giáo viên',
@@ -403,8 +389,6 @@ export const fetchCoursesFromSupabase = async (): Promise<CourseItem[]> => {
             levelEn: item.level_en || seed?.levelEn || '',
             targetOutputVi: item.target_output_vi || item.target_output || seed?.targetOutputVi || '',
             targetOutputEn: item.target_output_en || seed?.targetOutputEn || '',
-            tuitionFee: Number(item.tuition_fee) || seed?.tuitionFee || 0,
-            discountFee: item.discount_fee ? Number(item.discount_fee) : seed?.discountFee,
             thumbnailUrl: item.thumbnail_url || seed?.thumbnailUrl,
             bannerUrl: item.banner_url || seed?.bannerUrl,
             featuresVi: Array.isArray(item.features_vi) ? item.features_vi : seed?.featuresVi || [],
@@ -445,8 +429,6 @@ export const syncCourseToSupabase = async (course: CourseItem): Promise<{ succes
     level_en: course.levelEn,
     target_output_vi: course.targetOutputVi,
     target_output_en: course.targetOutputEn,
-    tuition_fee: course.tuitionFee,
-    discount_fee: course.discountFee,
     thumbnail_url: course.thumbnailUrl,
     banner_url: course.bannerUrl,
     features_vi: course.featuresVi,

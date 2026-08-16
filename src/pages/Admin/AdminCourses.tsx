@@ -94,8 +94,6 @@ export const AdminCourses: React.FC = () => {
     levelEn: '',
     targetOutputVi: '',
     targetOutputEn: '',
-    tuitionFee: 0,
-    discountFee: 0,
     featuresVi: [],
     featuresEn: [],
     syllabusVi: [],
@@ -177,8 +175,6 @@ export const AdminCourses: React.FC = () => {
       levelEn: '',
       targetOutputVi: '',
       targetOutputEn: '',
-      tuitionFee: 0,
-      discountFee: 0,
       featuresVi: [],
       featuresEn: [],
       syllabusVi: [],
@@ -209,8 +205,6 @@ export const AdminCourses: React.FC = () => {
       levelEn: course.levelEn,
       targetOutputVi: course.targetOutputVi,
       targetOutputEn: course.targetOutputEn,
-      tuitionFee: course.tuitionFee,
-      discountFee: course.discountFee || 0,
       featuresVi: course.featuresVi,
       featuresEn: course.featuresEn,
       syllabusVi: course.syllabusVi,
@@ -343,10 +337,6 @@ export const AdminCourses: React.FC = () => {
     }
   };
 
-  const formatVND = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-  };
-
   const getCategoryLabel = (catId: string) => {
     const found = categoriesList.find((c) => c.id === catId);
     if (found) return found.nameVi;
@@ -474,7 +464,6 @@ export const AdminCourses: React.FC = () => {
               <th>Phân Loại</th>
               <th>Độ Tuổi</th>
               <th>Thời Lượng</th>
-              <th>Học Phí</th>
               <th>Trạng Thái</th>
               <th>Thao Tác</th>
             </tr>
@@ -482,13 +471,13 @@ export const AdminCourses: React.FC = () => {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={8} className={styles.emptyState}>
+                <td colSpan={7} className={styles.emptyState}>
                   Đang tải dữ liệu khóa học từ hệ thống...
                 </td>
               </tr>
             ) : filteredCourses.length === 0 ? (
               <tr>
-                <td colSpan={8} className={styles.emptyState}>
+                <td colSpan={7} className={styles.emptyState}>
                   Không tìm thấy khóa học nào phù hợp.
                 </td>
               </tr>
@@ -509,7 +498,6 @@ export const AdminCourses: React.FC = () => {
                   </td>
                   <td>{course.targetAgeVi}</td>
                   <td>{course.durationVi}</td>
-                  <td className={styles.feeCell}>{formatVND(course.tuitionFee)}</td>
                   <td>
                     <button
                       className={`${styles.statusBadge} ${
@@ -637,27 +625,6 @@ export const AdminCourses: React.FC = () => {
                       placeholder="Ví dụ: 12 tháng / 3 khóa..."
                       value={formData.durationVi}
                       onChange={(e) => setFormData({ ...formData, durationVi: e.target.value, durationEn: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Học phí niêm yết (VNĐ) *</label>
-                    <input
-                      type="number"
-                      required
-                      className={styles.formInput}
-                      value={formData.tuitionFee}
-                      onChange={(e) => setFormData({ ...formData, tuitionFee: Number(e.target.value) })}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Học phí ưu đãi (VNĐ)</label>
-                    <input
-                      type="number"
-                      className={styles.formInput}
-                      value={formData.discountFee || ''}
-                      onChange={(e) => setFormData({ ...formData, discountFee: Number(e.target.value) })}
                     />
                   </div>
 
