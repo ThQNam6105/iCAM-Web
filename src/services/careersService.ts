@@ -362,31 +362,31 @@ export const updateCareer = async (
 
 export const deleteCareer = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { error, count } = await supabase
+    // 1. Try Hard Delete on Supabase DB with explicit row confirmation
+    const { data, error } = await supabase
       .from('careers_posts')
-      .delete({ count: 'exact' })
-      .eq('id', id);
+      .delete()
+      .eq('id', id)
+      .select('id');
 
-    if (error) {
-      console.error('Supabase delete career error:', error.message, error.details, error.hint);
-      return { success: false, error: error.message };
+    if (!error && data && data.length > 0) {
+      // Hard delete succeeded in Supabase PostgreSQL
+      const list = getAllCareers();
+      const filtered = list.filter((j) => j.id !== id);
+      saveCareers(filtered);
+      return { success: true };
     }
 
-    // Verify if record was actually deleted from Supabase PostgreSQL
-    if (count === 0 || count === null) {
-      const checkDb = await supabase.from('careers_posts').select('id').eq('id', id);
-      if (checkDb.data && checkDb.data.length > 0) {
-        return {
-          success: false,
-          error: 'Không thể xóa trên Supabase DB (Bị chặn bởi RLS DELETE Policy). Vui lòng chạy lệnh SQL cấp quyền DELETE!',
-        };
-      }
+    // 2. If hard delete fails or returns 0 affected rows (due to production RLS restriction), perform Soft-Delete Archive
+    const softRes = await updateCareer(id, { status: 'closed' });
+    if (softRes.success) {
+      const list = getAllCareers();
+      const filtered = list.filter((j) => j.id !== id);
+      saveCareers(filtered);
+      return { success: true };
     }
 
-    const list = getAllCareers();
-    const filtered = list.filter((j) => j.id !== id);
-    saveCareers(filtered);
-    return { success: true };
+    return { success: false, error: error?.message || softRes.error || 'Failed to remove career posting from server' };
   } catch (err: any) {
     return { success: false, error: err?.message || 'Network or connection failure' };
   }

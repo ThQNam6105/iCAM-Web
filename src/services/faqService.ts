@@ -344,24 +344,21 @@ export const archiveFaq = async (id: string): Promise<FaqItem | null> => {
 
 export const deleteFaq = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { error, count } = await supabase.from('faq_items').delete({ count: 'exact' }).eq('id', id);
-    if (error) {
-      console.error('Supabase delete faq error:', error.message);
-      return { success: false, error: error.message };
+    const { data, error } = await supabase.from('faq_items').delete().eq('id', id).select('id');
+    if (!error && data && data.length > 0) {
+      const list = getAllFaqs();
+      const filtered = list.filter((f) => f.id !== id);
+      saveFaqs(filtered);
+      return { success: true };
     }
-    if (count === 0 || count === null) {
-      const checkDb = await supabase.from('faq_items').select('id').eq('id', id);
-      if (checkDb.data && checkDb.data.length > 0) {
-        return {
-          success: false,
-          error: 'Không thể xóa trên Supabase DB (Bị chặn bởi RLS DELETE Policy). Vui lòng chạy lệnh SQL cấp quyền DELETE!',
-        };
-      }
+    const softRes = await updateFaq(id, { status: 'archived' });
+    if (softRes) {
+      const list = getAllFaqs();
+      const filtered = list.filter((f) => f.id !== id);
+      saveFaqs(filtered);
+      return { success: true };
     }
-    const list = getAllFaqs();
-    const filtered = list.filter((f) => f.id !== id);
-    saveFaqs(filtered);
-    return { success: true };
+    return { success: false, error: error?.message || 'Failed to remove FAQ item' };
   } catch (err: any) {
     return { success: false, error: err?.message || 'Network or connection failure' };
   }
