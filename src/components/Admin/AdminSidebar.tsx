@@ -25,10 +25,12 @@ export const AdminSidebar: React.FC = () => {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brandHeader}>
-        <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
+        <div className={styles.logoWrapper}>
+          <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
+        </div>
         <div className={styles.brandText}>
           <span className={styles.brandTitle}>iCANCAM Portal</span>
-          <span className={styles.brandSubtitle}>CMS Admin System</span>
+          <span className={styles.brandSubtitle}>CMS ADMIN SYSTEM</span>
         </div>
       </div>
 
@@ -39,7 +41,7 @@ export const AdminSidebar: React.FC = () => {
           end
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <FileText size={18} />
+          <span className={styles.navItemIcon}><FileText size={18} /></span>
           <span>Bài viết tin tức</span>
         </NavLink>
 
@@ -47,7 +49,7 @@ export const AdminSidebar: React.FC = () => {
           to="/admin/categories"
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <FolderTree size={18} />
+          <span className={styles.navItemIcon}><FolderTree size={18} /></span>
           <span>Danh mục tin tức</span>
         </NavLink>
 
@@ -55,11 +57,11 @@ export const AdminSidebar: React.FC = () => {
           to="/admin/media"
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <ImageIcon size={18} />
+          <span className={styles.navItemIcon}><ImageIcon size={18} /></span>
           <span>Thư viện Media</span>
         </NavLink>
 
-        <span className={styles.sectionLabel} style={{ marginTop: '1.25rem' }}>
+        <span className={styles.sectionLabel} style={{ marginTop: '0.75rem' }}>
           Đào tạo & tuyển sinh
         </span>
 
@@ -67,7 +69,7 @@ export const AdminSidebar: React.FC = () => {
           to="/admin/courses"
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <BookOpen size={18} />
+          <span className={styles.navItemIcon}><BookOpen size={18} /></span>
           <span>Quản lý khóa học</span>
         </NavLink>
 
@@ -75,7 +77,7 @@ export const AdminSidebar: React.FC = () => {
           to="/admin/faq"
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <HelpCircle size={18} />
+          <span className={styles.navItemIcon}><HelpCircle size={18} /></span>
           <span>Hỏi đáp & Hộp thư</span>
         </NavLink>
 
@@ -83,7 +85,7 @@ export const AdminSidebar: React.FC = () => {
           to="/admin/careers"
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <Briefcase size={18} />
+          <span className={styles.navItemIcon}><Briefcase size={18} /></span>
           <span>Tuyển dụng</span>
         </NavLink>
 
@@ -91,7 +93,7 @@ export const AdminSidebar: React.FC = () => {
           to="/admin/settings"
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
-          <Settings size={18} />
+          <span className={styles.navItemIcon}><Settings size={18} /></span>
           <span>Cấu hình hệ thống</span>
         </NavLink>
       </nav>
@@ -106,7 +108,7 @@ export const AdminSidebar: React.FC = () => {
         </div>
 
         <button onClick={handleLogout} className={styles.logoutBtn} title="Đăng xuất">
-          <LogOut size={16} />
+          <LogOut size={18} />
         </button>
       </div>
     </aside>
