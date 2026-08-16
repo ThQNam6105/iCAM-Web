@@ -4,7 +4,7 @@ import {
   FileText,
   FolderTree,
   Image as ImageIcon,
-  GraduationCap,
+  BookOpen,
   HelpCircle,
   Briefcase,
   Settings,
@@ -24,24 +24,23 @@ export const AdminSidebar: React.FC = () => {
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.brandHeader}>
-        <img src={footerLogo} alt="iCANCAM Logo" className={styles.logoImg} />
+      <div className={styles.brand}>
+        <img src={footerLogo} alt="iCANCAM Logo" className={styles.brandLogo} />
         <div className={styles.brandText}>
-          <h2 className={styles.brandTitle}>TRANG QUẢN TRỊ</h2>
-          <span className={styles.brandSubtitle}>Admin Portal</span>
+          <span className={styles.brandTitle}>iCANCAM Portal</span>
+          <span className={styles.brandSub}>CMS Admin System</span>
         </div>
       </div>
 
-      <nav className={styles.navGroup}>
-        <span className={styles.navSectionTitle}>Nội dung & tin tức</span>
-
+      <nav className={styles.nav}>
+        <span className={styles.sectionLabel}>Tổng quan</span>
         <NavLink
           to="/admin"
           end
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <FileText size={18} />
-          <span>Quản lý bài viết & Dashboard</span>
+          <span>Bài viết tin tức</span>
         </NavLink>
 
         <NavLink
@@ -49,7 +48,7 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <FolderTree size={18} />
-          <span>Danh mục</span>
+          <span>Danh mục tin tức</span>
         </NavLink>
 
         <NavLink
@@ -57,17 +56,20 @@ export const AdminSidebar: React.FC = () => {
           className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
         >
           <ImageIcon size={18} />
-          <span>Thư viện hệ thống</span>
+          <span>Thư viện Media</span>
         </NavLink>
 
-        <span className={styles.navSectionTitle} style={{ marginTop: '1rem' }}>
+        <span className={styles.sectionLabel} style={{ marginTop: '1.25rem' }}>
           Đào tạo & tuyển sinh
         </span>
 
-        <div className={`${styles.navItem} ${styles.disabledNavItem}`}>
-          <GraduationCap size={18} />
-          <span>Khóa học</span>
-        </div>
+        <NavLink
+          to="/admin/courses"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+        >
+          <BookOpen size={18} />
+          <span>Quản lý khóa học</span>
+        </NavLink>
 
         <NavLink
           to="/admin/faq"
