@@ -101,8 +101,11 @@ export const AdminCourses: React.FC = () => {
     status: 'active',
   });
 
+  const [activeLangTab, setActiveLangTab] = useState<'vi' | 'en'>('vi');
   const [featuresTextVi, setFeaturesTextVi] = useState('');
+  const [featuresTextEn, setFeaturesTextEn] = useState('');
   const [syllabusTextVi, setSyllabusTextVi] = useState('');
+  const [syllabusTextEn, setSyllabusTextEn] = useState('');
 
   const loadData = async () => {
     setIsLoading(true);
@@ -157,6 +160,7 @@ export const AdminCourses: React.FC = () => {
 
   const handleOpenCreate = () => {
     setEditingCourse(null);
+    setActiveLangTab('vi');
     const defaultCat = categoriesList.length > 0 ? categoriesList[0].id : 'kids';
     setFormData({
       courseCode: `ICAM-COURSE-${courses.length + 1}`,
@@ -182,57 +186,75 @@ export const AdminCourses: React.FC = () => {
       status: 'active',
     });
     setFeaturesTextVi('');
+    setFeaturesTextEn('');
     setSyllabusTextVi('');
+    setSyllabusTextEn('');
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (course: CourseItem) => {
     setEditingCourse(course);
+    setActiveLangTab('vi');
     setFormData({
       courseCode: course.courseCode,
       category: course.category,
       titleVi: course.titleVi,
-      titleEn: course.titleEn,
+      titleEn: course.titleEn || course.titleVi,
       badgeVi: course.badgeVi,
-      badgeEn: course.badgeEn,
+      badgeEn: course.badgeEn || course.badgeVi,
       targetAgeVi: course.targetAgeVi,
-      targetAgeEn: course.targetAgeEn,
+      targetAgeEn: course.targetAgeEn || course.targetAgeVi,
       descriptionVi: course.descriptionVi,
-      descriptionEn: course.descriptionEn,
+      descriptionEn: course.descriptionEn || course.descriptionVi,
       durationVi: course.durationVi,
-      durationEn: course.durationEn,
+      durationEn: course.durationEn || course.durationVi,
       levelVi: course.levelVi,
-      levelEn: course.levelEn,
+      levelEn: course.levelEn || course.levelVi,
       targetOutputVi: course.targetOutputVi,
-      targetOutputEn: course.targetOutputEn,
+      targetOutputEn: course.targetOutputEn || course.targetOutputVi,
       featuresVi: course.featuresVi,
-      featuresEn: course.featuresEn,
+      featuresEn: course.featuresEn && course.featuresEn.length ? course.featuresEn : course.featuresVi,
       syllabusVi: course.syllabusVi,
-      syllabusEn: course.syllabusEn,
+      syllabusEn: course.syllabusEn && course.syllabusEn.length ? course.syllabusEn : course.syllabusVi,
       status: course.status,
     });
     setFeaturesTextVi(course.featuresVi.join('\n'));
+    setFeaturesTextEn((course.featuresEn && course.featuresEn.length ? course.featuresEn : course.featuresVi).join('\n'));
     setSyllabusTextVi(course.syllabusVi.join('\n'));
+    setSyllabusTextEn((course.syllabusEn && course.syllabusEn.length ? course.syllabusEn : course.syllabusVi).join('\n'));
     setIsModalOpen(true);
   };
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsedFeatures = featuresTextVi
+    const parsedFeaturesVi = featuresTextVi
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean);
-    const parsedSyllabus = syllabusTextVi
+    const parsedFeaturesEn = featuresTextEn
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const parsedSyllabusVi = syllabusTextVi
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const parsedSyllabusEn = syllabusTextEn
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean);
 
     const payload = {
       ...formData,
-      featuresVi: parsedFeatures,
-      featuresEn: parsedFeatures,
-      syllabusVi: parsedSyllabus,
-      syllabusEn: parsedSyllabus,
+      titleEn: formData.titleEn || formData.titleVi,
+      targetAgeEn: formData.targetAgeEn || formData.targetAgeVi,
+      durationEn: formData.durationEn || formData.durationVi,
+      targetOutputEn: formData.targetOutputEn || formData.targetOutputVi,
+      descriptionEn: formData.descriptionEn || formData.descriptionVi,
+      featuresVi: parsedFeaturesVi,
+      featuresEn: parsedFeaturesEn.length ? parsedFeaturesEn : parsedFeaturesVi,
+      syllabusVi: parsedSyllabusVi,
+      syllabusEn: parsedSyllabusEn.length ? parsedSyllabusEn : parsedSyllabusVi,
     };
 
     if (editingCourse) {
@@ -560,7 +582,7 @@ export const AdminCourses: React.FC = () => {
 
             <form onSubmit={handleSubmitForm}>
               <div className={styles.modalBody}>
-                <div className={styles.formGrid}>
+                <div className={styles.formGrid} style={{ marginBottom: '1.25rem' }}>
                   <div className={styles.formGroup}>
                     <label>Mã khóa học *</label>
                     <input
@@ -582,95 +604,7 @@ export const AdminCourses: React.FC = () => {
                     />
                   </div>
 
-                  <div className={styles.formGroup}>
-                    <label>Tên khóa học (Tiếng Việt) *</label>
-                    <input
-                      type="text"
-                      required
-                      className={styles.formInput}
-                      placeholder="Ví dụ: CAM Kids Starter..."
-                      value={formData.titleVi}
-                      onChange={(e) => setFormData({ ...formData, titleVi: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Tên khóa học (Tiếng Anh)</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: CAM Kids Starter..."
-                      value={formData.titleEn}
-                      onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Độ tuổi mục tiêu *</label>
-                    <input
-                      type="text"
-                      required
-                      className={styles.formInput}
-                      placeholder="Ví dụ: 4 - 6 tuổi..."
-                      value={formData.targetAgeVi}
-                      onChange={(e) => setFormData({ ...formData, targetAgeVi: e.target.value, targetAgeEn: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Thời lượng học</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: 12 tháng / 3 khóa..."
-                      value={formData.durationVi}
-                      onChange={(e) => setFormData({ ...formData, durationVi: e.target.value, durationEn: e.target.value })}
-                    />
-                  </div>
-
                   <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label>Cam kết chuẩn đầu ra *</label>
-                    <input
-                      type="text"
-                      required
-                      className={styles.formInput}
-                      placeholder="Ví dụ: Cam kết đạt 12-15 khiên Cambridge / IELTS 6.5+..."
-                      value={formData.targetOutputVi}
-                      onChange={(e) => setFormData({ ...formData, targetOutputVi: e.target.value, targetOutputEn: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label>Mô tả ngắn khóa học</label>
-                    <textarea
-                      className={styles.formTextarea}
-                      placeholder="Nhập mô tả tổng quan về khóa học..."
-                      value={formData.descriptionVi}
-                      onChange={(e) => setFormData({ ...formData, descriptionVi: e.target.value, descriptionEn: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label>Điểm nổi bật khóa học (Mỗi dòng 1 ý)</label>
-                    <textarea
-                      className={styles.formTextarea}
-                      placeholder="Ví dụ:&#10;Phương pháp Phonics chuẩn Mỹ&#10;100% Giáo viên nước ngoài"
-                      value={featuresTextVi}
-                      onChange={(e) => setFeaturesTextVi(e.target.value)}
-                    />
-                  </div>
-
-                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label>Khung chương trình 4Ls + LETI (Mỗi dòng 1 Module)</label>
-                    <textarea
-                      className={styles.formTextarea}
-                      placeholder="Ví dụ:&#10;Module 1: Phonics & Alphabet Discovery&#10;Module 2: Family & Colors"
-                      value={syllabusTextVi}
-                      onChange={(e) => setSyllabusTextVi(e.target.value)}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
                     <label>Trạng thái tuyển sinh</label>
                     <Select
                       options={formStatusOptions}
@@ -680,6 +614,181 @@ export const AdminCourses: React.FC = () => {
                     />
                   </div>
                 </div>
+
+                {/* BILINGUAL LANGUAGE TABS */}
+                <div className={styles.langTabGroup}>
+                  <button
+                    type="button"
+                    className={`${styles.langTab} ${activeLangTab === 'vi' ? styles.langTabActive : ''}`}
+                    onClick={() => setActiveLangTab('vi')}
+                  >
+                    🇻🇳 Nội Dung Tiếng Việt
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.langTab} ${activeLangTab === 'en' ? styles.langTabActive : ''}`}
+                    onClick={() => setActiveLangTab('en')}
+                  >
+                    🇬🇧 English Content
+                  </button>
+                </div>
+
+                {activeLangTab === 'vi' ? (
+                  <div className={styles.formGrid}>
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Tên khóa học (Tiếng Việt) *</label>
+                      <input
+                        type="text"
+                        required
+                        className={styles.formInput}
+                        placeholder="Ví dụ: CAM Kids Starter..."
+                        value={formData.titleVi}
+                        onChange={(e) => setFormData({ ...formData, titleVi: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Độ tuổi mục tiêu (Tiếng Việt) *</label>
+                      <input
+                        type="text"
+                        required
+                        className={styles.formInput}
+                        placeholder="Ví dụ: 4 - 6 tuổi..."
+                        value={formData.targetAgeVi}
+                        onChange={(e) => setFormData({ ...formData, targetAgeVi: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Thời lượng học (Tiếng Việt)</label>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Ví dụ: 12 tháng / 3 khóa..."
+                        value={formData.durationVi}
+                        onChange={(e) => setFormData({ ...formData, durationVi: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Cam kết chuẩn đầu ra (Tiếng Việt) *</label>
+                      <input
+                        type="text"
+                        required
+                        className={styles.formInput}
+                        placeholder="Ví dụ: Cam kết đạt 12-15 khiên Cambridge / IELTS 6.5+..."
+                        value={formData.targetOutputVi}
+                        onChange={(e) => setFormData({ ...formData, targetOutputVi: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Mô tả ngắn khóa học (Tiếng Việt)</label>
+                      <textarea
+                        className={styles.formTextarea}
+                        placeholder="Nhập mô tả tổng quan tiếng Việt về khóa học..."
+                        value={formData.descriptionVi}
+                        onChange={(e) => setFormData({ ...formData, descriptionVi: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Điểm nổi bật khóa học (Tiếng Việt) - Mỗi dòng 1 ý</label>
+                      <textarea
+                        className={styles.formTextarea}
+                        placeholder="Ví dụ:&#10;Phương pháp Phonics chuẩn Mỹ&#10;100% Giáo viên nước ngoài"
+                        value={featuresTextVi}
+                        onChange={(e) => setFeaturesTextVi(e.target.value)}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Khung chương trình 4Ls + LETI (Tiếng Việt) - Mỗi dòng 1 Module</label>
+                      <textarea
+                        className={styles.formTextarea}
+                        placeholder="Ví dụ:&#10;Module 1: Phonics & Alphabet Discovery&#10;Module 2: Family & Colors"
+                        value={syllabusTextVi}
+                        onChange={(e) => setSyllabusTextVi(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.formGrid}>
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Course Title (English)</label>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="e.g. CAM Kids Starter..."
+                        value={formData.titleEn}
+                        onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Target Age Group (English)</label>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="e.g. Ages 4 - 6..."
+                        value={formData.targetAgeEn}
+                        onChange={(e) => setFormData({ ...formData, targetAgeEn: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Course Duration (English)</label>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="e.g. 12 months / 3 terms..."
+                        value={formData.durationEn}
+                        onChange={(e) => setFormData({ ...formData, durationEn: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Target Output Commitment (English)</label>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="e.g. Guaranteed 12-15 Cambridge Shields / IELTS 6.5+..."
+                        value={formData.targetOutputEn}
+                        onChange={(e) => setFormData({ ...formData, targetOutputEn: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Short Description (English)</label>
+                      <textarea
+                        className={styles.formTextarea}
+                        placeholder="Enter short English course overview..."
+                        value={formData.descriptionEn}
+                        onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>Key Features (English) - 1 item per line</label>
+                      <textarea
+                        className={styles.formTextarea}
+                        placeholder="e.g.:&#10;US Standard Phonics method&#10;100% Native English Teachers"
+                        value={featuresTextEn}
+                        onChange={(e) => setFeaturesTextEn(e.target.value)}
+                      />
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                      <label>4Ls + LETI Syllabus (English) - 1 Module per line</label>
+                      <textarea
+                        className={styles.formTextarea}
+                        placeholder="e.g.:&#10;Module 1: Phonics & Alphabet Discovery&#10;Module 2: Family & Colors"
+                        value={syllabusTextEn}
+                        onChange={(e) => setSyllabusTextEn(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className={styles.modalFooter}>
