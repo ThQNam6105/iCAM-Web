@@ -239,54 +239,35 @@ export const saveFaqs = (faqs: FaqItem[]) => {
 };
 
 export const fetchFaqsFromSupabase = async (): Promise<FaqItem[]> => {
-  const localList = getAllFaqs();
   try {
     const { data, error } = await supabase.from('faq_items').select('*').order('display_order', { ascending: true });
     if (!error && data) {
-      if (data.length > 0) {
-        const categories = getAllFaqCategories();
-        const faqsFromDb: FaqItem[] = data.map((item) => {
-          const cat = categories.find((c) => c.id === item.category_id);
-          const seed = INITIAL_FAQS.find((s) => s.id === item.id);
-          return {
-            id: item.id,
-            categoryId: item.category_id,
-            categoryNameVi: cat?.nameVi || 'Khác',
-            categoryNameEn: cat?.nameEn || 'Other',
-            questionVi: item.question_vi,
-            questionEn: item.question_en || seed?.questionEn || item.question_vi,
-            answerVi: item.answer_vi,
-            answerEn: item.answer_en || seed?.answerEn || item.answer_vi,
-            status: (item.status as FaqStatus) || 'published',
-            isPinned: !!item.is_pinned,
-            displayOrder: item.display_order || 1,
-            helpfulCount: item.helpful_count || 0,
-            unhelpfulCount: item.unhelpful_count || 0,
-            createdAt: item.created_at || '2026-01-01T00:00:00.000Z',
-            updatedAt: item.updated_at || '2026-01-01T00:00:00.000Z',
-            publishedAt: item.published_at,
-          };
-        });
+      const categories = getAllFaqCategories();
+      const faqsFromDb: FaqItem[] = data.map((item) => {
+        const cat = categories.find((c) => c.id === item.category_id);
+        const seed = INITIAL_FAQS.find((s) => s.id === item.id);
+        return {
+          id: item.id,
+          categoryId: item.category_id,
+          categoryNameVi: cat?.nameVi || 'Khác',
+          categoryNameEn: cat?.nameEn || 'Other',
+          questionVi: item.question_vi,
+          questionEn: item.question_en || seed?.questionEn || item.question_vi,
+          answerVi: item.answer_vi,
+          answerEn: item.answer_en || seed?.answerEn || item.answer_vi,
+          status: (item.status as FaqStatus) || 'published',
+          isPinned: !!item.is_pinned,
+          displayOrder: item.display_order || 1,
+          helpfulCount: item.helpful_count || 0,
+          unhelpfulCount: item.unhelpful_count || 0,
+          createdAt: item.created_at || '2026-01-01T00:00:00.000Z',
+          updatedAt: item.updated_at || '2026-01-01T00:00:00.000Z',
+          publishedAt: item.published_at,
+        };
+      });
 
-        // Supabase is master for all DB rows. Only preserve local items not in DB yet (offline additions)
-        const mergedList = [...faqsFromDb];
-        localList.forEach((localItem) => {
-          const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
-          if (dbIdx === -1) {
-            mergedList.unshift(localItem);
-            syncFaqToSupabase(localItem);
-          }
-        });
-
-        saveFaqs(mergedList);
-        return mergedList;
-      } else {
-        for (const faq of INITIAL_FAQS) {
-          await syncFaqToSupabase(faq);
-        }
-        saveFaqs(INITIAL_FAQS);
-        return INITIAL_FAQS;
-      }
+      saveFaqs(faqsFromDb);
+      return faqsFromDb;
     }
   } catch (err) {
     console.warn('Supabase faq_items table offline or not created yet:', err);

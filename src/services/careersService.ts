@@ -220,58 +220,38 @@ export const saveCareers = (list: CareersItem[]) => {
 };
 
 export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
-  const localList = getAllCareers();
   try {
     const { data, error } = await supabase.from('careers_posts').select('*').order('created_at', { ascending: false });
     if (!error && data) {
-      if (data.length > 0) {
-        const careersFromDb: CareersItem[] = data.map((item) => {
-          const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
-          return {
-            id: item.id,
-            title: item.title,
-            titleEn: item.title_en || seed?.titleEn || item.title,
-            department: item.department,
-            departmentEn: item.department_en || seed?.departmentEn || item.department,
-            location: item.location,
-            locationEn: item.location_en || seed?.locationEn || item.location,
-            type: item.type as JobType,
-            salary: item.salary,
-            salaryEn: item.salary_en || seed?.salaryEn || item.salary,
-            deadline: item.deadline,
-            status: item.status as JobStatus,
-            description: item.description,
-            descriptionEn: item.description_en || seed?.descriptionEn || item.description,
-            requirements: item.requirements,
-            requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
-            benefits: item.benefits,
-            benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
-            applicationsCount: item.applications_count || 0,
-            createdAt: item.created_at || '2026-08-16T02:30:00.000Z',
-            updatedAt: item.updated_at || '2026-08-16T02:30:00.000Z',
-          };
-        });
+      const careersFromDb: CareersItem[] = data.map((item) => {
+        const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
+        return {
+          id: item.id,
+          title: item.title,
+          titleEn: item.title_en || seed?.titleEn || item.title,
+          department: item.department,
+          departmentEn: item.department_en || seed?.departmentEn || item.department,
+          location: item.location,
+          locationEn: item.location_en || seed?.locationEn || item.location,
+          type: item.type as JobType,
+          salary: item.salary,
+          salaryEn: item.salary_en || seed?.salaryEn || item.salary,
+          deadline: item.deadline,
+          status: item.status as JobStatus,
+          description: item.description,
+          descriptionEn: item.description_en || seed?.descriptionEn || item.description,
+          requirements: item.requirements,
+          requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
+          benefits: item.benefits,
+          benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
+          applicationsCount: item.applications_count || 0,
+          createdAt: item.created_at || '2026-08-16T02:30:00.000Z',
+          updatedAt: item.updated_at || '2026-08-16T02:30:00.000Z',
+        };
+      });
 
-        // Supabase is master for all DB rows. Only preserve local items not in DB yet (offline additions)
-        const mergedList = [...careersFromDb];
-        localList.forEach((localItem) => {
-          const dbIdx = mergedList.findIndex((dbItem) => dbItem.id === localItem.id);
-          if (dbIdx === -1) {
-            mergedList.unshift(localItem);
-            syncCareerToSupabase(localItem);
-          }
-        });
-
-        saveCareers(mergedList);
-        return mergedList;
-      } else {
-        // Seed initial data to Supabase once if DB is empty
-        for (const job of INITIAL_CAREERS) {
-          await syncCareerToSupabase(job);
-        }
-        saveCareers(INITIAL_CAREERS);
-        return INITIAL_CAREERS;
-      }
+      saveCareers(careersFromDb);
+      return careersFromDb;
     }
   } catch (err) {
     console.warn('Supabase careers_posts table offline or not created yet:', err);
