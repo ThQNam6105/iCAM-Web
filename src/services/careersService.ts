@@ -575,7 +575,7 @@ const deleteApplicationFromSupabase = async (id: string) => {
 export const fetchApplicationsFromSupabase = async (): Promise<JobApplication[]> => {
   try {
     const { data, error } = await supabase.from('career_applications').select('*').order('created_at', { ascending: false });
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       const appsFromDb: JobApplication[] = data.map((item) => ({
         id: item.id,
         jobId: item.job_id,
@@ -594,7 +594,19 @@ export const fetchApplicationsFromSupabase = async (): Promise<JobApplication[]>
         rejectedAt: item.rejected_at || undefined,
       }));
 
-      const { cleanedList, removedIds } = cleanupExpiredRejectedApplications(appsFromDb);
+      // Merge local applications (if any were submitted offline) with DB applications
+      const localApps = getAllApplications();
+      const dbIds = new Set(appsFromDb.map((a) => a.id));
+      const unsyncedLocal = localApps.filter((a) => !dbIds.has(a.id));
+
+      if (unsyncedLocal.length > 0) {
+        for (const localApp of unsyncedLocal) {
+          await syncApplicationToSupabase(localApp);
+        }
+      }
+
+      const mergedApps = [...appsFromDb, ...unsyncedLocal];
+      const { cleanedList, removedIds } = cleanupExpiredRejectedApplications(mergedApps);
       if (removedIds.length > 0) {
         removedIds.forEach((id) => deleteApplicationFromSupabase(id));
       }

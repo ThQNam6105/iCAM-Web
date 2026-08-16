@@ -271,7 +271,7 @@ export const en: typeof vi = {
     noteLabel: 'CV Link / Additional Notes',
     notePlaceholder: 'Paste Google Drive CV link or experience notes...',
     submitApplyBtn: 'Submit Application',
-    successAlert: '🎉 Application submitted! iCANCAM HR will contact you within 48 business hours.',
+    successAlert: 'Application submitted! iCANCAM HR will contact you within 48 business hours.',
   },
   faq: {
     heroBadge: 'iCANCAM CONSULTATION & FAQ',
