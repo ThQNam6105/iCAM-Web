@@ -23,7 +23,7 @@ import { fetchCoursesFromSupabase } from '../../services/courseService';
 
 interface Course {
   id: string;
-  category: 'kids' | 'teens' | 'ielts' | 'comm' | 'online';
+  category: string;
   title: string;
   titleEn?: string;
   badge: string;

@@ -1,7 +1,26 @@
 import { supabase } from './supabaseClient';
 
-export type CourseCategory = 'kids' | 'teens' | 'ielts' | 'comm' | 'online';
+export type CourseCategory = string;
 export type CourseStatus = 'active' | 'paused' | 'draft';
+
+export interface CourseCategoryItem {
+  id: string;
+  nameVi: string;
+  nameEn?: string;
+  descriptionVi?: string;
+  descriptionEn?: string;
+  badgeColor?: string;
+}
+
+export const INITIAL_COURSE_CATEGORIES: CourseCategoryItem[] = [
+  { id: 'kids', nameVi: 'Tiếng Anh Mầm Non & Tiểu Học', nameEn: 'Kids & Primary', badgeColor: '#fb923c' },
+  { id: 'teens', nameVi: 'Tiếng Anh THCS & THPT', nameEn: 'Teens Academic', badgeColor: '#60a5fa' },
+  { id: 'ielts', nameVi: 'Luyện Thi IELTS Cam Kết', nameEn: 'IELTS Master', badgeColor: '#c084fc' },
+  { id: 'comm', nameVi: 'Tiếng Anh Giao Tiếp Quốc Tế', nameEn: 'Business Communication', badgeColor: '#4ade80' },
+  { id: 'online', nameVi: 'Chương Trình Online Đa Trải Nghiệm', nameEn: 'Online 21st', badgeColor: '#38bdf8' },
+];
+
+const COURSE_CATEGORIES_KEY = 'icancam_course_categories_v1';
 
 export interface CourseItem {
   id: string;
@@ -498,13 +517,136 @@ export const deleteCourse = async (id: string): Promise<{ success: boolean; erro
   const filtered = list.filter((c) => c.id !== id);
   saveCourses(filtered);
 
+  return { success: true };
+};
+
+// ==========================================
+// COURSE CATEGORIES CRUD OPERATIONS
+// ==========================================
+export const getCourseCategories = (): CourseCategoryItem[] => {
   try {
-    const { error } = await supabase.from('courses').delete().eq('id', id);
-    if (error) {
-      await supabase.from('courses').update({ status: 'draft' }).eq('id', id);
+    const raw = localStorage.getItem(COURSE_CATEGORIES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (err) {
-    console.warn('Supabase delete course notice:', err);
+    console.error('Error reading course categories:', err);
+  }
+  localStorage.setItem(COURSE_CATEGORIES_KEY, JSON.stringify(INITIAL_COURSE_CATEGORIES));
+  return INITIAL_COURSE_CATEGORIES;
+};
+
+export const saveCourseCategories = (cats: CourseCategoryItem[]) => {
+  localStorage.setItem(COURSE_CATEGORIES_KEY, JSON.stringify(cats));
+};
+
+export const fetchCourseCategoriesFromSupabase = async (): Promise<CourseCategoryItem[]> => {
+  try {
+    const { data, error } = await supabase.from('course_categories').select('*');
+    if (!error && data && data.length > 0) {
+      const mapped: CourseCategoryItem[] = data.map((item: any) => ({
+        id: item.id || item.slug,
+        nameVi: item.name_vi || item.nameVi,
+        nameEn: item.name_en || item.nameEn,
+        descriptionVi: item.description_vi || item.descriptionVi,
+        descriptionEn: item.description_en || item.descriptionEn,
+        badgeColor: item.badge_color || item.badgeColor || '#F58220',
+      }));
+      saveCourseCategories(mapped);
+      return mapped;
+    }
+  } catch (err) {
+    console.warn('Supabase fetch course categories notice:', err);
+  }
+  return getCourseCategories();
+};
+
+export const createCourseCategory = async (
+  item: Omit<CourseCategoryItem, 'id'> & { id?: string }
+): Promise<{ success: boolean; data?: CourseCategoryItem; error?: string }> => {
+  const categories = getCourseCategories();
+  const catId = item.id ? item.id.toLowerCase().trim() : `cat_${Date.now()}`;
+
+  if (categories.some((c) => c.id === catId)) {
+    return { success: false, error: 'Mã loại chương trình này đã tồn tại!' };
+  }
+
+  const newCat: CourseCategoryItem = {
+    id: catId,
+    nameVi: item.nameVi,
+    nameEn: item.nameEn || item.nameVi,
+    descriptionVi: item.descriptionVi || '',
+    descriptionEn: item.descriptionEn || '',
+    badgeColor: item.badgeColor || '#F58220',
+  };
+
+  const updated = [...categories, newCat];
+  saveCourseCategories(updated);
+
+  try {
+    await supabase.from('course_categories').upsert({
+      id: newCat.id,
+      name_vi: newCat.nameVi,
+      name_en: newCat.nameEn,
+      description_vi: newCat.descriptionVi,
+      description_en: newCat.descriptionEn,
+      badge_color: newCat.badgeColor,
+    });
+  } catch (err) {
+    console.warn('Supabase create course category notice:', err);
+  }
+
+  return { success: true, data: newCat };
+};
+
+export const updateCourseCategory = async (
+  id: string,
+  updates: Partial<CourseCategoryItem>
+): Promise<{ success: boolean; data?: CourseCategoryItem; error?: string }> => {
+  const categories = getCourseCategories();
+  const index = categories.findIndex((c) => c.id === id);
+  if (index === -1) return { success: false, error: 'Không tìm thấy loại chương trình!' };
+
+  const updatedCat: CourseCategoryItem = {
+    ...categories[index],
+    ...updates,
+  };
+
+  categories[index] = updatedCat;
+  saveCourseCategories(categories);
+
+  try {
+    await supabase.from('course_categories').upsert({
+      id: updatedCat.id,
+      name_vi: updatedCat.nameVi,
+      name_en: updatedCat.nameEn,
+      description_vi: updatedCat.descriptionVi,
+      description_en: updatedCat.descriptionEn,
+      badge_color: updatedCat.badgeColor,
+    });
+  } catch (err) {
+    console.warn('Supabase update course category notice:', err);
+  }
+
+  return { success: true, data: updatedCat };
+};
+
+export const deleteCourseCategory = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  const courses = getAllCourses();
+  const isUsed = courses.some((c) => c.category === id);
+  if (isUsed) {
+    return { success: false, error: 'Không thể xóa loại chương trình này vì đang có khóa học thuộc danh mục này!' };
+  }
+
+  const categories = getCourseCategories();
+  const filtered = categories.filter((c) => c.id !== id);
+  saveCourseCategories(filtered);
+
+  try {
+    await supabase.from('course_categories').delete().eq('id', id);
+  } catch (err) {
+    console.warn('Supabase delete course category notice:', err);
   }
 
   return { success: true };
