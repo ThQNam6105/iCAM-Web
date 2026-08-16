@@ -629,7 +629,7 @@ export const AdminCourses: React.FC = () => {
                     className={`${styles.langTab} ${activeLangTab === 'en' ? styles.langTabActive : ''}`}
                     onClick={() => setActiveLangTab('en')}
                   >
-                    English Content
+                    Nội Dung Tiếng Anh
                   </button>
                 </div>
 
@@ -715,74 +715,74 @@ export const AdminCourses: React.FC = () => {
                 ) : (
                   <div className={styles.formGrid}>
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label>Course Title (English)</label>
+                      <label>Tên khóa học (Tiếng Anh)</label>
                       <input
                         type="text"
                         className={styles.formInput}
-                        placeholder="e.g. CAM Kids Starter..."
+                        placeholder="Ví dụ: CAM Kids Starter..."
                         value={formData.titleEn}
                         onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
                       />
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Target Age Group (English)</label>
+                      <label>Độ tuổi mục tiêu (Tiếng Anh)</label>
                       <input
                         type="text"
                         className={styles.formInput}
-                        placeholder="e.g. Ages 4 - 6..."
+                        placeholder="Ví dụ: Ages 4 - 6..."
                         value={formData.targetAgeEn}
                         onChange={(e) => setFormData({ ...formData, targetAgeEn: e.target.value })}
                       />
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Course Duration (English)</label>
+                      <label>Thời lượng học (Tiếng Anh)</label>
                       <input
                         type="text"
                         className={styles.formInput}
-                        placeholder="e.g. 12 months / 3 terms..."
+                        placeholder="Ví dụ: 12 months / 3 terms..."
                         value={formData.durationEn}
                         onChange={(e) => setFormData({ ...formData, durationEn: e.target.value })}
                       />
                     </div>
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label>Target Output Commitment (English)</label>
+                      <label>Cam kết chuẩn đầu ra (Tiếng Anh)</label>
                       <input
                         type="text"
                         className={styles.formInput}
-                        placeholder="e.g. Guaranteed 12-15 Cambridge Shields / IELTS 6.5+..."
+                        placeholder="Ví dụ: Guaranteed 12-15 Cambridge Shields / IELTS 6.5+..."
                         value={formData.targetOutputEn}
                         onChange={(e) => setFormData({ ...formData, targetOutputEn: e.target.value })}
                       />
                     </div>
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label>Short Description (English)</label>
+                      <label>Mô tả ngắn khóa học (Tiếng Anh)</label>
                       <textarea
                         className={styles.formTextarea}
-                        placeholder="Enter short English course overview..."
+                        placeholder="Nhập mô tả tổng quan bằng tiếng Anh về khóa học..."
                         value={formData.descriptionEn}
                         onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
                       />
                     </div>
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label>Key Features (English) - 1 item per line</label>
+                      <label>Điểm nổi bật khóa học (Tiếng Anh) - Mỗi dòng 1 ý</label>
                       <textarea
                         className={styles.formTextarea}
-                        placeholder="e.g.:&#10;US Standard Phonics method&#10;100% Native English Teachers"
+                        placeholder="Ví dụ:&#10;US Standard Phonics method&#10;100% Native English Teachers"
                         value={featuresTextEn}
                         onChange={(e) => setFeaturesTextEn(e.target.value)}
                       />
                     </div>
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label>4Ls + LETI Syllabus (English) - 1 Module per line</label>
+                      <label>Khung chương trình 4Ls + LETI (Tiếng Anh) - Mỗi dòng 1 Module</label>
                       <textarea
                         className={styles.formTextarea}
-                        placeholder="e.g.:&#10;Module 1: Phonics & Alphabet Discovery&#10;Module 2: Family & Colors"
+                        placeholder="Ví dụ:&#10;Module 1: Phonics & Alphabet Discovery&#10;Module 2: Family & Colors"
                         value={syllabusTextEn}
                         onChange={(e) => setSyllabusTextEn(e.target.value)}
                       />
