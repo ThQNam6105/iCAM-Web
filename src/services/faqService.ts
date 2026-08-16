@@ -342,12 +342,23 @@ export const archiveFaq = async (id: string): Promise<FaqItem | null> => {
   return updateFaq(id, { status: 'archived' });
 };
 
-export const deleteFaq = async (id: string): Promise<boolean> => {
-  const list = getAllFaqs();
-  const filtered = list.filter((f) => f.id !== id);
-  saveFaqs(filtered);
-  await supabase.from('faq_items').delete().eq('id', id);
-  return true;
+export const deleteFaq = async (id: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error, count } = await supabase.from('faq_items').delete({ count: 'exact' }).eq('id', id);
+    if (error) {
+      console.error('Supabase delete faq error:', error.message);
+      return { success: false, error: error.message };
+    }
+    if (count === 0) {
+      console.warn(`Supabase delete faq warning: 0 rows affected for id ${id}.`);
+    }
+    const list = getAllFaqs();
+    const filtered = list.filter((f) => f.id !== id);
+    saveFaqs(filtered);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Network or connection failure' };
+  }
 };
 
 // HELPFUL VOTING SYSTEM WITH DUPLICATE PROTECTION

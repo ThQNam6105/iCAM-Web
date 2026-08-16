@@ -362,11 +362,20 @@ export const updateCareer = async (
 
 export const deleteCareer = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { error } = await supabase.from('careers_posts').delete().eq('id', id);
+    const { error, count } = await supabase
+      .from('careers_posts')
+      .delete({ count: 'exact' })
+      .eq('id', id);
+
     if (error) {
-      console.error('Supabase delete career error:', error.message);
+      console.error('Supabase delete career error:', error.message, error.details, error.hint);
       return { success: false, error: error.message };
     }
+
+    if (count === 0) {
+      console.warn(`Supabase delete career warning: 0 rows affected for id ${id}. Verify Supabase DELETE RLS policy.`);
+    }
+
     const list = getAllCareers();
     const filtered = list.filter((j) => j.id !== id);
     saveCareers(filtered);
