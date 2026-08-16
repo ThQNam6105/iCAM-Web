@@ -147,7 +147,7 @@ export const Careers: React.FC = () => {
   const processPdfFile = (file: File) => {
     if (!file) return;
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      showToast('⚠️ Vui lòng chỉ chọn 1 tập tin CV duy nhất với định dạng PDF (.pdf)!', 'error');
+      showToast('Vui lòng chỉ chọn 1 tập tin CV duy nhất với định dạng PDF (.pdf)!', 'error');
       return;
     }
     const sizeInMb = (file.size / (1024 * 1024)).toFixed(2);
@@ -161,7 +161,7 @@ export const Careers: React.FC = () => {
         size: sizeStr,
         dataUrl,
       });
-      showToast('Đã tải lên tập tin CV PDF thành công! ✓', 'success');
+      showToast('Đã tải lên tập tin CV PDF thành công!', 'success');
     };
     reader.readAsDataURL(file);
   };
@@ -169,7 +169,7 @@ export const Careers: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       if (e.target.files.length > 1) {
-        showToast('⚠️ Chỉ được phép tải lên duy nhất 1 tập tin PDF!', 'error');
+        showToast('Chỉ được phép tải lên duy nhất 1 tập tin PDF!', 'error');
         return;
       }
       processPdfFile(e.target.files[0]);
@@ -181,7 +181,7 @@ export const Careers: React.FC = () => {
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       if (e.dataTransfer.files.length > 1) {
-        showToast('⚠️ Chỉ được phép tải lên duy nhất 1 tập tin PDF!', 'error');
+        showToast('Chỉ được phép tải lên duy nhất 1 tập tin PDF!', 'error');
         return;
       }
       processPdfFile(e.dataTransfer.files[0]);
@@ -191,7 +191,7 @@ export const Careers: React.FC = () => {
   const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pdfFile) {
-      showToast('⚠️ Vui lòng tải lên hoặc kéo thả tập tin CV định dạng PDF!', 'error');
+      showToast('Vui lòng tải lên hoặc kéo thả tập tin CV định dạng PDF!', 'error');
       return;
     }
     if (!selectedJob) return;
@@ -218,7 +218,7 @@ export const Careers: React.FC = () => {
       });
 
       if (!res.success) {
-        showToast(`⚠️ Không thể gửi hồ sơ: ${res.error || 'Lỗi mạng'}`, 'error');
+        showToast(`Không thể gửi hồ sơ: ${res.error || 'Lỗi mạng'}`, 'error');
         return;
       }
 

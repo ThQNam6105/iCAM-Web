@@ -269,7 +269,7 @@ export const vi = {
     noteLabel: 'Link CV / Ghi chú thêm',
     notePlaceholder: 'Dán link Google Drive CV hoặc ghi chú kinh nghiệm...',
     submitApplyBtn: 'Gửi Hồ Sơ Ứng Tuyển',
-    successAlert: 'Nộp hồ sơ thành công! Bộ phận Tuyển sinh iCANCAM sẽ liên hệ với bạn trong vòng 48h làm việc.',
+    successAlert: 'Nộp hồ sơ thành công! iCANCAM sẽ phản hồi tới bạn trong thời gian sớm nhất (tối đa 2 tuần làm việc).',
   },
   faq: {
     heroBadge: 'TƯ VẤN & GIẢI ĐÁP iCANCAM',
