@@ -21,7 +21,36 @@ import {
 } from '../../services/courseService';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
+import { Select, type SelectOption } from '../../components/Admin/UI';
 import styles from './AdminCourses.module.css';
+
+const categoryFilterOptions: SelectOption[] = [
+  { value: 'all', label: 'Tất cả chương trình' },
+  { value: 'kids', label: 'Tiếng Anh Mầm Non / Tiểu Học' },
+  { value: 'teens', label: 'Tiếng Anh THCS / THPT' },
+  { value: 'ielts', label: 'Luyện Thi IELTS' },
+  { value: 'comm', label: 'Tiếng Anh Giao Tiếp' },
+];
+
+const statusFilterOptions: SelectOption[] = [
+  { value: 'all', label: 'Tất cả trạng thái' },
+  { value: 'active', label: 'Đang tuyển sinh' },
+  { value: 'paused', label: 'Tạm ngưng' },
+  { value: 'draft', label: 'Bản nháp' },
+];
+
+const formCategoryOptions: SelectOption[] = [
+  { value: 'kids', label: 'Tiếng Anh Mầm Non / Tiểu Học' },
+  { value: 'teens', label: 'Tiếng Anh THCS / THPT' },
+  { value: 'ielts', label: 'Luyện Thi IELTS' },
+  { value: 'comm', label: 'Tiếng Anh Giao Tiếp' },
+];
+
+const formStatusOptions: SelectOption[] = [
+  { value: 'active', label: 'Đang mở tuyển sinh' },
+  { value: 'paused', label: 'Tạm ngưng' },
+  { value: 'draft', label: 'Bản nháp' },
+];
 
 export const AdminCourses: React.FC = () => {
   const { showToast } = useToast();
@@ -310,28 +339,17 @@ export const AdminCourses: React.FC = () => {
         </div>
 
         <div className={styles.filterGroup}>
-          <select
-            className={styles.selectFilter}
+          <Select
+            options={categoryFilterOptions}
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value as any)}
-          >
-            <option value="all">Tất cả chương trình</option>
-            <option value="kids">Tiếng Anh Mầm Non / Tiểu Học</option>
-            <option value="teens">Tiếng Anh THCS / THPT</option>
-            <option value="ielts">Luyện Thi IELTS</option>
-            <option value="comm">Tiếng Anh Giao Tiếp</option>
-          </select>
+            onChange={(val) => setSelectedCategory(val as any)}
+          />
 
-          <select
-            className={styles.selectFilter}
+          <Select
+            options={statusFilterOptions}
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value as any)}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="active">Đang tuyển sinh</option>
-            <option value="paused">Tạm ngưng</option>
-            <option value="draft">Bản nháp</option>
-          </select>
+            onChange={(val) => setSelectedStatus(val as any)}
+          />
 
           <button className={styles.actionBtn} onClick={loadData} title="Tải lại dữ liệu">
             <RefreshCw size={16} />
@@ -458,16 +476,12 @@ export const AdminCourses: React.FC = () => {
 
                   <div className={styles.formGroup}>
                     <label>Phân loại chương trình *</label>
-                    <select
-                      className={styles.formSelect}
+                    <Select
+                      options={formCategoryOptions}
                       value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value as CourseCategory })}
-                    >
-                      <option value="kids">Tiếng Anh Mầm Non / Tiểu Học</option>
-                      <option value="teens">Tiếng Anh THCS / THPT</option>
-                      <option value="ielts">Luyện Thi IELTS</option>
-                      <option value="comm">Tiếng Anh Giao Tiếp</option>
-                    </select>
+                      onChange={(val) => setFormData({ ...formData, category: val as CourseCategory })}
+                      fullWidth
+                    />
                   </div>
 
                   <div className={styles.formGroup}>
@@ -580,15 +594,12 @@ export const AdminCourses: React.FC = () => {
 
                   <div className={styles.formGroup}>
                     <label>Trạng thái tuyển sinh</label>
-                    <select
-                      className={styles.formSelect}
+                    <Select
+                      options={formStatusOptions}
                       value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value as CourseStatus })}
-                    >
-                      <option value="active">Đang mở tuyển sinh</option>
-                      <option value="paused">Tạm ngưng</option>
-                      <option value="draft">Bản nháp</option>
-                    </select>
+                      onChange={(val) => setFormData({ ...formData, status: val as CourseStatus })}
+                      fullWidth
+                    />
                   </div>
                 </div>
               </div>
