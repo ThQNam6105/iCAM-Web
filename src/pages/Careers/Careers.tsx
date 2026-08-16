@@ -487,19 +487,19 @@ export const Careers: React.FC = () => {
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Bản CV / Hồ sơ ứng tuyển (Chuẩn định dạng PDF *):</label>
+                      <label>{t.careers.cvPdfLabel}</label>
                       {pdfFile ? (
                         <div className={styles.pdfFileCard}>
                           <FileText size={28} color="#ef4444" />
                           <div className={styles.pdfFileInfo}>
                             <span className={styles.pdfFileName}>{pdfFile.name}</span>
-                            <span className={styles.pdfFileSize}>{pdfFile.size} • Đã sẵn sàng gửi</span>
+                            <span className={styles.pdfFileSize}>{pdfFile.size} • {t.careers.cvPdfReadyText}</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => setPdfFile(null)}
                             className={styles.removePdfBtn}
-                            title="Xóa tệp PDF này"
+                            title={t.careers.cvPdfRemoveTitle}
                           >
                             <Trash2 size={16} />
                           </button>
@@ -524,15 +524,15 @@ export const Careers: React.FC = () => {
                           />
                           <UploadCloud size={36} color="#F58220" />
                           <p className={styles.dropZoneText}>
-                            Kéo thả tệp <strong>.PDF</strong> vào đây hoặc <span>Tải từ máy tính</span>
+                            {t.careers.cvPdfDropText} <strong>.PDF</strong> {language === 'en' ? 'here or' : 'vào đây hoặc'} <span>{t.careers.cvPdfUploadText}</span>
                           </p>
-                          <span className={styles.dropZoneSubtext}>Chỉ chấp nhận duy nhất 01 tập tin chuẩn định dạng PDF</span>
+                          <span className={styles.dropZoneSubtext}>{t.careers.cvPdfDropSubtext}</span>
                         </div>
                       )}
                     </div>
 
                     <button type="submit" className={styles.submitApplyBtn} disabled={isSubmittingApp}>
-                      <Send size={18} /> {isSubmittingApp ? 'Đang gửi hồ sơ...' : t.careers.submitApplyBtn}
+                      <Send size={18} /> {isSubmittingApp ? t.careers.submittingBtn : t.careers.submitApplyBtn}
                     </button>
                   </form>
                 </div>
