@@ -7,7 +7,6 @@ import {
   Trash2,
   CheckCircle2,
   PauseCircle,
-  Sparkles,
   X,
   RefreshCw,
 } from 'lucide-react';
@@ -293,16 +292,6 @@ export const AdminCourses: React.FC = () => {
           <div className={styles.statContent}>
             <span className={styles.statLabel}>Tạm ngưng / Nháp</span>
             <span className={styles.statValue}>{stats.paused}</span>
-          </div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.iconCategory}`}>
-            <Sparkles size={24} />
-          </div>
-          <div className={styles.statContent}>
-            <span className={styles.statLabel}>Khóa IELTS & Kid</span>
-            <span className={styles.statValue}>{stats.ielts + stats.kids}</span>
           </div>
         </div>
       </div>
