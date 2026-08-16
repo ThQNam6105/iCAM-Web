@@ -349,8 +349,14 @@ export const deleteFaq = async (id: string): Promise<{ success: boolean; error?:
       console.error('Supabase delete faq error:', error.message);
       return { success: false, error: error.message };
     }
-    if (count === 0) {
-      console.warn(`Supabase delete faq warning: 0 rows affected for id ${id}.`);
+    if (count === 0 || count === null) {
+      const checkDb = await supabase.from('faq_items').select('id').eq('id', id);
+      if (checkDb.data && checkDb.data.length > 0) {
+        return {
+          success: false,
+          error: 'Không thể xóa trên Supabase DB (Bị chặn bởi RLS DELETE Policy). Vui lòng chạy lệnh SQL cấp quyền DELETE!',
+        };
+      }
     }
     const list = getAllFaqs();
     const filtered = list.filter((f) => f.id !== id);

@@ -372,8 +372,15 @@ export const deleteCareer = async (id: string): Promise<{ success: boolean; erro
       return { success: false, error: error.message };
     }
 
-    if (count === 0) {
-      console.warn(`Supabase delete career warning: 0 rows affected for id ${id}. Verify Supabase DELETE RLS policy.`);
+    // Verify if record was actually deleted from Supabase PostgreSQL
+    if (count === 0 || count === null) {
+      const checkDb = await supabase.from('careers_posts').select('id').eq('id', id);
+      if (checkDb.data && checkDb.data.length > 0) {
+        return {
+          success: false,
+          error: 'Không thể xóa trên Supabase DB (Bị chặn bởi RLS DELETE Policy). Vui lòng chạy lệnh SQL cấp quyền DELETE!',
+        };
+      }
     }
 
     const list = getAllCareers();
