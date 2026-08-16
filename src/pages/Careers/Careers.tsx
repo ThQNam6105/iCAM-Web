@@ -397,13 +397,12 @@ export const Careers: React.FC = () => {
       <section className={styles.ctaSection}>
         <div className={styles.container}>
           <div className={styles.ctaCard}>
+            <div className={styles.ctaBadge}>
+              <Sparkles size={16} color="#F58220" />
+              <span>iCANCAM TALENT COMMUNITY</span>
+            </div>
             <h2>{t.careers.ctaTitle}</h2>
             <p>{t.careers.ctaDesc}</p>
-            <div className={styles.ctaButtons}>
-              <a href="mailto:thieunam2005@gmail.com" className={styles.primaryCtaBtn}>
-                {t.careers.ctaSendEmailBtn} <Send size={16} />
-              </a>
-            </div>
           </div>
         </div>
       </section>
