@@ -562,14 +562,25 @@ export const fetchCourseCategoriesFromSupabase = async (): Promise<CourseCategor
   return getCourseCategories();
 };
 
+const slugify = (text: string) => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
 export const createCourseCategory = async (
   item: Omit<CourseCategoryItem, 'id'> & { id?: string }
 ): Promise<{ success: boolean; data?: CourseCategoryItem; error?: string }> => {
   const categories = getCourseCategories();
-  const catId = item.id ? item.id.toLowerCase().trim() : `cat_${Date.now()}`;
+  let catId = item.id ? item.id.toLowerCase().trim() : slugify(item.nameVi);
+  if (!catId) catId = `cat_${Date.now()}`;
 
   if (categories.some((c) => c.id === catId)) {
-    return { success: false, error: 'Mã loại chương trình này đã tồn tại!' };
+    catId = `${catId}_${Date.now()}`;
   }
 
   const newCat: CourseCategoryItem = {

@@ -749,19 +749,6 @@ export const AdminCourses: React.FC = () => {
                 </h3>
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
-                    <label>Mã / Slug Loại (Ví dụ: summer, kids) *</label>
-                    <input
-                      type="text"
-                      required
-                      disabled={!!editingCat}
-                      placeholder="kids, ielts, summer..."
-                      className={styles.formInput}
-                      value={catFormData.id}
-                      onChange={(e) => setCatFormData({ ...catFormData, id: e.target.value })}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
                     <label>Tên Chương Trình (Tiếng Việt) *</label>
                     <input
                       type="text"
@@ -773,7 +760,7 @@ export const AdminCourses: React.FC = () => {
                     />
                   </div>
 
-                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                  <div className={styles.formGroup}>
                     <label>Tên Chương Trình (Tiếng Anh)</label>
                     <input
                       type="text"
@@ -806,19 +793,19 @@ export const AdminCourses: React.FC = () => {
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                       <tr style={{ background: 'rgba(0,0,0,0.3)', color: '#94a3b8', fontSize: '0.8rem' }}>
-                        <th style={{ padding: '0.75rem 1rem' }}>Mã Slug</th>
-                        <th style={{ padding: '0.75rem 1rem' }}>Tên Tiếng Việt</th>
+                        <th style={{ padding: '0.75rem 1rem' }}>Tên Chương Trình (Tiếng Việt)</th>
+                        <th style={{ padding: '0.75rem 1rem' }}>Tên Tiếng Anh</th>
                         <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Thao Tác</th>
                       </tr>
                     </thead>
                     <tbody>
                       {categoriesList.map((cat) => (
                         <tr key={cat.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 800, color: '#F58220', fontFamily: 'monospace' }}>
-                            {cat.id}
-                          </td>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#ffffff' }}>
+                          <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#ffffff' }}>
                             {cat.nameVi}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#94a3b8' }}>
+                            {cat.nameEn || cat.nameVi}
                           </td>
                           <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
                             <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
