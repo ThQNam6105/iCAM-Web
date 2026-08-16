@@ -5,7 +5,6 @@ import {
   FolderTree,
   Image as ImageIcon,
   GraduationCap,
-  Users,
   HelpCircle,
   Briefcase,
   Settings,
@@ -69,14 +68,6 @@ export const AdminSidebar: React.FC = () => {
           <GraduationCap size={18} />
           <span>Khóa học</span>
         </div>
-
-        <NavLink
-          to="/admin/staff"
-          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-        >
-          <Users size={18} />
-          <span>Quản lý nhân sự</span>
-        </NavLink>
 
         <NavLink
           to="/admin/faq"

@@ -20,7 +20,6 @@ import { AdminFAQ } from '../pages/Admin/AdminFAQ';
 import { AdminCategories } from '../pages/Admin/AdminCategories';
 import { AdminMediaLibrary } from '../pages/Admin/AdminMediaLibrary';
 import { AdminSettings } from '../pages/Admin/AdminSettings';
-import { AdminStaff } from '../pages/Admin/AdminStaff';
 
 export const AppRouter: React.FC = () => {
   const base = import.meta.env.BASE_URL;
@@ -44,7 +43,6 @@ export const AppRouter: React.FC = () => {
           <Route path="media" element={<AdminMediaLibrary />} />
           <Route path="faq" element={<AdminFAQ />} />
           <Route path="careers" element={<AdminCareers />} />
-          <Route path="staff" element={<AdminStaff />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
         <Route path="/" element={<Layout />}>
