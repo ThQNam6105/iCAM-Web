@@ -19,7 +19,7 @@ import {
 import styles from './Curriculum.module.css';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
-import { fetchCoursesFromSupabase } from '../../services/courseService';
+import { fetchCoursesFromSupabase, fetchCourseCategoriesFromSupabase, type CourseCategoryItem } from '../../services/courseService';
 
 interface Course {
   id: string;
@@ -286,8 +286,15 @@ export const Curriculum: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [liveCourses, setLiveCourses] = useState<Course[]>(coursesData);
+  const [categoriesList, setCategoriesList] = useState<CourseCategoryItem[]>([]);
 
   React.useEffect(() => {
+    fetchCourseCategoriesFromSupabase().then((cats) => {
+      if (cats && cats.length > 0) {
+        setCategoriesList(cats);
+      }
+    });
+
     fetchCoursesFromSupabase().then((data) => {
       if (data && data.length > 0) {
         const mapped: Course[] = data
@@ -350,36 +357,50 @@ export const Curriculum: React.FC = () => {
             >
               {t.curriculum.filterAll}
             </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'kids' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('kids')}
-            >
-              {t.curriculum.filterKids}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'teens' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('teens')}
-            >
-              {t.curriculum.filterTeens}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'ielts' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('ielts')}
-            >
-              {t.curriculum.filterIelts}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'comm' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('comm')}
-            >
-              {t.curriculum.filterComm}
-            </button>
-            <button
-              className={`${styles.filterBtn} ${activeCategory === 'online' ? styles.activeFilter : ''}`}
-              onClick={() => setActiveCategory('online')}
-            >
-              {t.curriculum.filterOnline}
-            </button>
+            {categoriesList.length > 0 ? (
+              categoriesList.map((cat) => (
+                <button
+                  key={cat.id}
+                  className={`${styles.filterBtn} ${activeCategory === cat.id ? styles.activeFilter : ''}`}
+                  onClick={() => setActiveCategory(cat.id)}
+                >
+                  {language === 'en' ? (cat.nameEn || cat.nameVi) : cat.nameVi}
+                </button>
+              ))
+            ) : (
+              <>
+                <button
+                  className={`${styles.filterBtn} ${activeCategory === 'kids' ? styles.activeFilter : ''}`}
+                  onClick={() => setActiveCategory('kids')}
+                >
+                  {t.curriculum.filterKids}
+                </button>
+                <button
+                  className={`${styles.filterBtn} ${activeCategory === 'teens' ? styles.activeFilter : ''}`}
+                  onClick={() => setActiveCategory('teens')}
+                >
+                  {t.curriculum.filterTeens}
+                </button>
+                <button
+                  className={`${styles.filterBtn} ${activeCategory === 'ielts' ? styles.activeFilter : ''}`}
+                  onClick={() => setActiveCategory('ielts')}
+                >
+                  {t.curriculum.filterIelts}
+                </button>
+                <button
+                  className={`${styles.filterBtn} ${activeCategory === 'comm' ? styles.activeFilter : ''}`}
+                  onClick={() => setActiveCategory('comm')}
+                >
+                  {t.curriculum.filterComm}
+                </button>
+                <button
+                  className={`${styles.filterBtn} ${activeCategory === 'online' ? styles.activeFilter : ''}`}
+                  onClick={() => setActiveCategory('online')}
+                >
+                  {t.curriculum.filterOnline}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </section>

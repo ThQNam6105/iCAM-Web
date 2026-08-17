@@ -626,15 +626,48 @@
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .heroSection {
-    padding: 4rem 1rem 3rem 1rem;
+    padding: 3.5rem 1rem 2.5rem 1rem;
+  }
+
+  .filterBar {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.5rem 0.25rem 0.75rem 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .filterBar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filterBtn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.85rem;
+  }
+
+  .coursesGrid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+
+  .courseCard {
+    padding: 1.5rem 1.25rem;
   }
 
   .modalCard {
     padding: 1.75rem 1.25rem;
+    max-height: 85vh;
+    overflow-y: auto;
   }
 
   .ctaCard {
-    padding: 3rem 1.5rem;
+    padding: 2.5rem 1.25rem;
   }
 }
 
