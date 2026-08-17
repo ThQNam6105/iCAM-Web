@@ -336,6 +336,10 @@ export const markCourseAsDeleted = (id: string) => {
   localStorage.setItem(DELETED_COURSES_KEY, JSON.stringify(Array.from(ids)));
 };
 
+export const saveDeletedCourseIds = (idsList: string[]) => {
+  localStorage.setItem(DELETED_COURSES_KEY, JSON.stringify(Array.from(new Set(idsList))));
+};
+
 export const getAllCourses = (): CourseItem[] => {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -363,10 +367,29 @@ export const saveCourses = (list: CourseItem[]) => {
 };
 
 export const fetchCoursesFromSupabase = async (): Promise<CourseItem[]> => {
+  let globalDeletedIds = getDeletedCourseIds();
+  try {
+    const { data: settingsData } = await supabase
+      .from('system_settings')
+      .select('value')
+      .eq('key', 'icancam_deleted_course_ids')
+      .maybeSingle();
+    if (settingsData && settingsData.value) {
+      const parsed = JSON.parse(settingsData.value);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        globalDeletedIds = Array.from(new Set([...globalDeletedIds, ...parsed]));
+        saveDeletedCourseIds(globalDeletedIds);
+      }
+    }
+  } catch (err) {
+    // Ignore settings fetch error
+  }
+
+  const deletedSet = new Set(globalDeletedIds);
+
   try {
     const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
     if (!error && data && data.length > 0) {
-      const deletedSet = new Set(getDeletedCourseIds());
       const coursesFromDb: CourseItem[] = data
         .filter((item) => !deletedSet.has(item.id))
         .map((item) => {
@@ -498,6 +521,23 @@ export const deleteCourse = async (id: string): Promise<{ success: boolean; erro
   const list = getAllCourses();
   const filtered = list.filter((c) => c.id !== id);
   saveCourses(filtered);
+
+  try {
+    await supabase.from('courses').delete().eq('id', id);
+  } catch (err) {
+    console.warn('Supabase delete course notice:', err);
+  }
+
+  try {
+    const deletedList = getDeletedCourseIds();
+    await supabase.from('system_settings').upsert({
+      key: 'icancam_deleted_course_ids',
+      value: JSON.stringify(deletedList),
+      updated_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.warn('Supabase system_settings sync notice:', err);
+  }
 
   return { success: true };
 };

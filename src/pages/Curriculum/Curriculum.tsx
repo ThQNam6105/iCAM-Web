@@ -19,7 +19,7 @@ import {
 import styles from './Curriculum.module.css';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
-import { fetchCoursesFromSupabase, fetchCourseCategoriesFromSupabase, type CourseCategoryItem } from '../../services/courseService';
+import { fetchCoursesFromSupabase, fetchCourseCategoriesFromSupabase, getAllCourses, type CourseCategoryItem, type CourseItem } from '../../services/courseService';
 
 interface Course {
   id: string;
@@ -43,6 +43,29 @@ interface Course {
   syllabus: string[];
   syllabusEn?: string[];
 }
+
+const mapCourseItemToCourse = (c: CourseItem): Course => ({
+  id: c.id,
+  category: c.category,
+  title: c.titleVi,
+  titleEn: c.titleEn || c.titleVi,
+  badge: c.badgeVi || c.courseCode,
+  badgeEn: c.badgeEn || c.courseCode,
+  age: c.targetAgeVi,
+  ageEn: c.targetAgeEn || c.targetAgeVi,
+  desc: c.descriptionVi,
+  descEn: c.descriptionEn || c.descriptionVi,
+  duration: c.durationVi,
+  durationEn: c.durationEn || c.durationVi,
+  level: c.levelVi,
+  levelEn: c.levelEn || c.levelVi,
+  target: c.targetOutputVi,
+  targetEn: c.targetOutputEn || c.targetOutputVi,
+  features: c.featuresVi,
+  featuresEn: c.featuresEn && c.featuresEn.length ? c.featuresEn : c.featuresVi,
+  syllabus: c.syllabusVi,
+  syllabusEn: c.syllabusEn && c.syllabusEn.length ? c.syllabusEn : c.syllabusVi,
+});
 
 const coursesData: Course[] = [
   {
@@ -285,7 +308,10 @@ export const Curriculum: React.FC = () => {
   const { language, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [liveCourses, setLiveCourses] = useState<Course[]>(coursesData);
+  const [liveCourses, setLiveCourses] = useState<Course[]>(() => {
+    const activeLocal = getAllCourses().filter((c) => c.status === 'active');
+    return activeLocal.length > 0 ? activeLocal.map(mapCourseItemToCourse) : coursesData;
+  });
   const [categoriesList, setCategoriesList] = useState<CourseCategoryItem[]>([]);
 
   React.useEffect(() => {
@@ -299,28 +325,7 @@ export const Curriculum: React.FC = () => {
       if (data && data.length > 0) {
         const mapped: Course[] = data
           .filter((c) => c.status === 'active')
-          .map((c) => ({
-            id: c.id,
-            category: c.category,
-            title: c.titleVi,
-            titleEn: c.titleEn || c.titleVi,
-            badge: c.badgeVi || c.courseCode,
-            badgeEn: c.badgeEn || c.courseCode,
-            age: c.targetAgeVi,
-            ageEn: c.targetAgeEn || c.targetAgeVi,
-            desc: c.descriptionVi,
-            descEn: c.descriptionEn || c.descriptionVi,
-            duration: c.durationVi,
-            durationEn: c.durationEn || c.durationVi,
-            level: c.levelVi,
-            levelEn: c.levelEn || c.levelVi,
-            target: c.targetOutputVi,
-            targetEn: c.targetOutputEn || c.targetOutputVi,
-            features: c.featuresVi,
-            featuresEn: c.featuresEn && c.featuresEn.length ? c.featuresEn : c.featuresVi,
-            syllabus: c.syllabusVi,
-            syllabusEn: c.syllabusEn && c.syllabusEn.length ? c.syllabusEn : c.syllabusVi,
-          }));
+          .map(mapCourseItemToCourse);
         setLiveCourses(mapped);
       }
     });
