@@ -27,6 +27,59 @@ export const markTeacherAsDeleted = (id: string) => {
 
 let inMemoryTeachers: Teacher[] | null = null;
 
+// IndexedDB Helper for Teacher Data
+const DB_NAME = 'icancam_cms_db_v1';
+const DB_VERSION = 1;
+let dbPromise: Promise<IDBDatabase> | null = null;
+
+const getIDB = (): Promise<IDBDatabase> => {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      reject(new Error('IndexedDB unavailable'));
+      return;
+    }
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('teachers')) {
+        db.createObjectStore('teachers', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  return dbPromise;
+};
+
+const saveTeachersToIDB = async (teachers: Teacher[]) => {
+  try {
+    const db = await getIDB();
+    const tx = db.transaction('teachers', 'readwrite');
+    const store = tx.objectStore('teachers');
+    store.clear();
+    for (const t of teachers) {
+      store.put(t);
+    }
+  } catch {
+    // Ignore
+  }
+};
+
+const getTeachersFromIDB = async (): Promise<Teacher[]> => {
+  try {
+    const db = await getIDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction('teachers', 'readonly');
+      const req = tx.objectStore('teachers').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch {
+    return [];
+  }
+};
+
 export const getAllTeachers = (): Teacher[] => {
   if (inMemoryTeachers) {
     const deletedSet = new Set(getDeletedTeacherIds());
@@ -56,6 +109,7 @@ export const saveTeachers = (list: Teacher[]) => {
   const deletedSet = new Set(getDeletedTeacherIds());
   const cleanList = list.filter((t) => !deletedSet.has(t.id));
   inMemoryTeachers = cleanList;
+  saveTeachersToIDB(cleanList);
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
   } catch (err) {
@@ -64,7 +118,14 @@ export const saveTeachers = (list: Teacher[]) => {
 };
 
 export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
+  const idbTeachers = await getTeachersFromIDB();
   const localList = getAllTeachers();
+
+  const localMap = new Map<string, Teacher>();
+  for (const t of localList) localMap.set(t.id, t);
+  for (const t of idbTeachers) localMap.set(t.id, t);
+  const currentLocalTeachers = Array.from(localMap.values());
+
   let globalDeletedIds = getDeletedTeacherIds();
   try {
     const { data: settingsData } = await supabase
@@ -103,13 +164,12 @@ export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
           };
         });
 
-      // MERGE Supabase DB with LocalStorage (Local edits take priority over old DB rows)
       const mergedMap = new Map<string, Teacher>();
       for (const item of teachersFromDb) {
         mergedMap.set(item.id, item);
       }
-      for (const item of localList) {
-        mergedMap.set(item.id, item); // Local item OVERRIDES DB item so user edits are NEVER lost!
+      for (const item of currentLocalTeachers) {
+        mergedMap.set(item.id, item); // Local/IndexedDB item OVERRIDES DB item so user edits are NEVER lost!
       }
 
       const mergedList = Array.from(mergedMap.values()).filter((t) => !deletedSet.has(t.id));
@@ -120,7 +180,7 @@ export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
     console.warn('Supabase teachers table offline or not synced yet:', err);
   }
 
-  return localList;
+  return currentLocalTeachers.length > 0 ? currentLocalTeachers : localList;
 };
 
 export const syncTeacherToSupabase = async (teacher: Teacher): Promise<{ success: boolean; error?: string }> => {

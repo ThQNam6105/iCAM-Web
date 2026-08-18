@@ -27,6 +27,62 @@ export const markStudentAsDeleted = (id: string) => {
 
 let inMemoryStudents: Student[] | null = null;
 
+// IndexedDB Helper for Student Data (No 5MB Quota limit for large image Data URLs)
+const DB_NAME = 'icancam_cms_db_v1';
+const DB_VERSION = 1;
+let dbPromise: Promise<IDBDatabase> | null = null;
+
+const getIDB = (): Promise<IDBDatabase> => {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      reject(new Error('IndexedDB unavailable'));
+      return;
+    }
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('students')) {
+        db.createObjectStore('students', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('teachers')) {
+        db.createObjectStore('teachers', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  return dbPromise;
+};
+
+const saveStudentsToIDB = async (students: Student[]) => {
+  try {
+    const db = await getIDB();
+    const tx = db.transaction('students', 'readwrite');
+    const store = tx.objectStore('students');
+    store.clear();
+    for (const s of students) {
+      store.put(s);
+    }
+  } catch {
+    // Ignore
+  }
+};
+
+const getStudentsFromIDB = async (): Promise<Student[]> => {
+  try {
+    const db = await getIDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction('students', 'readonly');
+      const req = tx.objectStore('students').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch {
+    return [];
+  }
+};
+
 export const getAllStudents = (): Student[] => {
   if (inMemoryStudents) {
     const deletedSet = new Set(getDeletedStudentIds());
@@ -56,6 +112,7 @@ export const saveStudents = (list: Student[]) => {
   const deletedSet = new Set(getDeletedStudentIds());
   const cleanList = list.filter((s) => !deletedSet.has(s.id));
   inMemoryStudents = cleanList;
+  saveStudentsToIDB(cleanList);
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
   } catch (err) {
@@ -64,7 +121,15 @@ export const saveStudents = (list: Student[]) => {
 };
 
 export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
+  const idbStudents = await getStudentsFromIDB();
   const localList = getAllStudents();
+
+  // Combine LocalStorage and IndexedDB (IndexedDB takes priority for large images)
+  const localMap = new Map<string, Student>();
+  for (const s of localList) localMap.set(s.id, s);
+  for (const s of idbStudents) localMap.set(s.id, s);
+  const currentLocalStudents = Array.from(localMap.values());
+
   let globalDeletedIds = getDeletedStudentIds();
   try {
     const { data: settingsData } = await supabase
@@ -104,13 +169,12 @@ export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
           };
         });
 
-      // MERGE Supabase DB with LocalStorage (Local edits take priority over old DB rows)
       const mergedMap = new Map<string, Student>();
       for (const item of studentsFromDb) {
         mergedMap.set(item.id, item);
       }
-      for (const item of localList) {
-        mergedMap.set(item.id, item); // Local item OVERRIDES DB item so user edits are NEVER lost!
+      for (const item of currentLocalStudents) {
+        mergedMap.set(item.id, item); // Local/IndexedDB item OVERRIDES DB item so user edits are NEVER lost!
       }
 
       const mergedList = Array.from(mergedMap.values()).filter((s) => !deletedSet.has(s.id));
@@ -121,7 +185,7 @@ export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
     console.warn('Supabase students table offline or not synced yet:', err);
   }
 
-  return localList;
+  return currentLocalStudents.length > 0 ? currentLocalStudents : localList;
 };
 
 export const syncStudentToSupabase = async (student: Student): Promise<{ success: boolean; error?: string }> => {
