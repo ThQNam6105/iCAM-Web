@@ -54,6 +54,20 @@ export const getAllStudents = (): Student[] => {
   }
 };
 
+export const syncStudentsToSystemSettings = async (list: Student[]) => {
+  try {
+    const deletedSet = new Set(getDeletedStudentIds());
+    const cleanList = list.filter((s) => !deletedSet.has(s.id));
+    await supabase.from('system_settings').upsert({
+      key: 'icancam_all_students_v1',
+      value: JSON.stringify(cleanList),
+      updated_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.warn('Supabase system_settings students sync notice:', err);
+  }
+};
+
 export const saveStudents = (list: Student[]) => {
   const deletedSet = new Set(getDeletedStudentIds());
   const cleanList = list.filter((s) => !deletedSet.has(s.id));
@@ -64,6 +78,7 @@ export const saveStudents = (list: Student[]) => {
   } catch (err) {
     console.warn('LocalStorage save warning in studentService:', err);
   }
+  syncStudentsToSystemSettings(cleanList);
 };
 
 export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
@@ -96,6 +111,37 @@ export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
 
   const deletedSet = new Set(globalDeletedIds);
 
+  // Cross-device & Mobile sync: Try reading global students list from Supabase system_settings first!
+  try {
+    const { data: globalSetting } = await supabase
+      .from('system_settings')
+      .select('value')
+      .eq('key', 'icancam_all_students_v1')
+      .maybeSingle();
+
+    if (globalSetting && globalSetting.value) {
+      const parsed: Student[] = JSON.parse(globalSetting.value);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const cleanGlobal = parsed.filter((s) => !deletedSet.has(s.id));
+        const mergedMap = new Map<string, Student>();
+        for (const s of cleanGlobal) mergedMap.set(s.id, s);
+        for (const s of currentLocalStudents) mergedMap.set(s.id, s);
+        const mergedList = Array.from(mergedMap.values()).filter((s) => !deletedSet.has(s.id));
+        
+        inMemoryStudents = mergedList;
+        saveStudentsIDB(mergedList);
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedList));
+        } catch {
+          // Ignore
+        }
+        return mergedList;
+      }
+    }
+  } catch (err) {
+    console.warn('System settings global students fetch notice:', err);
+  }
+
   try {
     const { data, error } = await supabase.from('students').select('*').order('created_at', { ascending: false });
     if (!error && data && data.length > 0) {
@@ -120,7 +166,7 @@ export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
         mergedMap.set(item.id, item);
       }
       for (const item of currentLocalStudents) {
-        mergedMap.set(item.id, item); // Local/IndexedDB item OVERRIDES DB item so user edits are NEVER lost!
+        mergedMap.set(item.id, item);
       }
 
       const mergedList = Array.from(mergedMap.values()).filter((s) => !deletedSet.has(s.id));
