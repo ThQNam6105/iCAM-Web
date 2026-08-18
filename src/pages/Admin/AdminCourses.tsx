@@ -30,6 +30,7 @@ import {
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
 import { Select, type SelectOption } from '../../components/Admin/UI';
+import { MediaSelectorModal } from '../../components/Admin/MediaSelectorModal';
 import styles from './AdminCourses.module.css';
 
 const statusFilterOptions: SelectOption[] = [
@@ -58,6 +59,8 @@ export const AdminCourses: React.FC = () => {
 
   // Course Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+  const [mediaTargetField, setMediaTargetField] = useState<'thumbnail' | 'banner'>('thumbnail');
   const [editingCourse, setEditingCourse] = useState<CourseItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -613,6 +616,33 @@ export const AdminCourses: React.FC = () => {
                       fullWidth
                     />
                   </div>
+
+                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                    <label>Ảnh Khóa Học / Thumbnail</label>
+                    <div className={styles.imagePickerWrapper}>
+                      <div className={styles.mediaPickerGroup}>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="Dán URL ảnh hoặc chọn từ thư viện..."
+                          value={formData.thumbnailUrl || ''}
+                          onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                          style={{ flex: 1 }}
+                        />
+                        <button
+                          type="button"
+                          className={styles.selectMediaBtn}
+                          onClick={() => {
+                            setMediaTargetField('thumbnail');
+                            setIsMediaModalOpen(true);
+                          }}
+                        >
+                          <FolderTree size={16} />
+                          <span>Thư Viện Hệ Thống</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* BILINGUAL LANGUAGE TABS */}
@@ -927,6 +957,24 @@ export const AdminCourses: React.FC = () => {
         cancelLabel="Hủy"
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteId(null)}
+      />
+      {/* MEDIA SELECTOR MODAL */}
+      <MediaSelectorModal
+        isOpen={isMediaModalOpen}
+        onClose={() => setIsMediaModalOpen(false)}
+        onSelect={(assets) => {
+          if (assets && assets.length > 0) {
+            if (mediaTargetField === 'thumbnail') {
+              setFormData({ ...formData, thumbnailUrl: assets[0].public_url });
+            } else {
+              setFormData({ ...formData, bannerUrl: assets[0].public_url });
+            }
+          }
+          setIsMediaModalOpen(false);
+        }}
+        allowMultiple={false}
+        filterType="image"
+        title="Chọn Tài Nguyên Từ Thư Viện Hệ Thống"
       />
     </div>
   );

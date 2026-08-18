@@ -9,7 +9,8 @@ import {
   Award,
   GraduationCap,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  FolderTree
 } from 'lucide-react';
 import styles from './AdminTeachers.module.css';
 import {
@@ -20,6 +21,7 @@ import {
   updateTeacher,
   deleteTeacher
 } from '../../services/teacherService';
+import { MediaSelectorModal } from '../../components/Admin/MediaSelectorModal';
 import { useToast } from '../../components/Toast/Toast';
 
 export const AdminTeachers: React.FC = () => {
@@ -27,6 +29,7 @@ export const AdminTeachers: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [activeLangTab, setActiveLangTab] = useState<'vi' | 'en'>('vi');
 
@@ -405,14 +408,36 @@ export const AdminTeachers: React.FC = () => {
                     </div>
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                      <label>Đường Dẫn Ảnh Đại Diện (URL Image)</label>
-                      <input
-                        type="text"
-                        className={styles.formInput}
-                        placeholder="https://..."
-                        value={image}
-                        onChange={(e) => setImage(e.target.value)}
-                      />
+                      <label>Ảnh Đại Diện Giáo Viên *</label>
+                      <div className={styles.imagePickerWrapper}>
+                        <div className={styles.mediaPickerGroup}>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Dán đường dẫn ảnh hoặc chọn từ thư viện..."
+                            value={image}
+                            onChange={(e) => setImage(e.target.value)}
+                            style={{ flex: 1 }}
+                          />
+                          <button
+                            type="button"
+                            className={styles.selectMediaBtn}
+                            onClick={() => setIsMediaModalOpen(true)}
+                          >
+                            <FolderTree size={16} />
+                            <span>Thư Viện Hệ Thống</span>
+                          </button>
+                        </div>
+                        {image && (
+                          <div className={styles.imagePreviewBox}>
+                            <img src={image} alt="Preview" className={styles.imagePreviewImg} />
+                            <div className={styles.imagePreviewInfo}>
+                              <strong>Xem trước ảnh đại diện</strong>
+                              <div style={{ wordBreak: 'break-all', opacity: 0.8 }}>{image}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -544,6 +569,21 @@ export const AdminTeachers: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* MEDIA SELECTOR MODAL */}
+      <MediaSelectorModal
+        isOpen={isMediaModalOpen}
+        onClose={() => setIsMediaModalOpen(false)}
+        onSelect={(assets) => {
+          if (assets && assets.length > 0) {
+            setImage(assets[0].public_url);
+          }
+          setIsMediaModalOpen(false);
+        }}
+        allowMultiple={false}
+        filterType="image"
+        title="Chọn Ảnh Đại Diện Giáo Viên Từ Thư Viện System"
+      />
     </div>
   );
 };
