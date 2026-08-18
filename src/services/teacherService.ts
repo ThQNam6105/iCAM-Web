@@ -25,70 +25,9 @@ export const markTeacherAsDeleted = (id: string) => {
   saveDeletedTeacherIds(Array.from(ids));
 };
 
+import { saveTeachersIDB, getTeachersIDB } from './cmsStorage';
+
 let inMemoryTeachers: Teacher[] | null = null;
-
-// IndexedDB Helper for Teacher Data
-const DB_NAME = 'icancam_cms_db_v1';
-const DB_VERSION = 1;
-let dbPromise: Promise<IDBDatabase> | null = null;
-
-const getIDB = (): Promise<IDBDatabase> => {
-  if (dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve, reject) => {
-    if (typeof window === 'undefined' || !window.indexedDB) {
-      reject(new Error('IndexedDB unavailable'));
-      return;
-    }
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains('teachers')) {
-        db.createObjectStore('teachers', { keyPath: 'id' });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-  return dbPromise;
-};
-
-const saveTeachersToIDB = async (teachers: Teacher[]) => {
-  try {
-    const db = await getIDB();
-    const tx = db.transaction('teachers', 'readwrite');
-    const store = tx.objectStore('teachers');
-    store.clear();
-    for (const t of teachers) {
-      store.put(t);
-    }
-  } catch {
-    // Ignore
-  }
-};
-
-const getTeachersFromIDB = async (): Promise<Teacher[]> => {
-  try {
-    const fetchPromise = new Promise<Teacher[]>((resolve) => {
-      getIDB()
-        .then((db) => {
-          if (!db.objectStoreNames.contains('teachers')) {
-            resolve([]);
-            return;
-          }
-          const tx = db.transaction('teachers', 'readonly');
-          const req = tx.objectStore('teachers').getAll();
-          req.onsuccess = () => resolve(req.result || []);
-          req.onerror = () => resolve([]);
-        })
-        .catch(() => resolve([]));
-    });
-
-    const timeoutPromise = new Promise<Teacher[]>((resolve) => setTimeout(() => resolve([]), 300));
-    return await Promise.race([fetchPromise, timeoutPromise]);
-  } catch {
-    return [];
-  }
-};
 
 export const getAllTeachers = (): Teacher[] => {
   if (inMemoryTeachers) {
@@ -119,7 +58,7 @@ export const saveTeachers = (list: Teacher[]) => {
   const deletedSet = new Set(getDeletedTeacherIds());
   const cleanList = list.filter((t) => !deletedSet.has(t.id));
   inMemoryTeachers = cleanList;
-  saveTeachersToIDB(cleanList);
+  saveTeachersIDB(cleanList);
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
   } catch (err) {
@@ -128,7 +67,7 @@ export const saveTeachers = (list: Teacher[]) => {
 };
 
 export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
-  const idbTeachers = await getTeachersFromIDB();
+  const idbTeachers = await getTeachersIDB();
   const localList = getAllTeachers();
 
   const localMap = new Map<string, Teacher>();

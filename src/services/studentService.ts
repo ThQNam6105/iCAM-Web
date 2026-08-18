@@ -25,73 +25,9 @@ export const markStudentAsDeleted = (id: string) => {
   saveDeletedStudentIds(Array.from(ids));
 };
 
+import { saveStudentsIDB, getStudentsIDB } from './cmsStorage';
+
 let inMemoryStudents: Student[] | null = null;
-
-// IndexedDB Helper for Student Data (No 5MB Quota limit for large image Data URLs)
-const DB_NAME = 'icancam_cms_db_v1';
-const DB_VERSION = 1;
-let dbPromise: Promise<IDBDatabase> | null = null;
-
-const getIDB = (): Promise<IDBDatabase> => {
-  if (dbPromise) return dbPromise;
-  dbPromise = new Promise((resolve, reject) => {
-    if (typeof window === 'undefined' || !window.indexedDB) {
-      reject(new Error('IndexedDB unavailable'));
-      return;
-    }
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    request.onupgradeneeded = () => {
-      const db = request.result;
-      if (!db.objectStoreNames.contains('students')) {
-        db.createObjectStore('students', { keyPath: 'id' });
-      }
-      if (!db.objectStoreNames.contains('teachers')) {
-        db.createObjectStore('teachers', { keyPath: 'id' });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-  return dbPromise;
-};
-
-const saveStudentsToIDB = async (students: Student[]) => {
-  try {
-    const db = await getIDB();
-    const tx = db.transaction('students', 'readwrite');
-    const store = tx.objectStore('students');
-    store.clear();
-    for (const s of students) {
-      store.put(s);
-    }
-  } catch {
-    // Ignore
-  }
-};
-
-const getStudentsFromIDB = async (): Promise<Student[]> => {
-  try {
-    const fetchPromise = new Promise<Student[]>((resolve) => {
-      getIDB()
-        .then((db) => {
-          if (!db.objectStoreNames.contains('students')) {
-            resolve([]);
-            return;
-          }
-          const tx = db.transaction('students', 'readonly');
-          const req = tx.objectStore('students').getAll();
-          req.onsuccess = () => resolve(req.result || []);
-          req.onerror = () => resolve([]);
-        })
-        .catch(() => resolve([]));
-    });
-
-    const timeoutPromise = new Promise<Student[]>((resolve) => setTimeout(() => resolve([]), 300));
-    return await Promise.race([fetchPromise, timeoutPromise]);
-  } catch {
-    return [];
-  }
-};
 
 export const getAllStudents = (): Student[] => {
   if (inMemoryStudents) {
@@ -122,7 +58,7 @@ export const saveStudents = (list: Student[]) => {
   const deletedSet = new Set(getDeletedStudentIds());
   const cleanList = list.filter((s) => !deletedSet.has(s.id));
   inMemoryStudents = cleanList;
-  saveStudentsToIDB(cleanList);
+  saveStudentsIDB(cleanList);
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
   } catch (err) {
@@ -131,7 +67,7 @@ export const saveStudents = (list: Student[]) => {
 };
 
 export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
-  const idbStudents = await getStudentsFromIDB();
+  const idbStudents = await getStudentsIDB();
   const localList = getAllStudents();
 
   // Combine LocalStorage and IndexedDB (IndexedDB takes priority for large images)
