@@ -641,6 +641,37 @@ export const AdminCourses: React.FC = () => {
                           <span>Thư Viện Hệ Thống</span>
                         </button>
                       </div>
+                      {formData.thumbnailUrl && (
+                        <div className={styles.imagePreviewBox}>
+                          <img src={formData.thumbnailUrl} alt="Preview" className={styles.imagePreviewImg} />
+                          <div className={styles.imagePreviewInfo} style={{ flex: 1 }}>
+                            <strong>Xem trước ảnh khóa học</strong>
+                            <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginTop: '2px' }}>
+                              {formData.thumbnailUrl.startsWith('data:image/')
+                                ? `📷 Tệp ảnh ${formData.thumbnailUrl.split(';')[0].replace('data:image/', '').toUpperCase()} từ Thư viện Media`
+                                : formData.thumbnailUrl.length > 55
+                                ? `${formData.thumbnailUrl.substring(0, 52)}...`
+                                : formData.thumbnailUrl}
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, thumbnailUrl: '' })}
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.15)',
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              color: '#ef4444',
+                              borderRadius: '8px',
+                              padding: '0.35rem 0.65rem',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Gỡ ảnh
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

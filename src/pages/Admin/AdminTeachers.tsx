@@ -431,10 +431,32 @@ export const AdminTeachers: React.FC = () => {
                         {image && (
                           <div className={styles.imagePreviewBox}>
                             <img src={image} alt="Preview" className={styles.imagePreviewImg} />
-                            <div className={styles.imagePreviewInfo}>
-                              <strong>Xem trước ảnh đại diện</strong>
-                              <div style={{ wordBreak: 'break-all', opacity: 0.8 }}>{image}</div>
+                            <div className={styles.imagePreviewInfo} style={{ flex: 1 }}>
+                              <strong>Xem trước ảnh giáo viên</strong>
+                              <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginTop: '2px' }}>
+                                {image.startsWith('data:image/')
+                                  ? `📷 Tệp ảnh ${image.split(';')[0].replace('data:image/', '').toUpperCase()} từ Thư viện Media`
+                                  : image.length > 55
+                                  ? `${image.substring(0, 52)}...`
+                                  : image}
+                              </div>
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => setImage('')}
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                color: '#ef4444',
+                                borderRadius: '8px',
+                                padding: '0.35rem 0.65rem',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Gỡ ảnh
+                            </button>
                           </div>
                         )}
                       </div>
