@@ -973,6 +973,24 @@ export const Home: React.FC = () => {
                       <div className={styles.teacherImageContainer}>
                         <img src={teacher.image} alt={teacher.name} className={styles.teacherImg} draggable={false} />
                         
+                        {/* Always-visible Floating Overlay Highlights */}
+                        {teacher.highlights && teacher.highlights.length > 0 && (
+                          <div className={styles.overlayHighlightList}>
+                            {teacher.highlights.map((hl, hlIdx) => {
+                              const text = language === 'en' ? (hl.titleEn || hl.title) : hl.title;
+                              if (!text) return null;
+                              return (
+                                <div key={hlIdx} className={styles.overlayHighlightBadge}>
+                                  <span className={styles.overlayHighlightIcon}>
+                                    {renderHighlightIcon(hl.iconType)}
+                                  </span>
+                                  <span className={styles.overlayHighlightText}>{text}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
                         {/* Default Badge */}
                         <div className={styles.defaultBadge}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -993,9 +1011,11 @@ export const Home: React.FC = () => {
                                   <p className={styles.highlightTitle}>
                                     {language === 'en' ? (hl.titleEn || hl.title) : hl.title}
                                   </p>
-                                  <p className={styles.highlightSubText}>
-                                    {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
-                                  </p>
+                                  {hl.subText && (
+                                    <p className={styles.highlightSubText}>
+                                      {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             ))}
@@ -1098,6 +1118,24 @@ export const Home: React.FC = () => {
                       <div className={styles.studentImageContainer}>
                         <img src={student.image} alt={student.name} className={styles.studentImg} draggable={false} />
                         
+                        {/* Always-visible Floating Overlay Highlights */}
+                        {student.highlights && student.highlights.length > 0 && (
+                          <div className={styles.overlayHighlightList}>
+                            {student.highlights.map((hl, hlIdx) => {
+                              const text = language === 'en' ? (hl.titleEn || hl.title) : hl.title;
+                              if (!text) return null;
+                              return (
+                                <div key={hlIdx} className={styles.overlayHighlightBadge}>
+                                  <span className={styles.overlayHighlightIcon}>
+                                    {renderHighlightIcon(hl.iconType)}
+                                  </span>
+                                  <span className={styles.overlayHighlightText}>{text}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
                         {/* Default Badge */}
                         <div className={styles.defaultBadge}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1118,9 +1156,11 @@ export const Home: React.FC = () => {
                                   <h5 className={styles.highlightTitle}>
                                     {language === 'en' ? (hl.titleEn || hl.title) : hl.title}
                                   </h5>
-                                  <p className={styles.highlightSubText}>
-                                    {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
-                                  </p>
+                                  {hl.subText && (
+                                    <p className={styles.highlightSubText}>
+                                      {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             ))}
