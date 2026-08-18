@@ -7,6 +7,7 @@ import {
   Trash2,
   X,
   Award,
+  Sparkles,
   RefreshCw,
   Trophy,
   FolderTree
@@ -31,6 +32,7 @@ export const AdminStudents: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [activeLangTab, setActiveLangTab] = useState<'vi' | 'en'>('vi');
 
   const { showToast } = useToast();
 
@@ -111,6 +113,7 @@ export const AdminStudents: React.FC = () => {
     setHl3Sub('Tiếng Anh cấp trường');
     setHl3SubEn('School English Contest');
 
+    setActiveLangTab('vi');
     setIsModalOpen(true);
   };
 
@@ -146,6 +149,7 @@ export const AdminStudents: React.FC = () => {
       setHl3SubEn(hls[2].subTextEn || hls[2].subText);
     }
 
+    setActiveLangTab('vi');
     setIsModalOpen(true);
   };
 
@@ -369,119 +373,311 @@ export const AdminStudents: React.FC = () => {
 
             <form onSubmit={handleSubmit}>
               <div className={styles.modalBody}>
-                <div className={styles.formGrid}>
-                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label>Họ và Tên Học Viên *</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: Đỗ Nhất Huy"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
+                {/* Language Tab Switcher */}
+                <div className={styles.langTabGroup}>
+                  <button
+                    type="button"
+                    className={`${styles.langTab} ${activeLangTab === 'vi' ? styles.langTabActive : ''}`}
+                    onClick={() => setActiveLangTab('vi')}
+                  >
+                    <span>Nội Dung Tiếng Việt</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.langTab} ${activeLangTab === 'en' ? styles.langTabActive : ''}`}
+                    onClick={() => setActiveLangTab('en')}
+                  >
+                    <span>Nội Dung Tiếng Anh</span>
+                  </button>
+                </div>
 
-                  <div className={styles.formGroup}>
-                    <label>Thành Tích Nổi Bật Chính (Tiếng Việt) *</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: 15/15 Flyers Overall"
-                      value={mainHighlight}
-                      onChange={(e) => setMainHighlight(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Thành Tích Nổi Bật Chính (Tiếng Anh)</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: 15/15 Shields Flyers"
-                      value={mainHighlightEn}
-                      onChange={(e) => setMainHighlightEn(e.target.value)}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Danh Hiệu / Vai Trò (Tiếng Việt)</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: Học viên tiêu biểu tại iCANCAM"
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label>Danh Hiệu / Vai Trò (Tiếng Anh)</label>
-                    <input
-                      type="text"
-                      className={styles.formInput}
-                      placeholder="Ví dụ: Outstanding Student at iCANCAM"
-                      value={roleEn}
-                      onChange={(e) => setRoleEn(e.target.value)}
-                    />
-                  </div>
-
-                  <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label>Ảnh Học Viên *</label>
-                    <div className={styles.imagePickerWrapper}>
-                      <div className={styles.mediaPickerGroup}>
+                {activeLangTab === 'vi' ? (
+                  <>
+                    <div className={styles.formGrid}>
+                      <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                        <label>Họ và Tên Học Viên *</label>
                         <input
                           type="text"
                           className={styles.formInput}
-                          placeholder="Dán đường dẫn ảnh hoặc chọn từ thư viện..."
-                          value={image}
-                          onChange={(e) => setImage(e.target.value)}
-                          style={{ flex: 1 }}
+                          placeholder="Ví dụ: Đỗ Nhất Huy"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
                         />
-                        <button
-                          type="button"
-                          className={styles.selectMediaBtn}
-                          onClick={() => setIsMediaModalOpen(true)}
-                        >
-                          <FolderTree size={16} />
-                          <span>Thư Viện Hệ Thống</span>
-                        </button>
                       </div>
-                      {image && (
-                        <div className={styles.imagePreviewBox}>
-                          <img src={image} alt="Preview" className={styles.imagePreviewImg} />
-                          <div className={styles.imagePreviewInfo} style={{ flex: 1 }}>
-                            <strong>Xem trước ảnh học viên</strong>
-                            <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginTop: '2px' }}>
-                              {image.startsWith('data:image/')
-                                ? `📷 Tệp ảnh ${image.split(';')[0].replace('data:image/', '').toUpperCase()} từ Thư viện Media`
-                                : image.length > 55
-                                ? `${image.substring(0, 52)}...`
-                                : image}
-                            </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Thành Tích Nổi Bật Chính (Tiếng Việt) *</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="Ví dụ: 15/15 Flyers Overall"
+                          value={mainHighlight}
+                          onChange={(e) => setMainHighlight(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Danh Hiệu / Vai Trò (Tiếng Việt)</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="Ví dụ: Học viên tiêu biểu tại iCANCAM"
+                          value={role}
+                          onChange={(e) => setRole(e.target.value)}
+                        />
+                      </div>
+
+                      <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                        <label>Ảnh Học Viên *</label>
+                        <div className={styles.imagePickerWrapper}>
+                          <div className={styles.mediaPickerGroup}>
+                            <input
+                              type="text"
+                              className={styles.formInput}
+                              placeholder="Dán đường dẫn ảnh hoặc chọn từ thư viện..."
+                              value={image}
+                              onChange={(e) => setImage(e.target.value)}
+                              style={{ flex: 1 }}
+                            />
+                            <button
+                              type="button"
+                              className={styles.selectMediaBtn}
+                              onClick={() => setIsMediaModalOpen(true)}
+                            >
+                              <FolderTree size={16} />
+                              <span>Thư Viện Hệ Thống</span>
+                            </button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => setImage('')}
-                            style={{
-                              background: 'rgba(239, 68, 68, 0.15)',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
-                              color: '#ef4444',
-                              borderRadius: '8px',
-                              padding: '0.35rem 0.65rem',
-                              fontSize: '0.8rem',
-                              fontWeight: 700,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Gỡ ảnh
-                          </button>
+                          {image && (
+                            <div className={styles.imagePreviewBox}>
+                              <img src={image} alt="Preview" className={styles.imagePreviewImg} />
+                              <div className={styles.imagePreviewInfo} style={{ flex: 1 }}>
+                                <strong>Xem trước ảnh học viên</strong>
+                                <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginTop: '2px' }}>
+                                  {image.startsWith('data:image/')
+                                    ? `📷 Tệp ảnh ${image.split(';')[0].replace('data:image/', '').toUpperCase()} từ Thư viện Media`
+                                    : image.length > 55
+                                    ? `${image.substring(0, 52)}...`
+                                    : image}
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setImage('')}
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.15)',
+                                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                                  color: '#ef4444',
+                                  borderRadius: '8px',
+                                  padding: '0.35rem 0.65rem',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Gỡ ảnh
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                </div>
+
+                    {/* 3 HIGHLIGHTS CARDS SECTION (VIETNAMESE) */}
+                    <div className={styles.highlightSection} style={{ marginTop: '1.25rem' }}>
+                      <div className={styles.highlightSectionTitle}>
+                        <Sparkles size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />
+                        3 Đặc Điểm Nổi Bật Trực Quan (Tiếng Việt)
+                      </div>
+
+                      {/* Highlight 1 */}
+                      <div className={styles.highlightCard}>
+                        <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          Đặc điểm nổi bật 1
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '0.5rem' }}>
+                          <select
+                            className={styles.formSelect}
+                            value={hl1Icon}
+                            onChange={(e) => setHl1Icon(e.target.value as any)}
+                          >
+                            <option value="ielts">Icon Ngôi Sao</option>
+                            <option value="degree">Icon Mũ Bằng Cấp</option>
+                            <option value="medal">Icon Huy Chương</option>
+                          </select>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Ví dụ: 15/15 Khiên"
+                            value={hl1Title}
+                            onChange={(e) => setHl1Title(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Highlight 2 */}
+                      <div className={styles.highlightCard}>
+                        <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          Đặc điểm nổi bật 2
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '0.5rem' }}>
+                          <select
+                            className={styles.formSelect}
+                            value={hl2Icon}
+                            onChange={(e) => setHl2Icon(e.target.value as any)}
+                          >
+                            <option value="ielts">Icon Ngôi Sao</option>
+                            <option value="degree">Icon Mũ Bằng Cấp</option>
+                            <option value="medal">Icon Huy Chương</option>
+                          </select>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Ví dụ: Điểm Tuyệt Đối Starters"
+                            value={hl2Title}
+                            onChange={(e) => setHl2Title(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Highlight 3 */}
+                      <div className={styles.highlightCard}>
+                        <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          Đặc điểm nổi bật 3
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '0.5rem' }}>
+                          <select
+                            className={styles.formSelect}
+                            value={hl3Icon}
+                            onChange={(e) => setHl3Icon(e.target.value as any)}
+                          >
+                            <option value="ielts">Icon Ngôi Sao</option>
+                            <option value="degree">Icon Mũ Bằng Cấp</option>
+                            <option value="medal">Icon Huy Chương</option>
+                          </select>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Ví dụ: Giải Nhất Tiếng Anh"
+                            value={hl3Title}
+                            onChange={(e) => setHl3Title(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label>Thành Tích Nổi Bật Chính (Tiếng Anh)</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="Ví dụ: 15/15 Shields Flyers"
+                          value={mainHighlightEn}
+                          onChange={(e) => setMainHighlightEn(e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Danh Hiệu / Vai Trò (Tiếng Anh)</label>
+                        <input
+                          type="text"
+                          className={styles.formInput}
+                          placeholder="Ví dụ: Outstanding Student at iCANCAM"
+                          value={roleEn}
+                          onChange={(e) => setRoleEn(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* 3 HIGHLIGHTS CARDS SECTION (ENGLISH) */}
+                    <div className={styles.highlightSection} style={{ marginTop: '1.25rem' }}>
+                      <div className={styles.highlightSectionTitle}>
+                        <Sparkles size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />
+                        3 Đặc Điểm Nổi Bật Trực Quan (Tiếng Anh)
+                      </div>
+
+                      {/* Highlight 1 EN */}
+                      <div className={styles.highlightCard}>
+                        <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          Đặc điểm nổi bật 1 (Tiếng Anh)
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '0.5rem' }}>
+                          <select
+                            className={styles.formSelect}
+                            value={hl1Icon}
+                            onChange={(e) => setHl1Icon(e.target.value as any)}
+                          >
+                            <option value="ielts">Icon Ngôi Sao</option>
+                            <option value="degree">Icon Mũ Bằng Cấp</option>
+                            <option value="medal">Icon Huy Chương</option>
+                          </select>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Ví dụ: 15/15 Shields"
+                            value={hl1TitleEn}
+                            onChange={(e) => setHl1TitleEn(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Highlight 2 EN */}
+                      <div className={styles.highlightCard}>
+                        <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          Đặc điểm nổi bật 2 (Tiếng Anh)
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '0.5rem' }}>
+                          <select
+                            className={styles.formSelect}
+                            value={hl2Icon}
+                            onChange={(e) => setHl2Icon(e.target.value as any)}
+                          >
+                            <option value="ielts">Icon Ngôi Sao</option>
+                            <option value="degree">Icon Mũ Bằng Cấp</option>
+                            <option value="medal">Icon Huy Chương</option>
+                          </select>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Ví dụ: Perfect Score Starters"
+                            value={hl2TitleEn}
+                            onChange={(e) => setHl2TitleEn(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Highlight 3 EN */}
+                      <div className={styles.highlightCard}>
+                        <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                          Đặc điểm nổi bật 3 (Tiếng Anh)
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '0.5rem' }}>
+                          <select
+                            className={styles.formSelect}
+                            value={hl3Icon}
+                            onChange={(e) => setHl3Icon(e.target.value as any)}
+                          >
+                            <option value="ielts">Icon Ngôi Sao</option>
+                            <option value="degree">Icon Mũ Bằng Cấp</option>
+                            <option value="medal">Icon Huy Chương</option>
+                          </select>
+                          <input
+                            type="text"
+                            className={styles.formInput}
+                            placeholder="Ví dụ: 1st Prize English Contest"
+                            value={hl3TitleEn}
+                            onChange={(e) => setHl3TitleEn(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className={styles.modalFooter}>
