@@ -47,53 +47,148 @@ import achievementTeacher from '../../assets/achievement_teacher.png';
 
 const PUBLIC_BUCKET = 'cms-public-media';
 const PRIVATE_BUCKET = 'cms-private-media';
-const LOCAL_STORAGE_KEY = 'ican_cms_media_items_v2';
-const LOCAL_USAGE_KEY = 'ican_cms_media_usages_v2';
-const LOCAL_FOLDER_KEY = 'ican_cms_media_folders_v2';
+const LOCAL_STORAGE_KEY = 'ican_cms_media_items_v3';
+const LOCAL_USAGE_KEY = 'ican_cms_media_usages_v3';
+const LOCAL_FOLDER_KEY = 'ican_cms_media_folders_v3';
+const LOCAL_DELETED_KEY = 'ican_cms_media_deleted_ids_v3';
+
+// In-Memory & IndexedDB Storage
+const inMemoryItemsMap = new Map<string, MediaItem>();
+let memoryDeletedIds = new Set<string>();
+
+const getDeletedIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(LOCAL_DELETED_KEY);
+    if (raw) {
+      const arr: string[] = JSON.parse(raw);
+      memoryDeletedIds = new Set(arr);
+      return memoryDeletedIds;
+    }
+  } catch {
+    // Ignore
+  }
+  return memoryDeletedIds;
+};
+
+const saveDeletedIds = (set: Set<string>) => {
+  memoryDeletedIds = set;
+  try {
+    localStorage.setItem(LOCAL_DELETED_KEY, JSON.stringify(Array.from(set)));
+  } catch {
+    // Ignore
+  }
+};
+
+// IndexedDB Helper for Large Uploaded Images (No 5MB LocalStorage Quota Limit)
+const DB_NAME = 'ican_cms_media_idb_v3';
+const DB_VERSION = 1;
+let dbPromise: Promise<IDBDatabase> | null = null;
+
+const getIDB = (): Promise<IDBDatabase> => {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject) => {
+    if (typeof window === 'undefined' || !window.indexedDB) {
+      reject(new Error('IndexedDB unavailable'));
+      return;
+    }
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains('media_items')) {
+        db.createObjectStore('media_items', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  return dbPromise;
+};
+
+const saveItemToIDB = async (item: MediaItem) => {
+  try {
+    const db = await getIDB();
+    const tx = db.transaction('media_items', 'readwrite');
+    tx.objectStore('media_items').put(item);
+  } catch {
+    // Ignore
+  }
+};
+
+const deleteItemFromIDB = async (id: string) => {
+  try {
+    const db = await getIDB();
+    const tx = db.transaction('media_items', 'readwrite');
+    tx.objectStore('media_items').delete(id);
+  } catch {
+    // Ignore
+  }
+};
+
+const getItemsFromIDB = async (): Promise<MediaItem[]> => {
+  try {
+    const db = await getIDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction('media_items', 'readonly');
+      const req = tx.objectStore('media_items').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch {
+    return [];
+  }
+};
 
 // Persistence fallback & Cache Auto-Sync
 const getStoredItems = (): MediaItem[] => {
+  const deletedSet = getDeletedIds();
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (raw) {
       const parsed: MediaItem[] = JSON.parse(raw);
-      let hasChanges = false;
-      const merged = [...parsed];
+      const merged = parsed.filter((m) => !deletedSet.has(m.id));
 
       for (const defItem of DEFAULT_INITIAL_MEDIA) {
+        if (deletedSet.has(defItem.id)) continue;
         const idx = merged.findIndex((m) => m.id === defItem.id || m.original_filename === defItem.original_filename);
         if (idx === -1) {
           merged.push(defItem);
-          hasChanges = true;
-        } else {
-          // Always ensure folder_id and public_url match standard assets
-          if (!merged[idx].folder_id && defItem.folder_id) {
-            merged[idx].folder_id = defItem.folder_id;
-            hasChanges = true;
-          }
-          if (defItem.public_url && merged[idx].public_url !== defItem.public_url) {
-            merged[idx].public_url = defItem.public_url;
-            hasChanges = true;
-          }
         }
       }
 
-      if (hasChanges) {
-        saveStoredItems(merged);
+      // Also merge in-memory items
+      for (const item of inMemoryItemsMap.values()) {
+        if (!deletedSet.has(item.id) && !merged.some((m) => m.id === item.id)) {
+          merged.unshift(item);
+        }
       }
+
       return merged;
     }
   } catch {
     // Ignore
   }
-  return DEFAULT_INITIAL_MEDIA;
+
+  // Populate memory map from initial
+  const initialFiltered = DEFAULT_INITIAL_MEDIA.filter((defItem) => !deletedSet.has(defItem.id));
+  for (const item of inMemoryItemsMap.values()) {
+    if (!deletedSet.has(item.id) && !initialFiltered.some((m) => m.id === item.id)) {
+      initialFiltered.unshift(item);
+    }
+  }
+  return initialFiltered;
 };
 
 const saveStoredItems = (items: MediaItem[]) => {
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
+    const deletedSet = getDeletedIds();
+    const cleanItems = items.filter((i) => !deletedSet.has(i.id));
+    for (const item of cleanItems) {
+      inMemoryItemsMap.set(item.id, item);
+      saveItemToIDB(item);
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanItems));
   } catch {
-    // Ignore
+    // Catch QuotaExceededError when Base64 URL is large, inMemory & IndexedDB will keep the item safe
   }
 };
 
@@ -356,6 +451,14 @@ export class MediaRepository {
    * Save media asset metadata record to DB and LocalStorage
    */
   async saveMediaRecord(item: MediaItem): Promise<MediaItem> {
+    const deletedSet = getDeletedIds();
+    if (deletedSet.has(item.id)) {
+      deletedSet.delete(item.id);
+      saveDeletedIds(deletedSet);
+    }
+    inMemoryItemsMap.set(item.id, item);
+    saveItemToIDB(item);
+
     try {
       const { data, error } = await supabase.from('media_items').upsert(item).select().single();
 
@@ -400,7 +503,13 @@ export class MediaRepository {
    */
   async getMediaItems(filter: MediaFilter = {}): Promise<{ items: MediaItem[]; total: number }> {
     const localItems = getStoredItems();
+    const idbItems = await getItemsFromIDB();
     let items = [...localItems];
+    for (const item of idbItems) {
+      if (!items.some((i) => i.id === item.id)) {
+        items.unshift(item);
+      }
+    }
 
     try {
       const { data, error } = await supabase.from('media_items').select('*').order('created_at', { ascending: false });
@@ -511,6 +620,9 @@ export class MediaRepository {
       }
     }
 
+    const deletedSet = getDeletedIds();
+    items = items.filter((i) => !deletedSet.has(i.id));
+
     const total = items.length;
     const page = filter.page || 1;
     const pageSize = filter.limit || (filter as { pageSize?: number }).pageSize || 100;
@@ -524,6 +636,13 @@ export class MediaRepository {
    * Delete media asset record permanently
    */
   async deleteMediaItem(id: string): Promise<void> {
+    const deletedSet = getDeletedIds();
+    deletedSet.add(id);
+    saveDeletedIds(deletedSet);
+
+    inMemoryItemsMap.delete(id);
+    deleteItemFromIDB(id);
+
     const items = getStoredItems();
     const filtered = items.filter((i) => i.id !== id);
     saveStoredItems(filtered);

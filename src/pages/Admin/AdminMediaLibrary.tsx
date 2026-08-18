@@ -294,13 +294,15 @@ export const AdminMediaLibrary: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (!deleteCandidate) return;
-    const res = await mediaService.deleteMediaItem(deleteCandidate.id);
+    const targetId = deleteCandidate.id;
+    const res = await mediaService.deleteMediaItem(targetId);
     if (res.success) {
       showToast('Đã xóa vĩnh viễn tệp media khỏi hệ thống!', 'info');
-      if (activeDrawerAsset?.id === deleteCandidate.id) {
+      if (activeDrawerAsset?.id === targetId) {
         setActiveDrawerAsset(null);
       }
-      setSelectedIds((prev) => prev.filter((id) => id !== deleteCandidate.id));
+      setSelectedIds((prev) => prev.filter((id) => id !== targetId));
+      setItems((prev) => prev.filter((item) => item.id !== targetId));
       await refreshMediaList();
     } else {
       showToast(res.error || 'Không thể xóa tệp.', 'error');
