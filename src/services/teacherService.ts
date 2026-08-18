@@ -64,6 +64,7 @@ export const saveTeachers = (list: Teacher[]) => {
 };
 
 export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
+  const localList = getAllTeachers();
   let globalDeletedIds = getDeletedTeacherIds();
   try {
     const { data: settingsData } = await supabase
@@ -102,13 +103,24 @@ export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
           };
         });
 
-      saveTeachers(teachersFromDb);
-      return teachersFromDb;
+      // MERGE Supabase DB with LocalStorage (Local edits take priority over old DB rows)
+      const mergedMap = new Map<string, Teacher>();
+      for (const item of teachersFromDb) {
+        mergedMap.set(item.id, item);
+      }
+      for (const item of localList) {
+        mergedMap.set(item.id, item); // Local item OVERRIDES DB item so user edits are NEVER lost!
+      }
+
+      const mergedList = Array.from(mergedMap.values()).filter((t) => !deletedSet.has(t.id));
+      saveTeachers(mergedList);
+      return mergedList;
     }
   } catch (err) {
     console.warn('Supabase teachers table offline or not synced yet:', err);
   }
-  return getAllTeachers();
+
+  return localList;
 };
 
 export const syncTeacherToSupabase = async (teacher: Teacher): Promise<{ success: boolean; error?: string }> => {
