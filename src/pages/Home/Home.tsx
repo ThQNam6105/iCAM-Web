@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { articlesData } from '../../data/newsData';
-import { teachersData } from '../../data/teacherData';
-import { studentsData } from '../../data/studentData';
+import { teachersData, type Teacher } from '../../data/teacherData';
+import { studentsData, type Student } from '../../data/studentData';
+import { fetchTeachersFromSupabase } from '../../services/teacherService';
+import { fetchStudentsFromSupabase } from '../../services/studentService';
 import { parentsData } from '../../data/parentData';
 import bannerBg from '../../assets/banner-bg.jpg';
 import bannerBgMobile from '../../assets/banner-bg-mobile.jpg';
@@ -101,6 +103,19 @@ export const Home: React.FC = () => {
   const parentDragMovedRef = React.useRef(false);
   const [parentCursorPos, setParentCursorPos] = useState<{ x: number; y: number } | null>(null);
   const [showParentCursorTooltip, setShowParentCursorTooltip] = useState(false);
+
+  // State for live data
+  const [liveTeachers, setLiveTeachers] = useState<Teacher[]>(teachersData);
+  const [liveStudents, setLiveStudents] = useState<Student[]>(studentsData);
+
+  useEffect(() => {
+    fetchTeachersFromSupabase().then((data) => {
+      if (data && data.length > 0) setLiveTeachers(data);
+    });
+    fetchStudentsFromSupabase().then((data) => {
+      if (data && data.length > 0) setLiveStudents(data);
+    });
+  }, []);
 
   // General States
   const [isTabActive, setIsTabActive] = useState(true);
@@ -311,9 +326,9 @@ export const Home: React.FC = () => {
   // ==========================================================================
   // Slider Teachers - Infinite loop logic
   // ==========================================================================
-  const clonedTeachersBefore = teachersData.slice(-teachersToShow);
-  const clonedTeachersAfter = teachersData.slice(0, teachersToShow);
-  const extendedTeachers = [...clonedTeachersBefore, ...teachersData, ...clonedTeachersAfter];
+  const clonedTeachersBefore = liveTeachers.slice(-teachersToShow);
+  const clonedTeachersAfter = liveTeachers.slice(0, teachersToShow);
+  const extendedTeachers = [...clonedTeachersBefore, ...liveTeachers, ...clonedTeachersAfter];
 
   const nextTeacherSlide = () => {
     if (disableTeacherTransition) return;
@@ -409,15 +424,15 @@ export const Home: React.FC = () => {
   const handleTeacherTransitionEnd = () => {
     if (teacherIndex === -1) {
       setDisableTeacherTransition(true);
-      setTeacherIndex(teachersData.length - 1);
-    } else if (teacherIndex === teachersData.length) {
+      setTeacherIndex(liveTeachers.length - 1);
+    } else if (teacherIndex === liveTeachers.length) {
       setDisableTeacherTransition(true);
       setTeacherIndex(0);
     }
   };
 
   useEffect(() => {
-    if (teacherIndex >= teachersData.length + 1) {
+    if (teacherIndex >= liveTeachers.length + 1) {
       const timer = setTimeout(() => {
         setDisableTeacherTransition(true);
         setTeacherIndex(0);
@@ -426,11 +441,11 @@ export const Home: React.FC = () => {
     } else if (teacherIndex <= -2) {
       const timer = setTimeout(() => {
         setDisableTeacherTransition(true);
-        setTeacherIndex(teachersData.length - 1);
+        setTeacherIndex(liveTeachers.length - 1);
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [teacherIndex]);
+  }, [teacherIndex, liveTeachers.length]);
 
   useEffect(() => {
     if (disableTeacherTransition) {
@@ -442,11 +457,12 @@ export const Home: React.FC = () => {
   }, [disableTeacherTransition]);
 
   // ==========================================================================
+  // ==========================================================================
   // Slider Students - Infinite loop logic
   // ==========================================================================
-  const clonedStudentsBefore = studentsData.slice(-studentsToShow);
-  const clonedStudentsAfter = studentsData.slice(0, studentsToShow);
-  const extendedStudents = [...clonedStudentsBefore, ...studentsData, ...clonedStudentsAfter];
+  const clonedStudentsBefore = liveStudents.slice(-studentsToShow);
+  const clonedStudentsAfter = liveStudents.slice(0, studentsToShow);
+  const extendedStudents = [...clonedStudentsBefore, ...liveStudents, ...clonedStudentsAfter];
 
   const nextStudentSlide = () => {
     if (disableStudentTransition) return;
@@ -542,15 +558,15 @@ export const Home: React.FC = () => {
   const handleStudentTransitionEnd = () => {
     if (studentIndex === -1) {
       setDisableStudentTransition(true);
-      setStudentIndex(studentsData.length - 1);
-    } else if (studentIndex === studentsData.length) {
+      setStudentIndex(liveStudents.length - 1);
+    } else if (studentIndex === liveStudents.length) {
       setDisableStudentTransition(true);
       setStudentIndex(0);
     }
   };
 
   useEffect(() => {
-    if (studentIndex >= studentsData.length + 1) {
+    if (studentIndex >= liveStudents.length + 1) {
       const timer = setTimeout(() => {
         setDisableStudentTransition(true);
         setStudentIndex(0);
@@ -559,11 +575,11 @@ export const Home: React.FC = () => {
     } else if (studentIndex <= -2) {
       const timer = setTimeout(() => {
         setDisableStudentTransition(true);
-        setStudentIndex(studentsData.length - 1);
+        setStudentIndex(liveStudents.length - 1);
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [studentIndex]);
+  }, [studentIndex, liveStudents.length]);
 
   useEffect(() => {
     if (disableStudentTransition) {

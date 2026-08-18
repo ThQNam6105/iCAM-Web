@@ -5,6 +5,8 @@ import {
   FolderTree,
   Image as ImageIcon,
   BookOpen,
+  UserCheck,
+  Star,
   HelpCircle,
   Briefcase,
   Settings,
@@ -71,6 +73,26 @@ export const AdminSidebar: React.FC = () => {
         >
           <span className={styles.navItemIcon}><BookOpen size={18} /></span>
           <span>Quản lý khóa học</span>
+        </NavLink>
+
+        <span className={styles.sectionLabel} style={{ marginTop: '0.75rem' }}>
+          Đội ngũ & Học viên
+        </span>
+
+        <NavLink
+          to="/admin/teachers"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+        >
+          <span className={styles.navItemIcon}><UserCheck size={18} /></span>
+          <span>Giáo viên tiêu biểu</span>
+        </NavLink>
+
+        <NavLink
+          to="/admin/students"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+        >
+          <span className={styles.navItemIcon}><Star size={18} /></span>
+          <span>Học viên ưu tú</span>
         </NavLink>
 
         <NavLink
