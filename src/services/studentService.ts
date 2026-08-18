@@ -135,8 +135,9 @@ export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
       if (Array.isArray(parsed) && parsed.length > 0) {
         const cleanGlobal = parsed.filter((s) => !deletedSet.has(s.id));
         const mergedMap = new Map<string, Student>();
-        for (const s of cleanGlobal) mergedMap.set(s.id, s);
+        // Local first, then Cloud data ON TOP so Cloud data overrides local cache on mobile phones!
         for (const s of currentLocalStudents) mergedMap.set(s.id, s);
+        for (const s of cleanGlobal) mergedMap.set(s.id, s);
         const mergedList = Array.from(mergedMap.values()).filter((s) => !deletedSet.has(s.id));
         
         inMemoryStudents = mergedList;
@@ -173,10 +174,10 @@ export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {
         });
 
       const mergedMap = new Map<string, Student>();
-      for (const item of studentsFromDb) {
+      for (const item of currentLocalStudents) {
         mergedMap.set(item.id, item);
       }
-      for (const item of currentLocalStudents) {
+      for (const item of studentsFromDb) {
         mergedMap.set(item.id, item);
       }
 
