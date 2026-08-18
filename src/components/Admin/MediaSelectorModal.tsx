@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FolderTree,
   Search,
@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Folder,
   Trash2,
+  Upload,
 } from 'lucide-react';
 import type { MediaItem, MediaFolder } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
@@ -37,6 +38,8 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [prevFilterType, setPrevFilterType] = useState(filterType);
   const [selectedFileType, setSelectedFileType] = useState<string>(filterType);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (filterType !== prevFilterType) {
     setPrevFilterType(filterType);
@@ -118,21 +121,62 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
     }
   };
 
+  const handleDirectUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsUploading(true);
+
+    const folderIdToUse = selectedFolderId || 'root';
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const res = await mediaService.uploadMedia(file, { folderId: folderIdToUse });
+      if (res.success && res.asset) {
+        setItems((prev) => [res.asset!, ...prev]);
+        setSelectedAssetIds([res.asset.id]);
+      } else if (res.isDuplicate && res.existingAsset) {
+        setSelectedAssetIds([res.existingAsset.id]);
+      } else if (res.error) {
+        alert(`Lỗi khi tải file ${file.name}: ${res.error}`);
+      }
+    }
+    setIsUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const currentFolderName = selectedFolderId === 'root'
     ? 'Thư mục gốc'
     : (folders.find((f) => f.id === selectedFolderId)?.name || 'Thư mục');
 
   return (
     <div className={styles.overlay} onClick={onClose}>
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*,.pdf,.doc,.docx"
+        multiple
+        onChange={handleDirectUpload}
+      />
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>
             <FolderTree size={22} color="#F58220" /> {title}
           </h3>
-          <button type="button" onClick={onClose} className={styles.closeBtn}>
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              icon={<Upload size={16} />}
+            >
+              {isUploading ? 'Đang tải...' : 'Tải tệp mới lên'}
+            </Button>
+            <button type="button" onClick={onClose} className={styles.closeBtn}>
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {!selectedFolderId ? (
@@ -216,6 +260,16 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
                   className={styles.searchInput}
                 />
               </div>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                icon={<Upload size={16} />}
+              >
+                {isUploading ? 'Đang tải...' : 'Tải tệp từ máy'}
+              </Button>
 
               <Select
                 options={[

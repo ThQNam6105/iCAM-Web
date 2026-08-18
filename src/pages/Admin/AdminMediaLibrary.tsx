@@ -214,22 +214,20 @@ export const AdminMediaLibrary: React.FC = () => {
     await mediaService.downloadFolderFiles(folder.name, res.items);
   };
 
-  // Upload handler direct into current folder
+  // Upload handler direct into current folder or root directory
   const handleUploadFiles = async (files: FileList | File[]) => {
-    if (!currentFolder) {
-      showToast('Vui lòng mở một Thư mục trước khi tải tệp lên!', 'error');
-      return;
-    }
+    const targetFolderId = currentFolder ? currentFolder.id : 'root';
+    const folderName = currentFolder ? currentFolder.name : 'Thư mục gốc';
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const res = await mediaService.uploadMedia(file, { folderId: currentFolder.id });
+      const res = await mediaService.uploadMedia(file, { folderId: targetFolderId });
 
       if (res.isDuplicate && res.existingAsset) {
         setDuplicateWarning({ file, existingAsset: res.existingAsset });
         break;
       } else if (res.success) {
-        showToast(`Tải lên ${file.name} vào "${currentFolder.name}" thành công! ✓`, 'success');
+        showToast(`Tải lên ${file.name} vào "${folderName}" thành công! ✓`, 'success');
       } else {
         showToast(`Lỗi khi tải ${file.name}: ${res.error}`, 'error');
       }

@@ -89,13 +89,7 @@ export class MediaService {
    * Main Upload Flow: Validate -> Hash -> Check Duplicate -> Sanitize SVG -> Dimensions -> Store -> Save Metadata
    */
   async uploadMedia(file: File, options: UploadOptions = {}): Promise<UploadResult> {
-    // 0. Strict Folder Requirement Check
-    if (!options.folderId) {
-      return {
-        success: false,
-        error: 'Tệp truyền thông chỉ được phép tải lên bên trong một Thư mục cụ thể! Vui lòng chọn hoặc tạo một Thư mục trước khi tải tệp.',
-      };
-    }
+    const targetFolderId = (options.folderId && options.folderId !== 'root') ? options.folderId : null;
 
     // 1. Validation
     const valResult = await validateMediaFile(file);
@@ -161,7 +155,7 @@ export class MediaService {
       focal_x: 0.5,
       focal_y: 0.5,
       tags: options.tags || ['uncategorized'],
-      folder_id: options.folderId || null,
+      folder_id: targetFolderId,
       created_at: now,
       updated_at: now,
     };
