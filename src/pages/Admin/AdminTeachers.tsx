@@ -16,6 +16,7 @@ import styles from './AdminTeachers.module.css';
 import {
   type Teacher,
   type TeacherHighlight,
+  getAllTeachers,
   fetchTeachersFromSupabase,
   createTeacher,
   updateTeacher,
@@ -62,10 +63,22 @@ export const AdminTeachers: React.FC = () => {
   const [hl3SubEn, setHl3SubEn] = useState('');
 
   const loadTeachers = async () => {
-    setIsLoading(true);
-    const data = await fetchTeachersFromSupabase();
-    setTeachers(data);
-    setIsLoading(false);
+    try {
+      const initial = getAllTeachers();
+      if (initial && initial.length > 0) {
+        setTeachers(initial);
+      } else {
+        setIsLoading(true);
+      }
+      const data = await fetchTeachersFromSupabase();
+      if (data && data.length > 0) {
+        setTeachers(data);
+      }
+    } catch (err) {
+      console.warn('Error loading teachers:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

@@ -16,6 +16,7 @@ import styles from './AdminStudents.module.css';
 import {
   type Student,
   type StudentHighlight,
+  getAllStudents,
   fetchStudentsFromSupabase,
   createStudent,
   updateStudent,
@@ -63,10 +64,22 @@ export const AdminStudents: React.FC = () => {
   const [hl3SubEn, setHl3SubEn] = useState('');
 
   const loadStudents = async () => {
-    setIsLoading(true);
-    const data = await fetchStudentsFromSupabase();
-    setStudents(data);
-    setIsLoading(false);
+    try {
+      const initial = getAllStudents();
+      if (initial && initial.length > 0) {
+        setStudents(initial);
+      } else {
+        setIsLoading(true);
+      }
+      const data = await fetchStudentsFromSupabase();
+      if (data && data.length > 0) {
+        setStudents(data);
+      }
+    } catch (err) {
+      console.warn('Error loading students:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

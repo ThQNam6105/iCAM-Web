@@ -71,13 +71,23 @@ const saveStudentsToIDB = async (students: Student[]) => {
 
 const getStudentsFromIDB = async (): Promise<Student[]> => {
   try {
-    const db = await getIDB();
-    return new Promise((resolve) => {
-      const tx = db.transaction('students', 'readonly');
-      const req = tx.objectStore('students').getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => resolve([]);
+    const fetchPromise = new Promise<Student[]>((resolve) => {
+      getIDB()
+        .then((db) => {
+          if (!db.objectStoreNames.contains('students')) {
+            resolve([]);
+            return;
+          }
+          const tx = db.transaction('students', 'readonly');
+          const req = tx.objectStore('students').getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve([]);
+        })
+        .catch(() => resolve([]));
     });
+
+    const timeoutPromise = new Promise<Student[]>((resolve) => setTimeout(() => resolve([]), 300));
+    return await Promise.race([fetchPromise, timeoutPromise]);
   } catch {
     return [];
   }
