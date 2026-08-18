@@ -993,11 +993,6 @@ export const Home: React.FC = () => {
                                   <p className={styles.highlightTitle}>
                                     {language === 'en' ? (hl.titleEn || hl.title) : hl.title}
                                   </p>
-                                  {hl.subText && (
-                                    <p className={styles.highlightSubText}>
-                                      {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
                             ))}
@@ -1120,11 +1115,6 @@ export const Home: React.FC = () => {
                                   <h5 className={styles.highlightTitle}>
                                     {language === 'en' ? (hl.titleEn || hl.title) : hl.title}
                                   </h5>
-                                  {hl.subText && (
-                                    <p className={styles.highlightSubText}>
-                                      {language === 'en' ? (hl.subTextEn || hl.subText) : hl.subText}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
                             ))}
