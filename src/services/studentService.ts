@@ -25,7 +25,13 @@ export const markStudentAsDeleted = (id: string) => {
   saveDeletedStudentIds(Array.from(ids));
 };
 
+let inMemoryStudents: Student[] | null = null;
+
 export const getAllStudents = (): Student[] => {
+  if (inMemoryStudents) {
+    const deletedSet = new Set(getDeletedStudentIds());
+    return inMemoryStudents.filter((s) => !deletedSet.has(s.id));
+  }
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     let list: Student[] = [];
@@ -36,18 +42,25 @@ export const getAllStudents = (): Student[] => {
     }
     const deletedSet = new Set(getDeletedStudentIds());
     const cleanList = list.filter((s) => !deletedSet.has(s.id));
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
+    inMemoryStudents = cleanList;
     return cleanList;
   } catch {
     const deletedSet = new Set(getDeletedStudentIds());
-    return studentsData.filter((s) => !deletedSet.has(s.id));
+    const cleanList = studentsData.filter((s) => !deletedSet.has(s.id));
+    inMemoryStudents = cleanList;
+    return cleanList;
   }
 };
 
 export const saveStudents = (list: Student[]) => {
   const deletedSet = new Set(getDeletedStudentIds());
   const cleanList = list.filter((s) => !deletedSet.has(s.id));
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
+  inMemoryStudents = cleanList;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
+  } catch (err) {
+    console.warn('LocalStorage save warning in studentService:', err);
+  }
 };
 
 export const fetchStudentsFromSupabase = async (): Promise<Student[]> => {

@@ -155,7 +155,13 @@ export const AdminStudents: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      showToast('Vui lòng nhập tên học viên', 'error');
+      showToast('Vui lòng nhập tên học viên!', 'error');
+      setActiveLangTab('vi');
+      return;
+    }
+    if (!mainHighlight.trim()) {
+      showToast('Vui lòng nhập thành tích nổi bật chính!', 'error');
+      setActiveLangTab('vi');
       return;
     }
 
