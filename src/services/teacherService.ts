@@ -133,20 +133,14 @@ export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
       const parsed: Teacher[] = JSON.parse(globalSetting.value);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const cleanGlobal = parsed.filter((t) => !deletedSet.has(t.id));
-        const mergedMap = new Map<string, Teacher>();
-        // Local first, then Cloud data ON TOP so Cloud data overrides local cache on mobile phones!
-        for (const t of currentLocalTeachers) mergedMap.set(t.id, t);
-        for (const t of cleanGlobal) mergedMap.set(t.id, t);
-        const mergedList = Array.from(mergedMap.values()).filter((t) => !deletedSet.has(t.id));
-        
-        inMemoryTeachers = mergedList;
-        saveTeachersIDB(mergedList);
+        inMemoryTeachers = cleanGlobal;
+        saveTeachersIDB(cleanGlobal);
         try {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(mergedList));
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanGlobal));
         } catch {
           // Ignore
         }
-        return mergedList;
+        return cleanGlobal;
       }
     }
   } catch (err) {
