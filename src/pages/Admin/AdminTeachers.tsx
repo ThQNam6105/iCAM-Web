@@ -8,6 +8,7 @@ import {
   X,
   Award,
   GraduationCap,
+  Sparkles,
   RefreshCw,
   FolderTree
 } from 'lucide-react';
@@ -460,6 +461,158 @@ export const AdminTeachers: React.FC = () => {
                           </button>
                         </div>
                       )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3 HIGHLIGHTS CARDS SECTION FOR TEACHER OVERLAY */}
+                <div className={styles.highlightSection} style={{ marginTop: '1.25rem' }}>
+                  <div className={styles.highlightSectionTitle}>
+                    <Sparkles size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />
+                    3 Điểm Thành Tích Góc Ảnh (Hiển thị đè lên ảnh trên Trang chủ)
+                  </div>
+
+                  {/* Highlight 1 */}
+                  <div className={styles.highlightCard}>
+                    <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                      Dòng 1 (Màn hình / IELTS)
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 1fr', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                      <select
+                        className={styles.formSelect}
+                        value={hl1Icon}
+                        onChange={(e) => setHl1Icon(e.target.value as any)}
+                      >
+                        <option value="ielts">Icon IELTS / Máy tính</option>
+                        <option value="degree">Icon Mũ Bằng Cấp</option>
+                        <option value="medal">Icon Huy Chương / Bằng</option>
+                      </select>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Tiêu đề VI (Ví dụ: 8.5)"
+                        value={hl1Title}
+                        onChange={(e) => setHl1Title(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Mô tả VI (Ví dụ: IELTS Overall)"
+                        value={hl1Sub}
+                        onChange={(e) => setHl1Sub(e.target.value)}
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Tiêu đề EN (Ví dụ: 8.5)"
+                        value={hl1TitleEn}
+                        onChange={(e) => setHl1TitleEn(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Mô tả EN (Ví dụ: IELTS Overall)"
+                        value={hl1SubEn}
+                        onChange={(e) => setHl1SubEn(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Highlight 2 */}
+                  <div className={styles.highlightCard}>
+                    <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                      Dòng 2 (Học vị / Bằng cấp)
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 1fr', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                      <select
+                        className={styles.formSelect}
+                        value={hl2Icon}
+                        onChange={(e) => setHl2Icon(e.target.value as any)}
+                      >
+                        <option value="ielts">Icon IELTS / Máy tính</option>
+                        <option value="degree">Icon Mũ Bằng Cấp</option>
+                        <option value="medal">Icon Huy Chương / Bằng</option>
+                      </select>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Tiêu đề VI (Ví dụ: Thạc sĩ Ngôn ngữ)"
+                        value={hl2Title}
+                        onChange={(e) => setHl2Title(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Mô tả VI (Ví dụ: Đại học Edinburgh)"
+                        value={hl2Sub}
+                        onChange={(e) => setHl2Sub(e.target.value)}
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Tiêu đề EN (Ví dụ: Master of Linguistics)"
+                        value={hl2TitleEn}
+                        onChange={(e) => setHl2TitleEn(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Mô tả EN (Ví dụ: University of Edinburgh)"
+                        value={hl2SubEn}
+                        onChange={(e) => setHl2SubEn(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Highlight 3 */}
+                  <div className={styles.highlightCard}>
+                    <div style={{ fontWeight: 600, color: '#38bdf8', marginBottom: '0.4rem', fontSize: '0.85rem' }}>
+                      Dòng 3 (Chứng chỉ quốc tế)
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 1fr', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                      <select
+                        className={styles.formSelect}
+                        value={hl3Icon}
+                        onChange={(e) => setHl3Icon(e.target.value as any)}
+                      >
+                        <option value="ielts">Icon IELTS / Máy tính</option>
+                        <option value="degree">Icon Mũ Bằng Cấp</option>
+                        <option value="medal">Icon Huy Chương / Bằng</option>
+                      </select>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Tiêu đề VI (Ví dụ: Chứng chỉ CELTA)"
+                        value={hl3Title}
+                        onChange={(e) => setHl3Title(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Mô tả VI (Ví dụ: Đạt chuẩn Cambridge)"
+                        value={hl3Sub}
+                        onChange={(e) => setHl3Sub(e.target.value)}
+                      />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Tiêu đề EN (Ví dụ: CELTA Certificate)"
+                        value={hl3TitleEn}
+                        onChange={(e) => setHl3TitleEn(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className={styles.formInput}
+                        placeholder="Mô tả EN (Ví dụ: Cambridge certified)"
+                        value={hl3SubEn}
+                        onChange={(e) => setHl3SubEn(e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
