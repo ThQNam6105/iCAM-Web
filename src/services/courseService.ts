@@ -188,50 +188,6 @@ export const INITIAL_COURSES: CourseItem[] = [
     updatedAt: '2026-08-16T10:00:00.000Z',
   },
   {
-    id: 'ielts-foundation',
-    courseCode: 'ICAM-IELTS-45',
-    category: 'ielts',
-    titleVi: 'IELTS Foundation (Target 4.5 - 5.5+)',
-    titleEn: 'IELTS Foundation (Target 4.5 - 5.5+)',
-    badgeVi: 'IELTS NỀN TẢNG',
-    badgeEn: 'IELTS FOUNDATION',
-    targetAgeVi: '14+ tuổi',
-    targetAgeEn: 'Ages 14+',
-    descriptionVi: 'Xây dựng nền tảng từ vựng, ngữ pháp học thuật và làm quen với cấu trúc đề thi IELTS 4 kỹ năng.',
-    descriptionEn: 'Building academic vocabulary, grammar foundation, and familiarizing with 4-skill IELTS exam structure.',
-    durationVi: '4 tháng / 48 buổi',
-    durationEn: '4 months / 48 sessions',
-    levelVi: 'Target 4.5 - 5.5+',
-    levelEn: 'Target 4.5 - 5.5+',
-    targetOutputVi: 'Cam kết bằng hợp đồng đạt IELTS 5.0 - 5.5+',
-    targetOutputEn: 'Contractual guarantee to reach IELTS 5.0 - 5.5+',
-    featuresVi: [
-      'Giáo trình độc quyền biên soạn bởi Chuyên gia 8.5+ IELTS',
-      'Chữa bài Writing & Speaking chi tiết từng tiêu chí',
-      'Thi thử Mock Test hàng tháng môi trường thật',
-      'Cam kết học lại miễn phí nếu không đạt đầu ra'
-    ],
-    featuresEn: [
-      'Exclusive syllabus by 8.5+ IELTS Experts',
-      'Detailed Writing & Speaking feedback per criteria',
-      'Monthly real-environment Mock Test',
-      'Free retake commitment if target not met'
-    ],
-    syllabusVi: [
-      'Module 1: IELTS Grammar & Academic Vocabulary (Từ vựng & Ngữ pháp IELTS)',
-      'Module 2: Listening & Reading Strategies (Chiến thuật Nghe & Đọc)',
-      'Module 3: Speaking Part 1 & Writing Task 1 Foundation (Nền tảng Nói & Viết)'
-    ],
-    syllabusEn: [
-      'Module 1: IELTS Grammar & Academic Vocabulary',
-      'Module 2: Listening & Reading Strategies',
-      'Module 3: Speaking Part 1 & Writing Task 1 Foundation'
-    ],
-    status: 'active',
-    createdAt: '2026-02-10T08:00:00.000Z',
-    updatedAt: '2026-08-16T10:00:00.000Z',
-  },
-  {
     id: 'ielts-master',
     courseCode: 'ICAM-IELTS-65',
     category: 'ielts',

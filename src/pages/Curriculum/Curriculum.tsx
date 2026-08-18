@@ -262,45 +262,6 @@ const coursesData: Course[] = [
       'Module 3: Project presentation & international job interviews',
       'Module 4: Real-world communication & scenario discussions'
     ]
-  },
-  {
-    id: 'online-21st',
-    category: 'online',
-    title: 'iCAM Online Đa Trải Nghiệm',
-    titleEn: 'iCAM Online 21st',
-    badge: 'ONLINE MULTI-EXPERIENCE',
-    badgeEn: 'ONLINE MULTI-EXPERIENCE',
-    age: 'Mọi lứa tuổi',
-    ageEn: 'All Ages',
-    desc: 'Mô hình học trực tuyến thông minh với màn hình hologram & bảng tương tác hiện đại, giúp học viên học mọi lúc mọi nơi với hiệu quả tối ưu.',
-    descEn: 'Smart online learning model with hologram displays & modern interactive boards, allowing flexible learning anytime anywhere.',
-    duration: 'Linh hoạt theo lộ trình',
-    durationEn: 'Flexible per pathway',
-    level: 'Đa dạng cấp độ',
-    target: 'Linh hoạt thời gian & Hiệu quả tương đương Offline',
-    targetEn: 'Flexible schedule with effectiveness equal to Offline classes.',
-    features: [
-      'Tương tác trực tiếp 1-1 hoặc nhóm nhỏ với giáo viên',
-      'Nền tảng học đa phương tiện Anh Quốc kiểm định',
-      'Hệ thống theo dõi tiến độ học tập thông minh'
-    ],
-    featuresEn: [
-      'Direct 1-on-1 or small group interaction with teachers',
-      'Verified British multimedia learning platform',
-      'Smart learning progress tracking system'
-    ],
-    syllabus: [
-      'Module 1: Kiểm tra trình độ & cá nhân hóa lộ trình học',
-      'Module 2: Học tương tác trực tiếp trên phần mềm iCAM',
-      'Module 3: Bài tập rèn luyện tự học độc lập hàng ngày',
-      'Module 4: Đánh giá năng lực định kỳ & cấp chứng chỉ'
-    ],
-    syllabusEn: [
-      'Module 1: Proficiency assessment & personalized learning roadmap',
-      'Module 2: Direct interactive learning on iCAM platform',
-      'Module 3: Daily independent self-study exercises',
-      'Module 4: Periodic evaluation & certificate issuance'
-    ]
   }
 ];
 
