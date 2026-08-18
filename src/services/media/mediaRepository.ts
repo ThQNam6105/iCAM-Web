@@ -147,11 +147,22 @@ export class MediaRepository {
    * Fetch all folders with item count
    */
   async getFolders(): Promise<MediaFolder[]> {
-    let folders = getStoredFolders();
+    const localFolders = getStoredFolders();
+    let folders = [...localFolders];
     try {
       const { data, error } = await supabase.from('media_folders').select('*').order('created_at', { ascending: true });
       if (!error && data && data.length > 0) {
-        folders = data as MediaFolder[];
+        const supabaseFolders = data as MediaFolder[];
+        const folderMap = new Map<string, MediaFolder>();
+        for (const f of supabaseFolders) {
+          folderMap.set(f.id, f);
+        }
+        for (const f of localFolders) {
+          if (!folderMap.has(f.id)) {
+            folderMap.set(f.id, f);
+          }
+        }
+        folders = Array.from(folderMap.values());
         saveStoredFolders(folders);
       } else {
         // Sync default initial folders to Supabase if database table is empty
@@ -388,12 +399,30 @@ export class MediaRepository {
    * Fetch media assets with filtering, debounced search, tags, folders, and pagination
    */
   async getMediaItems(filter: MediaFilter = {}): Promise<{ items: MediaItem[]; total: number }> {
-    let items = getStoredItems();
+    const localItems = getStoredItems();
+    let items = [...localItems];
 
     try {
       const { data, error } = await supabase.from('media_items').select('*').order('created_at', { ascending: false });
       if (!error && data && data.length > 0) {
-        items = data as MediaItem[];
+        const supabaseItems = data as MediaItem[];
+        const itemMap = new Map<string, MediaItem>();
+
+        for (const item of supabaseItems) {
+          itemMap.set(item.id, item);
+        }
+
+        for (const item of localItems) {
+          if (!itemMap.has(item.id)) {
+            itemMap.set(item.id, item);
+          } else {
+            const existing = itemMap.get(item.id)!;
+            if (new Date(item.updated_at).getTime() >= new Date(existing.updated_at).getTime()) {
+              itemMap.set(item.id, item);
+            }
+          }
+        }
+        items = Array.from(itemMap.values());
         saveStoredItems(items);
       } else {
         // Sync default initial media items to Supabase
@@ -484,7 +513,7 @@ export class MediaRepository {
 
     const total = items.length;
     const page = filter.page || 1;
-    const pageSize = (filter as { pageSize?: number }).pageSize || 24;
+    const pageSize = filter.limit || (filter as { pageSize?: number }).pageSize || 100;
     const startIndex = (page - 1) * pageSize;
     const paginatedItems = items.slice(startIndex, startIndex + pageSize);
 
