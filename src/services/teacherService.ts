@@ -25,7 +25,7 @@ export const markTeacherAsDeleted = (id: string) => {
   saveDeletedTeacherIds(Array.from(ids));
 };
 
-import { saveTeachersIDB, getTeachersIDB } from './cmsStorage';
+import { saveTeachersIDB, getTeachersIDB, compressBase64Image } from './cmsStorage';
 
 let inMemoryTeachers: Teacher[] | null = null;
 
@@ -58,11 +58,22 @@ export const syncTeachersToSystemSettings = async (list: Teacher[]) => {
   try {
     const deletedSet = new Set(getDeletedTeacherIds());
     const cleanList = list.filter((t) => !deletedSet.has(t.id));
-    await supabase.from('system_settings').upsert({
+    const compressedList = await Promise.all(
+      cleanList.map(async (t) => {
+        if (t.image && t.image.startsWith('data:image/') && t.image.length > 20000) {
+          const comp = await compressBase64Image(t.image);
+          return { ...t, image: comp };
+        }
+        return t;
+      })
+    );
+
+    const { error } = await supabase.from('system_settings').upsert({
       key: 'icancam_all_teachers_v1',
-      value: JSON.stringify(cleanList),
+      value: JSON.stringify(compressedList),
       updated_at: new Date().toISOString(),
     });
+    if (error) console.warn('Supabase system_settings teachers sync error:', error.message);
   } catch (err) {
     console.warn('Supabase system_settings teachers sync notice:', err);
   }
@@ -206,8 +217,14 @@ export const createTeacher = async (
   data: Omit<Teacher, 'id'>
 ): Promise<{ success: boolean; data?: Teacher; error?: string }> => {
   const list = getAllTeachers();
+  let image = data.image;
+  if (image && image.startsWith('data:image/') && image.length > 20000) {
+    image = await compressBase64Image(image);
+  }
+
   const created: Teacher = {
     ...data,
+    image,
     id: `teacher_${Date.now()}`,
   };
 
@@ -226,9 +243,15 @@ export const updateTeacher = async (
   const idx = list.findIndex((t) => t.id === id);
   if (idx === -1) return { success: false, error: 'Giáo viên không tồn tại' };
 
+  let image = data.image !== undefined ? data.image : list[idx].image;
+  if (image && image.startsWith('data:image/') && image.length > 20000) {
+    image = await compressBase64Image(image);
+  }
+
   const updated: Teacher = {
     ...list[idx],
     ...data,
+    image,
   };
 
   await syncTeacherToSupabase(updated);
