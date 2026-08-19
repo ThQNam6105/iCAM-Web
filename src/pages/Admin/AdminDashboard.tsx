@@ -18,7 +18,6 @@ import {
   updateNewsPost,
   deleteNewsPost,
   fetchPostsFromSupabase,
-  syncAllLocalPostsToSupabase,
   type DynamicNewsItem,
   type PostStatus
 } from '../../services/newsService';
@@ -59,7 +58,6 @@ export const AdminDashboard: React.FC = () => {
       setRefreshKey((prev) => prev + 1);
     });
     fetchCategoriesFromSupabase();
-    syncAllLocalPostsToSupabase();
   }, []);
 
   const allRawPosts = useMemo(() => {
