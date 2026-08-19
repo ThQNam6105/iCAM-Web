@@ -1,3 +1,4 @@
+import mammoth from 'mammoth';
 import { sanitizeHtml } from './sanitizerService';
 
 /**
@@ -25,26 +26,32 @@ export const cleanWordHtml = (htmlRaw: string): string => {
   return sanitizeHtml(cleaned);
 };
 
-export const parseWordDocument = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+export const parseWordDocument = async (file: File | Blob): Promise<string> => {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    const rawHtml = result.value || '';
+    if (rawHtml.trim()) {
+      return cleanWordHtml(rawHtml);
+    }
+  } catch (err) {
+    console.error('Error parsing .docx document with mammoth:', err);
+  }
 
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        // Basic extraction fallback for text/html from docx/html export
-        const cleanText = text
-          .split('\n')
-          .filter((line) => line.trim() !== '')
-          .map((line) => `<p>${line.trim()}</p>`)
-          .join('');
-        resolve(cleanWordHtml(cleanText));
-      } catch (err) {
-        reject(err);
-      }
-    };
+  // Fallback for plain text files
+  try {
+    const text = await file.text();
+    if (text && !text.includes('PK')) {
+      const cleanText = text
+        .split('\n')
+        .filter((line) => line.trim() !== '')
+        .map((line) => `<p>${line.trim()}</p>`)
+        .join('');
+      return cleanWordHtml(cleanText);
+    }
+  } catch {
+    // Ignore
+  }
 
-    reader.onerror = (err) => reject(err);
-    reader.readAsText(file);
-  });
+  return '';
 };

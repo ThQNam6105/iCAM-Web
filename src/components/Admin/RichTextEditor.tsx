@@ -23,6 +23,7 @@ import {
   Redo2,
   Minus,
   Sparkles,
+  FolderTree,
 } from 'lucide-react';
 import { cleanWordHtml, parseWordDocument } from '../../services/importService';
 import { sanitizeHtml } from '../../services/sanitizerService';
@@ -124,9 +125,25 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     setIsMediaModalOpen(true);
   };
 
+  const directDocxInputRef = useRef<HTMLInputElement>(null);
+
   const handleImportWord = () => {
     setMediaFilterType('doc');
     setIsMediaModalOpen(true);
+  };
+
+  const handleDirectDocxUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const parsedHtml = await parseWordDocument(file);
+      if (parsedHtml) {
+        execCmd('insertHTML', parsedHtml);
+      }
+    } catch (err) {
+      console.error('Error importing direct Word document:', err);
+    }
+    if (directDocxInputRef.current) directDocxInputRef.current.value = '';
   };
 
   const handleSelectMediaAsset = async (assets: MediaItem[]) => {
@@ -146,9 +163,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         const blob = await response.blob();
         const file = new File([blob], asset.original_filename, { type: asset.mime_type });
         const parsedHtml = await parseWordDocument(file);
-        if (contentRef.current) {
-          contentRef.current.innerHTML += parsedHtml;
-          triggerChange();
+        if (parsedHtml) {
+          execCmd('insertHTML', parsedHtml);
         }
       } catch (err) {
         console.error('Error parsing Word document from system library:', err);
@@ -364,13 +380,28 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         {/* Import & Search & Fullscreen */}
         <div className={styles.toolbarGroup}>
+          <input
+            type="file"
+            ref={directDocxInputRef}
+            style={{ display: 'none' }}
+            accept=".docx,.doc"
+            onChange={handleDirectDocxUpload}
+          />
+          <button
+            type="button"
+            onClick={() => directDocxInputRef.current?.click()}
+            className={styles.toolBtn}
+            title="Tải & nhập tệp Word (.docx) từ máy tính"
+          >
+            <FileDown size={15} />
+          </button>
           <button
             type="button"
             onClick={handleImportWord}
             className={styles.toolBtn}
             title="Nhập tài liệu MS Word từ Thư viện hệ thống"
           >
-            <FileDown size={15} />
+            <FolderTree size={15} />
           </button>
           <button
             type="button"
