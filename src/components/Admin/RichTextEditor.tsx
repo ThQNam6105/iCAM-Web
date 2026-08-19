@@ -43,14 +43,19 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = 'Nhập nội dung bài viết...',
 }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const isLocalChange = useRef(false);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [replaceText, setReplaceText] = useState('');
 
-  // Sync value from props to contenteditable div when prop changes externally
+  // Sync value from props to contenteditable div ONLY when prop changes externally
   useEffect(() => {
+    if (isLocalChange.current) {
+      isLocalChange.current = false;
+      return;
+    }
     if (contentRef.current && contentRef.current.innerHTML !== value) {
       contentRef.current.innerHTML = value || '';
     }
@@ -63,6 +68,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const triggerChange = () => {
     if (contentRef.current) {
+      isLocalChange.current = true;
       const sanitized = sanitizeHtml(contentRef.current.innerHTML);
       onChange(sanitized);
     }
