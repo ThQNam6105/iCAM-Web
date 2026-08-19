@@ -196,7 +196,7 @@ export const getFilteredNewsPosts = (options: PostFilterOptions): DynamicNewsIte
 };
 
 // Helper to sync single post to Supabase
-const syncPostToSupabase = async (post: DynamicNewsItem) => {
+export const syncPostToSupabase = async (post: DynamicNewsItem) => {
   try {
     const rawIdStr = String(post.id).replace('default_', '').replace('post_', '');
     const dbId = !isNaN(Number(rawIdStr)) && Number(rawIdStr) > 0 ? Number(rawIdStr) : Date.now();
@@ -204,38 +204,41 @@ const syncPostToSupabase = async (post: DynamicNewsItem) => {
     const { error } = await supabase.from('news_posts').upsert({
       id: dbId,
       title: post.title,
-      title_en: post.titleEn,
+      title_en: post.titleEn || post.title,
       slug: post.slug,
       category: post.category,
       category_label: post.categoryLabel,
-      category_label_en: post.categoryLabelEn,
+      category_label_en: post.categoryLabelEn || post.categoryLabel,
       status: post.status,
-      author: post.author,
+      author: post.author || 'iCANCAM Admin',
       excerpt: post.excerpt,
-      excerpt_en: post.excerptEn,
+      excerpt_en: post.excerptEn || post.excerpt,
       content: post.content,
-      content_en: post.contentEn,
+      content_en: post.contentEn || post.content,
       image: post.image,
-      image_en: post.imageEn || post.image,
-      og_image: post.ogImage || post.image,
-      og_title: post.ogTitle || post.title,
-      og_description: post.ogDescription || post.excerpt,
-      canonical_url_override: post.canonicalUrlOverride,
-      url: post.url,
+      url: post.url || '/news',
       date: post.date || post.publishedAt || new Date().toLocaleDateString('vi-VN'),
       published_at: post.publishedAt,
-      reading_time: post.readingTime,
-      featured: post.featured,
-      is_custom: post.isCustom,
-      tags: post.tags,
-      created_at: post.createdAt,
-      updated_at: post.updatedAt,
+      reading_time: post.readingTime || '3 phút đọc',
+      featured: post.featured ?? true,
+      is_custom: post.isCustom ?? true,
+      tags: post.tags || ['Anh ngữ', 'Giáo dục'],
+      created_at: post.createdAt || new Date().toISOString(),
+      updated_at: post.updatedAt || new Date().toISOString(),
     });
     if (error) {
       console.warn('Supabase upsert error:', error.message);
     }
   } catch (err) {
     console.warn('Supabase sync warning:', err);
+  }
+};
+
+// Helper to sync all local posts to Supabase
+export const syncAllLocalPostsToSupabase = async () => {
+  const posts = getAllNewsPosts();
+  for (const post of posts) {
+    await syncPostToSupabase(post);
   }
 };
 
