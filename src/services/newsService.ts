@@ -234,11 +234,35 @@ export const syncPostToSupabase = async (post: DynamicNewsItem) => {
   }
 };
 
-// Helper to sync all local posts to Supabase
+// Helper to sync all local posts to Supabase & clean up deleted posts in DB
 export const syncAllLocalPostsToSupabase = async () => {
-  const posts = getAllNewsPosts();
-  for (const post of posts) {
-    await syncPostToSupabase(post);
+  try {
+    const localPosts = getAllNewsPosts();
+    if (localPosts.length === 0) return;
+
+    const localIdSet = new Set(
+      localPosts.map((p) => String(p.id).replace('default_', '').replace('post_', ''))
+    );
+
+    // 1. Fetch current IDs in Supabase DB
+    const { data: dbRows, error } = await supabase.from('news_posts').select('id');
+    if (!error && dbRows && dbRows.length > 0) {
+      for (const row of dbRows) {
+        const dbIdStr = String(row.id).replace('default_', '').replace('post_', '');
+        // If a post exists in Supabase DB but is NOT in Admin local posts, delete it from Supabase DB!
+        if (!localIdSet.has(dbIdStr) && !localIdSet.has(String(row.id))) {
+          const dbIdVal = !isNaN(Number(dbIdStr)) ? Number(dbIdStr) : row.id;
+          await supabase.from('news_posts').delete().eq('id', dbIdVal);
+        }
+      }
+    }
+
+    // 2. Upsert current local posts to Supabase DB
+    for (const post of localPosts) {
+      await syncPostToSupabase(post);
+    }
+  } catch (err) {
+    console.warn('Sync error:', err);
   }
 };
 
@@ -276,12 +300,12 @@ export const updateNewsPost = (
   data: Partial<Omit<DynamicNewsItem, 'id' | 'createdAt' | 'isCustom'>>
 ): DynamicNewsItem | null => {
   const posts = getAllNewsPosts();
-  const targetIdStr = String(id).replace('default_', '');
+  const targetIdStr = String(id).replace('default_', '').replace('post_', '');
 
   let index = posts.findIndex(
     (p) =>
       String(p.id) === String(id) ||
-      String(p.id).replace('default_', '') === targetIdStr
+      String(p.id).replace('default_', '').replace('post_', '') === targetIdStr
   );
 
   // If still not found by ID, try matching by slug or title
@@ -341,19 +365,19 @@ export const updateNewsPost = (
 export const deleteNewsPost = (id: string | number): boolean => {
   try {
     const posts = getAllNewsPosts();
-    const targetIdStr = String(id).replace('default_', '');
+    const targetIdStr = String(id).replace('default_', '').replace('post_', '');
 
     const filtered = posts.filter(
       (post) =>
         String(post.id) !== String(id) &&
-        String(post.id).replace('default_', '') !== targetIdStr
+        String(post.id).replace('default_', '').replace('post_', '') !== targetIdStr
     );
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
 
     // Delete from Supabase Database
-    const dbId = !isNaN(Number(targetIdStr)) ? Number(targetIdStr) : targetIdStr;
-    supabase.from('news_posts').delete().eq('id', dbId).then(({ error }) => {
+    const dbIdVal = !isNaN(Number(targetIdStr)) ? Number(targetIdStr) : targetIdStr;
+    supabase.from('news_posts').delete().eq('id', dbIdVal).then(({ error }) => {
       if (error) console.warn('Supabase delete error:', error.message);
     });
 
