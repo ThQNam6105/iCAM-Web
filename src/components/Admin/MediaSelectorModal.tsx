@@ -153,7 +153,7 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
         type="file"
         ref={fileInputRef}
         style={{ display: 'none' }}
-        accept="image/*,.pdf,.doc,.docx"
+        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
         multiple
         onChange={handleDirectUpload}
       />

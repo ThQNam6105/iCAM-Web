@@ -7,6 +7,7 @@ export interface FileValidationResult {
   isGif?: boolean;
   isAnimatedGif?: boolean;
   isPdf?: boolean;
+  isDoc?: boolean;
 }
 
 export const ALLOWED_MIME_TYPES = new Set([
@@ -20,40 +21,53 @@ export const ALLOWED_MIME_TYPES = new Set([
   'image/vnd.microsoft.icon',
   'image/ico',
   'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'text/plain',
+  'audio/mpeg',
+  'audio/wav',
+  'video/mp4',
+  'video/webm',
 ]);
 
-export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+export const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 /**
  * Validates file MIME type, extension, size, and content
  */
 export const validateMediaFile = async (file: File): Promise<FileValidationResult> => {
   const ext = file.name.split('.').pop()?.toLowerCase() || '';
-  const allowedExts = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico', 'icon', 'pdf']);
+  const allowedExts = new Set([
+    'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico', 'icon',
+    'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt',
+    'mp4', 'webm', 'mp3', 'wav', 'm4a', 'ogg'
+  ]);
 
   if (!allowedExts.has(ext)) {
-    return { valid: false, error: `Định dạng file .${ext} không được hỗ trợ.` };
+    return { valid: false, error: `Định dạng file .${ext} không được hệ thống hỗ trợ.` };
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    return { valid: false, error: `Dung lượng tệp (${(file.size / (1024 * 1024)).toFixed(1)}MB) vượt quá giới hạn tối đa 10MB.` };
+    return { valid: false, error: `Dung lượng tệp (${(file.size / (1024 * 1024)).toFixed(1)}MB) vượt quá giới hạn tối đa 50MB.` };
   }
 
   const mime = file.type.toLowerCase();
   const isSvg = ext === 'svg' || mime.includes('svg');
   const isPdf = ext === 'pdf' || mime.includes('pdf');
   const isGif = ext === 'gif' || mime.includes('gif');
-
-  if (!isSvg && !isPdf && !mime.startsWith('image/')) {
-    return { valid: false, error: 'File tải lên không thuộc định dạng hình ảnh hoặc tài liệu PDF hợp lệ.' };
-  }
+  const isDoc = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'].includes(ext) ||
+                mime.includes('word') || mime.includes('document') || mime.includes('excel') || mime.includes('powerpoint') || mime.includes('text');
 
   let isAnimatedGif = false;
   if (isGif) {
     try {
       const buffer = await file.arrayBuffer();
       const arr = new Uint8Array(buffer);
-      // Basic animated GIF detection: check for multiple Graphic Control Extensions (0x21 0xF9)
+      // Basic animated GIF detection
       let gceCount = 0;
       for (let i = 0; i < arr.length - 1; i++) {
         if (arr[i] === 0x21 && arr[i + 1] === 0xf9) {
@@ -75,6 +89,7 @@ export const validateMediaFile = async (file: File): Promise<FileValidationResul
     isGif,
     isAnimatedGif,
     isPdf,
+    isDoc,
   };
 };
 
@@ -102,7 +117,8 @@ export const sanitizeSvgContent = async (file: File): Promise<Blob> => {
  */
 export const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
   return new Promise((resolve) => {
-    if (file.type === 'application/pdf') {
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (file.type === 'application/pdf' || ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'].includes(ext)) {
       resolve({ width: 0, height: 0 });
       return;
     }

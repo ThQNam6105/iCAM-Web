@@ -586,7 +586,7 @@ export const AdminMediaLibrary: React.FC = () => {
                 type="file"
                 ref={fileInputRef}
                 multiple
-                accept="image/*,video/*,audio/*,.pdf,.svg"
+                accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.svg"
                 onChange={(e) => e.target.files && handleUploadFiles(e.target.files)}
                 style={{ display: 'none' }}
               />

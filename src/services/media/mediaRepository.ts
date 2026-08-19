@@ -569,8 +569,19 @@ export class MediaRepository {
         items = items.filter((i) => i.mime_type.includes('svg'));
       } else if (filter.fileType === 'gif') {
         items = items.filter((i) => i.mime_type.includes('gif'));
-      } else if (filter.fileType === 'pdf') {
-        items = items.filter((i) => i.mime_type.includes('pdf'));
+      } else if (filter.fileType === 'pdf' || filter.fileType === 'doc') {
+        items = items.filter((i) =>
+          i.mime_type.includes('pdf') ||
+          i.mime_type.includes('word') ||
+          i.mime_type.includes('document') ||
+          i.mime_type.includes('excel') ||
+          i.mime_type.includes('powerpoint') ||
+          i.original_filename.endsWith('.doc') ||
+          i.original_filename.endsWith('.docx') ||
+          i.original_filename.endsWith('.xls') ||
+          i.original_filename.endsWith('.xlsx') ||
+          i.original_filename.endsWith('.pdf')
+        );
       }
     }
 
