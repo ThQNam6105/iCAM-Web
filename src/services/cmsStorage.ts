@@ -1,8 +1,9 @@
 import type { Student } from '../data/studentData';
 import type { Teacher } from '../data/teacherData';
+import type { ParentTestimonial } from '../data/parentData';
 
 const DB_NAME = 'icancam_app_db_v3';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -21,6 +22,9 @@ export const getCMS_IDB = (): Promise<IDBDatabase> => {
       }
       if (!db.objectStoreNames.contains('teachers')) {
         db.createObjectStore('teachers', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('parents')) {
+        db.createObjectStore('parents', { keyPath: 'id' });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -97,6 +101,43 @@ export const getTeachersIDB = async (): Promise<Teacher[]> => {
         .catch(() => resolve([]));
     });
     const timeoutPromise = new Promise<Teacher[]>((resolve) => setTimeout(() => resolve([]), 500));
+    return await Promise.race([fetchPromise, timeoutPromise]);
+  } catch {
+    return [];
+  }
+};
+
+export const saveParentsIDB = async (parents: ParentTestimonial[]): Promise<void> => {
+  try {
+    const db = await getCMS_IDB();
+    const tx = db.transaction('parents', 'readwrite');
+    const store = tx.objectStore('parents');
+    store.clear();
+    for (const p of parents) {
+      store.put(p);
+    }
+  } catch (err) {
+    console.warn('IDB saveParents error:', err);
+  }
+};
+
+export const getParentsIDB = async (): Promise<ParentTestimonial[]> => {
+  try {
+    const fetchPromise = new Promise<ParentTestimonial[]>((resolve) => {
+      getCMS_IDB()
+        .then((db) => {
+          if (!db.objectStoreNames.contains('parents')) {
+            resolve([]);
+            return;
+          }
+          const tx = db.transaction('parents', 'readonly');
+          const req = tx.objectStore('parents').getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve([]);
+        })
+        .catch(() => resolve([]));
+    });
+    const timeoutPromise = new Promise<ParentTestimonial[]>((resolve) => setTimeout(() => resolve([]), 500));
     return await Promise.race([fetchPromise, timeoutPromise]);
   } catch {
     return [];

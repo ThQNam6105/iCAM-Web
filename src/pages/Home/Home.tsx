@@ -4,9 +4,10 @@ import styles from './Home.module.css';
 import { articlesData } from '../../data/newsData';
 import { teachersData, type Teacher } from '../../data/teacherData';
 import { studentsData, type Student } from '../../data/studentData';
+import { parentsData, type ParentTestimonial } from '../../data/parentData';
 import { fetchTeachersFromSupabase } from '../../services/teacherService';
 import { fetchStudentsFromSupabase } from '../../services/studentService';
-import { parentsData } from '../../data/parentData';
+import { fetchParentsFromSupabase } from '../../services/parentService';
 import bannerBg from '../../assets/banner-bg.jpg';
 import bannerBgMobile from '../../assets/banner-bg-mobile.jpg';
 import enBannerBg from '../../assets/en_banner-bg.jpg';
@@ -105,6 +106,7 @@ export const Home: React.FC = () => {
   // State for live data
   const [liveTeachers, setLiveTeachers] = useState<Teacher[]>(teachersData);
   const [liveStudents, setLiveStudents] = useState<Student[]>(studentsData);
+  const [liveParents, setLiveParents] = useState<ParentTestimonial[]>(parentsData);
 
   useEffect(() => {
     fetchTeachersFromSupabase().then((data) => {
@@ -112,6 +114,9 @@ export const Home: React.FC = () => {
     });
     fetchStudentsFromSupabase().then((data) => {
       if (data && data.length > 0) setLiveStudents(data);
+    });
+    fetchParentsFromSupabase().then((data) => {
+      if (data && data.length > 0) setLiveParents(data);
     });
   }, []);
 
@@ -591,9 +596,9 @@ export const Home: React.FC = () => {
   // ==========================================================================
   // Slider Parents - Infinite loop logic
   // ==========================================================================
-  const clonedParentsBefore = parentsData.slice(-parentsToShow);
-  const clonedParentsAfter = parentsData.slice(0, parentsToShow);
-  const extendedParents = [...clonedParentsBefore, ...parentsData, ...clonedParentsAfter];
+  const clonedParentsBefore = liveParents.slice(-parentsToShow);
+  const clonedParentsAfter = liveParents.slice(0, parentsToShow);
+  const extendedParents = [...clonedParentsBefore, ...liveParents, ...clonedParentsAfter];
 
   const nextParentSlide = () => {
     if (disableParentTransition) return;
@@ -689,15 +694,15 @@ export const Home: React.FC = () => {
   const handleParentTransitionEnd = () => {
     if (parentIndex === -1) {
       setDisableParentTransition(true);
-      setParentIndex(parentsData.length - 1);
-    } else if (parentIndex === parentsData.length) {
+      setParentIndex(liveParents.length - 1);
+    } else if (parentIndex === liveParents.length) {
       setDisableParentTransition(true);
       setParentIndex(0);
     }
   };
 
   useEffect(() => {
-    if (parentIndex >= parentsData.length + 1) {
+    if (parentIndex >= liveParents.length + 1) {
       const timer = setTimeout(() => {
         setDisableParentTransition(true);
         setParentIndex(0);
@@ -706,11 +711,11 @@ export const Home: React.FC = () => {
     } else if (parentIndex <= -2) {
       const timer = setTimeout(() => {
         setDisableParentTransition(true);
-        setParentIndex(parentsData.length - 1);
+        setParentIndex(liveParents.length - 1);
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [parentIndex]);
+  }, [parentIndex, liveParents.length]);
 
   useEffect(() => {
     if (disableParentTransition) {

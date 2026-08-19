@@ -7,6 +7,7 @@ import {
   BookOpen,
   UserCheck,
   Star,
+  MessageSquare,
   HelpCircle,
   Briefcase,
   Settings,
@@ -93,6 +94,14 @@ export const AdminSidebar: React.FC = () => {
         >
           <span className={styles.navItemIcon}><Star size={18} /></span>
           <span>Học viên ưu tú</span>
+        </NavLink>
+
+        <NavLink
+          to="/admin/parents"
+          className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
+        >
+          <span className={styles.navItemIcon}><MessageSquare size={18} /></span>
+          <span>Ý kiến Phụ huynh</span>
         </NavLink>
 
         <NavLink
