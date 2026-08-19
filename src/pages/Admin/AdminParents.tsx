@@ -244,14 +244,14 @@ export const AdminParents: React.FC = () => {
                     className={`${styles.langTab} ${activeLangTab === 'vi' ? styles.langTabActive : ''}`}
                     onClick={() => setActiveLangTab('vi')}
                   >
-                    🇻🇳 Nội dung Tiếng Việt
+                    Nội dung Tiếng Việt
                   </button>
                   <button
                     type="button"
                     className={`${styles.langTab} ${activeLangTab === 'en' ? styles.langTabActive : ''}`}
                     onClick={() => setActiveLangTab('en')}
                   >
-                    🇬🇧 Nội dung Tiếng Anh
+                    Nội dung Tiếng Anh
                   </button>
                 </div>
 
