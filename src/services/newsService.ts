@@ -86,27 +86,9 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
         updatedAt: item.updated_at,
       }));
 
-      // Smart merge: Keep local custom posts if not in Supabase yet
-      const localPosts = getAllNewsPosts();
-      const mergedPostsMap = new Map<string, DynamicNewsItem>();
-      postsFromDb.forEach((dbPost) => {
-        mergedPostsMap.set(String(dbPost.id), dbPost);
-      });
-
-      localPosts.forEach((localPost: DynamicNewsItem) => {
-        if (localPost.isCustom) {
-          const key = String(localPost.id).replace('default_', '').replace('post_', '');
-          if (!mergedPostsMap.has(key) && !mergedPostsMap.has(String(localPost.id))) {
-            mergedPostsMap.set(String(localPost.id), localPost);
-            // Re-trigger sync in case previous sync failed
-            syncPostToSupabase(localPost);
-          }
-        }
-      });
-
-      const finalPosts = Array.from(mergedPostsMap.values());
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalPosts));
-      return finalPosts;
+      // Cache exact Supabase posts into localStorage so all devices & sessions stay 100% in sync
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
+      return postsFromDb;
     }
   } catch (err) {
     console.warn('Supabase table not created yet or offline, using local storage cache:', err);
@@ -362,7 +344,7 @@ export const updateNewsPost = (
 };
 
 // Delete post
-export const deleteNewsPost = (id: string | number): boolean => {
+export const deleteNewsPost = async (id: string | number): Promise<boolean> => {
   try {
     const posts = getAllNewsPosts();
     const targetIdStr = String(id).replace('default_', '').replace('post_', '');
@@ -377,9 +359,10 @@ export const deleteNewsPost = (id: string | number): boolean => {
 
     // Delete from Supabase Database
     const dbIdVal = !isNaN(Number(targetIdStr)) ? Number(targetIdStr) : targetIdStr;
-    supabase.from('news_posts').delete().eq('id', dbIdVal).then(({ error }) => {
-      if (error) console.warn('Supabase delete error:', error.message);
-    });
+    const { error } = await supabase.from('news_posts').delete().eq('id', dbIdVal);
+    if (error) {
+      console.warn('Supabase delete error:', error.message);
+    }
 
     return true;
   } catch (error) {

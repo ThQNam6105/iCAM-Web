@@ -143,11 +143,11 @@ export const AdminDashboard: React.FC = () => {
   };
 
   // Delete handler
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (deleteCandidateId) {
-      deleteNewsPost(deleteCandidateId);
+      await deleteNewsPost(deleteCandidateId);
       showToast('Đã xóa bài viết thành công!', 'info');
-      loadPosts();
+      setRefreshKey((prev) => prev + 1);
     }
     setDeleteCandidateId(null);
   };
