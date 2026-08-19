@@ -106,18 +106,17 @@ export const Home: React.FC = () => {
 
   // State for live data
   const [liveArticles, setLiveArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
-    const dynamic = getPublicNewsPosts();
-    return dynamic.length > 0 ? dynamic : articlesData;
+    return getPublicNewsPosts();
   });
   const [liveTeachers, setLiveTeachers] = useState<Teacher[]>(teachersData);
   const [liveStudents, setLiveStudents] = useState<Student[]>(studentsData);
   const [liveParents, setLiveParents] = useState<ParentTestimonial[]>(parentsData);
 
   useEffect(() => {
-    fetchPostsFromSupabase().then(() => {
-      const dynamic = getPublicNewsPosts();
-      if (dynamic && dynamic.length > 0) {
-        setLiveArticles(dynamic);
+    fetchPostsFromSupabase().then((postsFromDb) => {
+      if (postsFromDb) {
+        const published = postsFromDb.filter((p) => p.status === 'published');
+        setLiveArticles(published);
       }
     });
     fetchTeachersFromSupabase().then((data) => {

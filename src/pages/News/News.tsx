@@ -44,24 +44,23 @@ export const News: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [articles, setArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
-    const dynamic = getPublicNewsPosts();
-    return dynamic.length > 0 ? dynamic : articlesData;
+    return getPublicNewsPosts();
   });
 
   useEffect(() => {
-    fetchPostsFromSupabase().then(() => {
-      const dynamic = getPublicNewsPosts();
-      if (dynamic.length > 0) {
-        setArticles(dynamic);
+    fetchPostsFromSupabase().then((postsFromDb) => {
+      if (postsFromDb) {
+        const published = postsFromDb.filter((p) => p.status === 'published');
+        setArticles(published);
       }
     });
     fetchCategoriesFromSupabase();
 
     const handleFocus = () => {
-      fetchPostsFromSupabase().then(() => {
-        const dynamic = getPublicNewsPosts();
-        if (dynamic.length > 0) {
-          setArticles(dynamic);
+      fetchPostsFromSupabase().then((postsFromDb) => {
+        if (postsFromDb) {
+          const published = postsFromDb.filter((p) => p.status === 'published');
+          setArticles(published);
         }
       });
     };

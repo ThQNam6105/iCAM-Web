@@ -57,9 +57,8 @@ export const calculateReadingTime = (content: string): string => {
 export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
   try {
     const { data, error } = await supabase.from('news_posts').select('*').order('created_at', { ascending: false });
-    const localPosts = getAllNewsPosts();
 
-    if (!error && data && data.length > 0) {
+    if (!error && data) {
       const postsFromDb: DynamicNewsItem[] = data.map((item) => ({
         id: item.id,
         title: item.title,
@@ -87,30 +86,9 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
         updatedAt: item.updated_at,
       }));
 
-      // Smart merge: DB posts take precedence over default seeded posts
-      const mergedPostsMap = new Map<string, DynamicNewsItem>();
-      postsFromDb.forEach((dbPost) => {
-        mergedPostsMap.set(String(dbPost.id), dbPost);
-      });
-
-      localPosts.forEach((localPost) => {
-        const key = String(localPost.id).replace('default_', '');
-        const dbPost = mergedPostsMap.get(key) || mergedPostsMap.get(String(localPost.id));
-
-        if (!dbPost) {
-          mergedPostsMap.set(key, localPost);
-        } else {
-          const localTime = new Date(localPost.updatedAt || 0).getTime();
-          const dbTime = new Date(dbPost.updatedAt || 0).getTime();
-          if (localPost.isCustom && localTime > dbTime) {
-            mergedPostsMap.set(key, { ...dbPost, ...localPost });
-          }
-        }
-      });
-
-      const finalPosts = Array.from(mergedPostsMap.values());
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalPosts));
-      return finalPosts;
+      // Cache exact Supabase posts into localStorage so incognito / new sessions stay 100% in sync
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
+      return postsFromDb;
     }
   } catch (err) {
     console.warn('Supabase table not created yet or offline, using local storage cache:', err);
@@ -341,12 +319,21 @@ export const updateNewsPost = (
 export const deleteNewsPost = (id: string | number): boolean => {
   try {
     const posts = getAllNewsPosts();
-    const filtered = posts.filter((post) => String(post.id) !== String(id));
+    const targetIdStr = String(id).replace('default_', '');
+
+    const filtered = posts.filter(
+      (post) =>
+        String(post.id) !== String(id) &&
+        String(post.id).replace('default_', '') !== targetIdStr
+    );
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
 
-    // Async delete from Supabase
-    supabase.from('news_posts').delete().eq('id', String(id)).then();
+    // Delete from Supabase Database
+    const dbId = !isNaN(Number(targetIdStr)) ? Number(targetIdStr) : targetIdStr;
+    supabase.from('news_posts').delete().eq('id', dbId).then(({ error }) => {
+      if (error) console.warn('Supabase delete error:', error.message);
+    });
 
     return true;
   } catch (error) {
