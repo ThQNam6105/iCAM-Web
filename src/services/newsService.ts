@@ -1,4 +1,4 @@
-import { articlesData, type Article } from '../data/newsData';
+import { type Article } from '../data/newsData';
 import { supabase } from './supabaseClient';
 
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v4';
@@ -107,41 +107,24 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
   return getAllNewsPosts();
 };
 
-// Get raw combined posts from storage (seed with default data if empty)
+// Get raw combined posts from storage (Supabase DB in-memory cache is priority)
 export const getAllNewsPosts = (): DynamicNewsItem[] => {
+  if (inMemoryNewsPostsCache && inMemoryNewsPostsCache.length > 0) {
+    return inMemoryNewsPostsCache;
+  }
+
   try {
     const customPostsRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    let posts: DynamicNewsItem[] = [];
     if (customPostsRaw) {
-      posts = JSON.parse(customPostsRaw);
-    } else if (inMemoryNewsPostsCache.length > 0) {
-      posts = inMemoryNewsPostsCache;
-    } else {
-      // Seed default articles into localStorage with fixed baseline past timestamp
-      const baselineTime = '2026-08-01T00:00:00.000Z';
-      posts = articlesData.map((post) => ({
-        ...post,
-        id: post.id,
-        slug: generateSlug(post.title),
-        status: 'published',
-        author: 'iCANCAM Editor',
-        tags: ['Anh ngữ', 'Giáo dục'],
-        createdAt: baselineTime,
-        updatedAt: baselineTime,
-        publishedAt: post.date,
-        featured: true,
-        readingTime: '3 phút đọc',
-        isCustom: false,
-      }));
-      safeSetLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+      const parsed = JSON.parse(customPostsRaw);
+      inMemoryNewsPostsCache = parsed;
+      return parsed;
     }
-
-    inMemoryNewsPostsCache = posts;
-    return posts;
   } catch (error) {
     console.error('Error reading news posts:', error);
-    return [];
   }
+
+  return [];
 };
 
 // Public website: Only get published posts
