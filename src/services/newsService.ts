@@ -4,6 +4,16 @@ import { supabase } from './supabaseClient';
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v4';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
 
+let inMemoryNewsPostsCache: DynamicNewsItem[] = [];
+
+const safeSetLocalStorage = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (err) {
+    console.warn(`[LocalStorage Notice] Storage quota exceeded writing "${key}". Supabase Cloud Database remains the authoritative source of truth.`, err);
+  }
+};
+
 export type PostStatus = 'draft' | 'published' | 'archived';
 
 export interface DynamicNewsItem extends Article {
@@ -87,7 +97,8 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
       }));
 
       // Cache exact Supabase posts into localStorage so all devices & sessions stay 100% in sync
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
+      inMemoryNewsPostsCache = postsFromDb;
+      safeSetLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
       return postsFromDb;
     }
   } catch (err) {
@@ -103,6 +114,8 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
     let posts: DynamicNewsItem[] = [];
     if (customPostsRaw) {
       posts = JSON.parse(customPostsRaw);
+    } else if (inMemoryNewsPostsCache.length > 0) {
+      posts = inMemoryNewsPostsCache;
     } else {
       // Seed default articles into localStorage with fixed baseline past timestamp
       const baselineTime = '2026-08-01T00:00:00.000Z';
@@ -120,9 +133,10 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
         readingTime: '3 phút đọc',
         isCustom: false,
       }));
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+      safeSetLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(posts));
     }
 
+    inMemoryNewsPostsCache = posts;
     return posts;
   } catch (error) {
     console.error('Error reading news posts:', error);
@@ -276,7 +290,8 @@ export const createNewsPost = async (
   }
 
   const updatedPosts = [createdPost, ...posts];
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedPosts));
+  inMemoryNewsPostsCache = updatedPosts;
+  safeSetLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(updatedPosts));
 
   return { success: true, data: createdPost };
 };
@@ -346,7 +361,8 @@ export const updateNewsPost = async (
   }
 
   posts[index] = updatedPost;
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
+  inMemoryNewsPostsCache = posts;
+  safeSetLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(posts));
 
   return { success: true, data: updatedPost };
 };
@@ -363,7 +379,8 @@ export const deleteNewsPost = async (id: string | number): Promise<boolean> => {
         String(post.id).replace('default_', '').replace('post_', '') !== targetIdStr
     );
 
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
+    inMemoryNewsPostsCache = filtered;
+    safeSetLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
 
     // Delete from Supabase Database
     const dbIdVal = !isNaN(Number(targetIdStr)) ? Number(targetIdStr) : targetIdStr;
@@ -381,7 +398,7 @@ export const deleteNewsPost = async (id: string | number): Promise<boolean> => {
 
 // Autosave draft helper
 export const saveDraftAutosave = (draftData: Partial<DynamicNewsItem>): void => {
-  localStorage.setItem(AUTOSAVE_DRAFT_KEY, JSON.stringify({ ...draftData, savedAt: new Date().toISOString() }));
+  safeSetLocalStorage(AUTOSAVE_DRAFT_KEY, JSON.stringify({ ...draftData, savedAt: new Date().toISOString() }));
 };
 
 export const getDraftAutosave = (): (Partial<DynamicNewsItem> & { savedAt?: string }) | null => {
