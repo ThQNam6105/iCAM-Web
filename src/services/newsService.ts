@@ -178,7 +178,7 @@ export const getFilteredNewsPosts = (options: PostFilterOptions): DynamicNewsIte
 };
 
 // Helper to sync single post to Supabase
-export const syncPostToSupabase = async (post: DynamicNewsItem) => {
+export const syncPostToSupabase = async (post: DynamicNewsItem): Promise<{ success: boolean; error?: string }> => {
   try {
     const rawIdStr = String(post.id).replace('default_', '').replace('post_', '');
     const dbId = !isNaN(Number(rawIdStr)) && Number(rawIdStr) > 0 ? Number(rawIdStr) : Date.now();
@@ -209,10 +209,13 @@ export const syncPostToSupabase = async (post: DynamicNewsItem) => {
       updated_at: post.updatedAt || new Date().toISOString(),
     });
     if (error) {
-      console.warn('Supabase upsert error:', error.message);
+      console.error('Supabase news_posts upsert error:', error.message, error.details);
+      return { success: false, error: error.message };
     }
-  } catch (err) {
-    console.warn('Supabase sync warning:', err);
+    return { success: true };
+  } catch (err: any) {
+    console.error('Supabase sync exception:', err);
+    return { success: false, error: err?.message || 'Lỗi kết nối khi đồng bộ CSDL' };
   }
 };
 
@@ -249,9 +252,9 @@ export const syncAllLocalPostsToSupabase = async () => {
 };
 
 // Create new post
-export const createNewsPost = (
+export const createNewsPost = async (
   data: Omit<DynamicNewsItem, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>
-): DynamicNewsItem => {
+): Promise<{ success: boolean; data?: DynamicNewsItem; error?: string }> => {
   const posts = getAllNewsPosts();
 
   const now = new Date().toISOString();
@@ -267,20 +270,22 @@ export const createNewsPost = (
     isCustom: true,
   };
 
+  const syncRes = await syncPostToSupabase(createdPost);
+  if (!syncRes.success) {
+    return { success: false, error: syncRes.error };
+  }
+
   const updatedPosts = [createdPost, ...posts];
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedPosts));
 
-  // Sync background to Supabase
-  syncPostToSupabase(createdPost);
-
-  return createdPost;
+  return { success: true, data: createdPost };
 };
 
 // Update existing post
-export const updateNewsPost = (
+export const updateNewsPost = async (
   id: string | number,
   data: Partial<Omit<DynamicNewsItem, 'id' | 'createdAt' | 'isCustom'>>
-): DynamicNewsItem | null => {
+): Promise<{ success: boolean; data?: DynamicNewsItem; error?: string }> => {
   const posts = getAllNewsPosts();
   const targetIdStr = String(id).replace('default_', '').replace('post_', '');
 
@@ -298,7 +303,7 @@ export const updateNewsPost = (
 
   // Fallback: If post doesn't exist in local array, create it as new post!
   if (index === -1) {
-    return createNewsPost({
+    const newPostData = {
       title: data.title || 'Bài viết tin tức iCANCAM',
       titleEn: data.titleEn || data.title || 'iCANCAM News Article',
       slug: data.slug || (data.title ? generateSlug(data.title) : `post_${Date.now()}`),
@@ -319,7 +324,8 @@ export const updateNewsPost = (
       readingTime: '3 phút đọc',
       date: data.date || new Date().toLocaleDateString('vi-VN'),
       ...data,
-    });
+    } as any;
+    return createNewsPost(newPostData);
   }
 
   const now = new Date().toISOString();
@@ -334,13 +340,15 @@ export const updateNewsPost = (
     readingTime: data.content ? calculateReadingTime(data.content) : posts[index].readingTime,
   };
 
+  const syncRes = await syncPostToSupabase(updatedPost);
+  if (!syncRes.success) {
+    return { success: false, error: syncRes.error };
+  }
+
   posts[index] = updatedPost;
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
 
-  // Sync background to Supabase
-  syncPostToSupabase(updatedPost);
-
-  return updatedPost;
+  return { success: true, data: updatedPost };
 };
 
 // Delete post
