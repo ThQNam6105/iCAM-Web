@@ -20,8 +20,8 @@ import styles from './AdminSidebar.module.css';
 export const AdminSidebar: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
     navigate('/admin/login');
   };
 
