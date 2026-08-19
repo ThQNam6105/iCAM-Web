@@ -348,17 +348,8 @@ export interface ValidationError {
 
 export const validatePostForm = (data: Partial<DynamicNewsItem>): ValidationError => {
   const errors: ValidationError = {};
-  if (!data.title || data.title.trim().length < 2) {
-    errors.title = 'Tiêu đề bài viết phải dài ít nhất 2 ký tự.';
-  }
-  if (!data.excerpt || data.excerpt.trim().length < 5) {
-    errors.excerpt = 'Tóm tắt bài viết phải dài ít nhất 5 ký tự.';
-  }
-  if (!data.content || data.content.trim().length < 10) {
-    errors.content = 'Nội dung chi tiết phải dài ít nhất 10 ký tự.';
-  }
-  if (!data.image || data.image.trim().length === 0) {
-    errors.image = 'Vui lòng chọn hoặc nhập đường dẫn hình ảnh bìa bài viết.';
+  if (!data.title || data.title.trim().length === 0) {
+    errors.title = 'Vui lòng nhập tiêu đề bài viết.';
   }
   return errors;
 };

@@ -11,8 +11,6 @@ import {
   type DynamicNewsItem,
   type PostStatus,
   generateSlug,
-  validatePostForm,
-  type ValidationError,
   saveDraftAutosave,
   clearDraftAutosave
 } from '../../services/newsService';
@@ -87,7 +85,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [excerptEn, setExcerptEn] = useState(postToEdit?.excerptEn || '');
   const [content, setContent] = useState(postToEdit?.content || '');
   const [contentEn, setContentEn] = useState(postToEdit?.contentEn || '');
-  const [errors, setErrors] = useState<ValidationError>({});
+  const [errors] = useState<Record<string, string>>({});
 
   // Media selector target ('image' or 'imageEn')
   const [mediaTarget, setMediaTarget] = useState<'image' | 'imageEn'>('image');
@@ -133,34 +131,39 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     return () => clearInterval(interval);
   }, [isOpen, status, title, titleEn, slug, category, excerpt, content, image, showToast]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
 
     const cats = getCategories();
     const matchedCat = cats.find((c) => c.id === category || c.slug === category);
     const finalLabelVi = matchedCat ? matchedCat.nameVi : categoryLabel;
     const finalLabelEn = matchedCat ? matchedCat.nameEn : (categoryLabelEn || finalLabelVi);
 
+    const mainTitle = title.trim() || 'Bài viết tin tức iCANCAM';
+    const mainExcerpt = excerpt.trim() || mainTitle;
+    const mainContent = content.trim() || `<p>${mainTitle}</p>`;
+    const mainImage = image.trim() || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop';
+
     const postData: Partial<DynamicNewsItem> = {
-      title: title.trim(),
-      titleEn: (titleEn || title).trim(),
-      slug: generateSlug(title),
+      title: mainTitle,
+      titleEn: (titleEn || mainTitle).trim(),
+      slug: slug || generateSlug(mainTitle),
       status,
       category,
       categoryLabel: finalLabelVi,
       categoryLabelEn: finalLabelEn,
-      image: image.trim() || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
-      imageEn: (imageEn || image).trim(),
+      image: mainImage,
+      imageEn: (imageEn || mainImage).trim(),
       imageZoom,
       panX,
       panY,
-      excerpt: excerpt.trim(),
-      excerptEn: (excerptEn || excerpt).trim(),
-      content: content.trim(),
-      contentEn: (contentEn || content).trim(),
-      ogTitle,
-      ogDescription,
-      ogImage: ogImage || image,
+      excerpt: mainExcerpt,
+      excerptEn: (excerptEn || mainExcerpt).trim(),
+      content: mainContent,
+      contentEn: (contentEn || mainContent).trim(),
+      ogTitle: ogTitle || mainTitle,
+      ogDescription: ogDescription || mainExcerpt,
+      ogImage: ogImage || mainImage,
       canonicalUrlOverride: canonicalUrl,
       noIndex,
       noFollow,
@@ -168,18 +171,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
       author: 'iCANCAM Admin',
       tags: ['Anh ngữ', 'Giáo dục'],
     };
-
-    const validation = validatePostForm(postData);
-    if (Object.keys(validation).length > 0) {
-      setErrors(validation);
-      if (validation.title || validation.content || validation.excerpt || validation.image) {
-        setActiveLangTab('vi');
-      } else if (validation.titleEn) {
-        setActiveLangTab('en');
-      }
-      showToast('Vui lòng kiểm tra lại thông tin còn thiếu!', 'error');
-      return;
-    }
 
     onSave(postData);
     if (postToEdit?.id) {
@@ -512,7 +503,13 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             />
 
             <div className={styles.modalActions}>
-              <Button type="submit" variant="primary" size="md" icon={<Save size={16} />}>
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                onClick={handleSubmit}
+                icon={<Save size={16} />}
+              >
                 {postToEdit ? 'Lưu thay đổi' : 'Lưu & đăng bài'}
               </Button>
             </div>
