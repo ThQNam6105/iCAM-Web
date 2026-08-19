@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
-import { articlesData } from '../../data/newsData';
+import { articlesData, type Article } from '../../data/newsData';
+import { getPublicNewsPosts, fetchPostsFromSupabase, type DynamicNewsItem } from '../../services/newsService';
 import { teachersData, type Teacher } from '../../data/teacherData';
 import { studentsData, type Student } from '../../data/studentData';
 import { parentsData, type ParentTestimonial } from '../../data/parentData';
@@ -104,11 +105,21 @@ export const Home: React.FC = () => {
   const [showParentCursorTooltip, setShowParentCursorTooltip] = useState(false);
 
   // State for live data
+  const [liveArticles, setLiveArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
+    const dynamic = getPublicNewsPosts();
+    return dynamic.length > 0 ? dynamic : articlesData;
+  });
   const [liveTeachers, setLiveTeachers] = useState<Teacher[]>(teachersData);
   const [liveStudents, setLiveStudents] = useState<Student[]>(studentsData);
   const [liveParents, setLiveParents] = useState<ParentTestimonial[]>(parentsData);
 
   useEffect(() => {
+    fetchPostsFromSupabase().then(() => {
+      const dynamic = getPublicNewsPosts();
+      if (dynamic && dynamic.length > 0) {
+        setLiveArticles(dynamic);
+      }
+    });
     fetchTeachersFromSupabase().then((data) => {
       if (data && data.length > 0) setLiveTeachers(data);
     });
@@ -195,9 +206,9 @@ export const Home: React.FC = () => {
   // ==========================================================================
   // Slider News - Infinite loop logic
   // ==========================================================================
-  const clonedArticlesBefore = articlesData.slice(-cardsToShow);
-  const clonedArticlesAfter = articlesData.slice(0, cardsToShow);
-  const extendedArticles = [...clonedArticlesBefore, ...articlesData, ...clonedArticlesAfter];
+  const clonedArticlesBefore = liveArticles.slice(-cardsToShow);
+  const clonedArticlesAfter = liveArticles.slice(0, cardsToShow);
+  const extendedArticles = [...clonedArticlesBefore, ...liveArticles, ...clonedArticlesAfter];
 
   const nextSlide = () => {
     if (disableTransition) return;
@@ -811,7 +822,7 @@ export const Home: React.FC = () => {
                     >
                       <div className={styles.imageWrapper}>
                         <img
-                          src={article.image}
+                          src={language === 'en' ? ((article as any).imageEn || article.image) : article.image}
                           alt={language === 'en' ? (article.titleEn || article.title) : article.title}
                           className={styles.newsImg}
                           draggable={false}

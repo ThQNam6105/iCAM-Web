@@ -87,7 +87,7 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
         updatedAt: item.updated_at,
       }));
 
-      // Smart merge: Local edits win if local updatedAt is newer or equal
+      // Smart merge: DB posts take precedence over default seeded posts
       const mergedPostsMap = new Map<string, DynamicNewsItem>();
       postsFromDb.forEach((dbPost) => {
         mergedPostsMap.set(String(dbPost.id), dbPost);
@@ -97,14 +97,13 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
         const key = String(localPost.id).replace('default_', '');
         const dbPost = mergedPostsMap.get(key) || mergedPostsMap.get(String(localPost.id));
 
-        const localTime = new Date(localPost.updatedAt || 0).getTime();
-        const dbTime = dbPost ? new Date(dbPost.updatedAt || 0).getTime() : 0;
-
-        if (!dbPost || localTime >= dbTime) {
-          mergedPostsMap.set(key, { ...localPost, id: dbPost ? dbPost.id : localPost.id });
-          if (dbPost && localTime > dbTime) {
-            // Push local edit back to Supabase
-            syncPostToSupabase(localPost);
+        if (!dbPost) {
+          mergedPostsMap.set(key, localPost);
+        } else {
+          const localTime = new Date(localPost.updatedAt || 0).getTime();
+          const dbTime = new Date(dbPost.updatedAt || 0).getTime();
+          if (localPost.isCustom && localTime > dbTime) {
+            mergedPostsMap.set(key, { ...dbPost, ...localPost });
           }
         }
       });
@@ -127,7 +126,8 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
     if (customPostsRaw) {
       posts = JSON.parse(customPostsRaw);
     } else {
-      // Seed default articles into localStorage so all of them are editable & deletable
+      // Seed default articles into localStorage with fixed baseline past timestamp
+      const baselineTime = '2026-08-01T00:00:00.000Z';
       posts = articlesData.map((post) => ({
         ...post,
         id: post.id,
@@ -135,12 +135,12 @@ export const getAllNewsPosts = (): DynamicNewsItem[] => {
         status: 'published',
         author: 'iCANCAM Editor',
         tags: ['Anh ngữ', 'Giáo dục'],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: baselineTime,
+        updatedAt: baselineTime,
         publishedAt: post.date,
         featured: true,
         readingTime: '3 phút đọc',
-        isCustom: true,
+        isCustom: false,
       }));
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(posts));
     }
