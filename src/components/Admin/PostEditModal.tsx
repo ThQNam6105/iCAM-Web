@@ -65,6 +65,8 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   };
 
   const initialCat = getInitialCategory();
+  const [activeLangTab, setActiveLangTab] = useState<'vi' | 'en'>('vi');
+
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [titleEn, setTitleEn] = useState(postToEdit?.titleEn || '');
   const [slug, setSlug] = useState(postToEdit?.slug || (postToEdit?.title ? generateSlug(postToEdit.title) : ''));
@@ -72,15 +74,23 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [category, setCategory] = useState<string>(initialCat.id || initialCat.slug);
   const [categoryLabel, setCategoryLabel] = useState<string>(initialCat.nameVi);
   const [categoryLabelEn, setCategoryLabelEn] = useState<string>(initialCat.nameEn);
+
+  // Cover image VI & EN
   const [image, setImage] = useState(postToEdit?.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop');
+  const [imageEn, setImageEn] = useState(postToEdit?.imageEn || postToEdit?.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop');
+
   const [imageZoom, setImageZoom] = useState<number>(postToEdit?.imageZoom ?? 100);
   const [panX, setPanX] = useState<number>(postToEdit?.panX ?? 50);
   const [panY, setPanY] = useState<number>(postToEdit?.panY ?? 50);
+
   const [excerpt, setExcerpt] = useState(postToEdit?.excerpt || '');
   const [excerptEn, setExcerptEn] = useState(postToEdit?.excerptEn || '');
   const [content, setContent] = useState(postToEdit?.content || '');
   const [contentEn, setContentEn] = useState(postToEdit?.contentEn || '');
   const [errors, setErrors] = useState<ValidationError>({});
+
+  // Media selector target ('image' or 'imageEn')
+  const [mediaTarget, setMediaTarget] = useState<'image' | 'imageEn'>('image');
 
   // SEO States
   const [metaTitle, setMetaTitle] = useState(postToEdit?.title || '');
@@ -101,9 +111,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
   const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
   const [lastAutosave, setLastAutosave] = useState<string | null>(null);
 
-
-
-  // Auto-generate slug when VI title changes (if user hasn't custom edited it)
+  // Auto-generate slug when VI title changes
   const handleTitleChange = (val: string) => {
     setTitle(val);
     setSlug(generateSlug(val));
@@ -134,24 +142,25 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     const finalLabelEn = matchedCat ? matchedCat.nameEn : (categoryLabelEn || finalLabelVi);
 
     const postData: Partial<DynamicNewsItem> = {
-      title,
-      titleEn: titleEn || title,
+      title: title.trim(),
+      titleEn: (titleEn || title).trim(),
       slug: generateSlug(title),
       status,
       category,
       categoryLabel: finalLabelVi,
       categoryLabelEn: finalLabelEn,
-      image: image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
+      image: image.trim() || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
+      imageEn: (imageEn || image).trim(),
       imageZoom,
       panX,
       panY,
-      excerpt,
-      excerptEn: excerptEn || excerpt,
-      content,
-      contentEn: contentEn || content,
+      excerpt: excerpt.trim(),
+      excerptEn: (excerptEn || excerpt).trim(),
+      content: content.trim(),
+      contentEn: (contentEn || content).trim(),
       ogTitle,
       ogDescription,
-      ogImage,
+      ogImage: ogImage || image,
       canonicalUrlOverride: canonicalUrl,
       noIndex,
       noFollow,
@@ -163,6 +172,11 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     const validation = validatePostForm(postData);
     if (Object.keys(validation).length > 0) {
       setErrors(validation);
+      if (validation.title || validation.content || validation.excerpt || validation.image) {
+        setActiveLangTab('vi');
+      } else if (validation.titleEn) {
+        setActiveLangTab('en');
+      }
       showToast('Vui lòng kiểm tra lại thông tin còn thiếu!', 'error');
       return;
     }
@@ -181,9 +195,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
     title,
     titleEn,
     categoryLabel,
-    image,
-    excerpt,
-    content,
+    image: activeLangTab === 'en' ? (imageEn || image) : image,
+    excerpt: activeLangTab === 'en' ? (excerptEn || excerpt) : excerpt,
+    content: activeLangTab === 'en' ? (contentEn || content) : content,
     status,
     author: 'iCANCAM Admin',
   };
@@ -233,9 +247,12 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
           </div>
 
           <form onSubmit={handleSubmit} className={styles.formGrid}>
+            {/* Top Common Fields: Status & Category */}
             <div className={styles.rowTwo}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Trạng thái xuất bản (Status)</label>
+                <label className={styles.label}>
+                  Trạng thái xuất bản (Status) <span className={styles.requiredStar}>*</span>
+                </label>
                 <Select
                   options={[
                     { value: 'draft', label: 'Bản nháp (Draft - ẩn trên web)' },
@@ -249,7 +266,9 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Danh mục bài viết</label>
+                <label className={styles.label}>
+                  Danh mục bài viết <span className={styles.requiredStar}>*</span>
+                </label>
                 <Select
                   options={getCategories().map((cat) => ({
                     value: cat.id || cat.slug,
@@ -269,123 +288,210 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
               </div>
             </div>
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                Tiêu đề bài viết (tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Nhập tiêu đề tiếng Việt..."
-                value={title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                className={styles.input}
-              />
-              {errors.title && <span className={styles.errorText}>{errors.title}</span>}
+            {/* Language Tabs */}
+            <div className={styles.langTabGroup}>
+              <button
+                type="button"
+                className={`${styles.langTab} ${activeLangTab === 'vi' ? styles.langTabActive : ''}`}
+                onClick={() => setActiveLangTab('vi')}
+              >
+                Nội dung Tiếng Việt
+              </button>
+              <button
+                type="button"
+                className={`${styles.langTab} ${activeLangTab === 'en' ? styles.langTabActive : ''}`}
+                onClick={() => setActiveLangTab('en')}
+              >
+                Nội dung Tiếng Anh
+              </button>
             </div>
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                Tiêu đề bài viết (tiếng Anh) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="English title..."
-                value={titleEn}
-                onChange={(e) => setTitleEn(e.target.value)}
-                className={styles.input}
-              />
-              {errors.titleEn && <span className={styles.errorText}>{errors.titleEn}</span>}
-            </div>
+            {/* Tab 1: Nội dung Tiếng Việt */}
+            {activeLangTab === 'vi' && (
+              <>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Tiêu đề bài viết (Tiếng Việt) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Nhập tiêu đề tiếng Việt..."
+                    value={title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    className={styles.input}
+                    required
+                  />
+                  {errors.title && <span className={styles.errorText}>{errors.title}</span>}
+                </div>
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                Hình ảnh bìa bài viết (URL hoặc tải từ máy tính) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <div className={styles.imageInputGroup}>
-                <input
-                  type="text"
-                  placeholder="Dán URL ảnh hoặc chọn từ Thư viện hệ thống..."
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className={styles.input}
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsMediaSelectorOpen(true)}
-                  className={styles.uploadPlaceholderBtn}
-                  style={{ background: '#F58220', color: '#ffffff' }}
-                  title="Chọn ảnh từ Thư viện hệ thống"
-                >
-                  <FolderTree size={16} /> Thư viện hệ thống
-                </button>
-              </div>
-              {errors.image && <span className={styles.errorText}>{errors.image}</span>}
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Ảnh bìa bài viết (Tiếng Việt) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <div className={styles.imageInputGroup}>
+                    <input
+                      type="text"
+                      placeholder="Dán URL ảnh hoặc chọn từ Thư viện hệ thống..."
+                      value={image}
+                      onChange={(e) => setImage(e.target.value)}
+                      className={styles.input}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMediaTarget('image');
+                        setIsMediaSelectorOpen(true);
+                      }}
+                      className={styles.uploadPlaceholderBtn}
+                      style={{ background: '#F58220', color: '#ffffff' }}
+                      title="Chọn ảnh từ Thư viện hệ thống"
+                    >
+                      <FolderTree size={16} /> Thư viện hệ thống
+                    </button>
+                  </div>
+                  {errors.image && <span className={styles.errorText}>{errors.image}</span>}
 
-              {image && (
-                <div style={{ marginTop: '0.75rem', background: '#0f172a', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <ImageEditorCore
-                    mode="quick"
-                    imageSrc={image}
-                    initialPanX={panX}
-                    initialPanY={panY}
-                    initialZoom={imageZoom}
-                    filename="cover.jpg"
-                    onQuickChange={(s) => {
-                      setPanX(s.panX);
-                      setPanY(s.panY);
-                      setImageZoom(s.zoom);
-                    }}
+                  {image && (
+                    <div style={{ marginTop: '0.75rem', background: '#0f172a', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <ImageEditorCore
+                        mode="quick"
+                        imageSrc={image}
+                        initialPanX={panX}
+                        initialPanY={panY}
+                        initialZoom={imageZoom}
+                        filename="cover_vi.jpg"
+                        onQuickChange={(s) => {
+                          setPanX(s.panX);
+                          setPanY(s.panY);
+                          setImageZoom(s.zoom);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Tóm tắt bài viết (Tiếng Việt) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="Tóm tắt nội dung bài viết tiếng Việt..."
+                    value={excerpt}
+                    onChange={(e) => setExcerpt(e.target.value)}
+                    className={styles.textarea}
+                    required
+                  />
+                  {errors.excerpt && <span className={styles.errorText}>{errors.excerpt}</span>}
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Nội dung chi tiết bài viết (Tiếng Việt) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <RichTextEditor
+                    value={content}
+                    onChange={setContent}
+                    placeholder="Soạn thảo nội dung bài viết tiếng Việt như trên Word..."
+                  />
+                  {errors.content && <span className={styles.errorText}>{errors.content}</span>}
+                </div>
+              </>
+            )}
+
+            {/* Tab 2: Nội dung Tiếng Anh */}
+            {activeLangTab === 'en' && (
+              <>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Tiêu đề bài viết (Tiếng Anh) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="English title..."
+                    value={titleEn}
+                    onChange={(e) => setTitleEn(e.target.value)}
+                    className={styles.input}
+                    required
+                  />
+                  {errors.titleEn && <span className={styles.errorText}>{errors.titleEn}</span>}
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Ảnh bìa bài viết (Tiếng Anh) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <div className={styles.imageInputGroup}>
+                    <input
+                      type="text"
+                      placeholder="Dán URL ảnh bìa tiếng Anh hoặc chọn từ Thư viện..."
+                      value={imageEn}
+                      onChange={(e) => setImageEn(e.target.value)}
+                      className={styles.input}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMediaTarget('imageEn');
+                        setIsMediaSelectorOpen(true);
+                      }}
+                      className={styles.uploadPlaceholderBtn}
+                      style={{ background: '#F58220', color: '#ffffff' }}
+                      title="Chọn ảnh từ Thư viện hệ thống"
+                    >
+                      <FolderTree size={16} /> Thư viện hệ thống
+                    </button>
+                  </div>
+
+                  {imageEn && (
+                    <div style={{ marginTop: '0.75rem', background: '#0f172a', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <ImageEditorCore
+                        mode="quick"
+                        imageSrc={imageEn}
+                        initialPanX={panX}
+                        initialPanY={panY}
+                        initialZoom={imageZoom}
+                        filename="cover_en.jpg"
+                        onQuickChange={(s) => {
+                          setPanX(s.panX);
+                          setPanY(s.panY);
+                          setImageZoom(s.zoom);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Tóm tắt bài viết (Tiếng Anh) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="Short excerpt in English..."
+                    value={excerptEn}
+                    onChange={(e) => setExcerptEn(e.target.value)}
+                    className={styles.textarea}
+                    required
                   />
                 </div>
-              )}
-            </div>
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                Tóm tắt bài viết (tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <textarea
-                rows={2}
-                placeholder="Tóm tắt nội dung bài viết..."
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                className={styles.textarea}
-              />
-              {errors.excerpt && <span className={styles.errorText}>{errors.excerpt}</span>}
-            </div>
+                <div className={styles.inputGroup}>
+                  <label className={styles.label}>
+                    Nội dung chi tiết bài viết (Tiếng Anh) <span className={styles.requiredStar}>*</span>
+                  </label>
+                  <RichTextEditor
+                    value={contentEn}
+                    onChange={setContentEn}
+                    placeholder="Full article content in English..."
+                  />
+                </div>
+              </>
+            )}
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Tóm tắt bài viết (tiếng Anh)</label>
-              <textarea
-                rows={2}
-                placeholder="Short excerpt in English..."
-                value={excerptEn}
-                onChange={(e) => setExcerptEn(e.target.value)}
-                className={styles.textarea}
-              />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                Nội dung chi tiết bài viết (tiếng Việt) <span style={{ color: '#ef4444' }}>*</span>
-              </label>
-              <RichTextEditor
-                value={content}
-                onChange={setContent}
-                placeholder="Soạn thảo nội dung bài viết tiếng Việt như trên Word..."
-              />
-              {errors.content && <span className={styles.errorText}>{errors.content}</span>}
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Nội dung chi tiết bài viết (tiếng Anh)</label>
-              <RichTextEditor
-                value={contentEn}
-                onChange={setContentEn}
-                placeholder="Full article content in English..."
-              />
-            </div>
-
+            {/* SEO Panel */}
             <SeoPanel
               articleTitle={title}
               articleExcerpt={excerpt}
@@ -447,7 +553,11 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
         onSelect={(assets) => {
           if (assets.length > 0) {
             const chosen = assets[0];
-            setImage(chosen.public_url);
+            if (mediaTarget === 'imageEn') {
+              setImageEn(chosen.public_url);
+            } else {
+              setImage(chosen.public_url);
+            }
             if (chosen.focal_x !== undefined) setPanX(Math.round(chosen.focal_x * 100));
             if (chosen.focal_y !== undefined) setPanY(Math.round(chosen.focal_y * 100));
             showToast('Đã chọn ảnh bìa từ Thư viện Media! ✓', 'success');

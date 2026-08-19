@@ -182,7 +182,7 @@ export const News: React.FC = () => {
             <div className={styles.featuredCard} onClick={() => handleSelectArticle(featuredArticle)}>
               <div className={styles.featuredImageWrapper}>
                 <img
-                  src={featuredArticle.image}
+                  src={language === 'en' ? (featuredArticle.imageEn || featuredArticle.image) : featuredArticle.image}
                   alt={language === 'en' ? (featuredArticle.titleEn || featuredArticle.title) : featuredArticle.title}
                   className={styles.featuredImage}
                   style={{
@@ -274,7 +274,7 @@ export const News: React.FC = () => {
                 <div key={article.id} className={styles.articleCard} onClick={() => handleSelectArticle(article)}>
                   <div className={styles.articleImageWrapper}>
                     <img
-                      src={article.image}
+                      src={language === 'en' ? (article.imageEn || article.image) : article.image}
                       alt={language === 'en' ? (article.titleEn || article.title) : article.title}
                       className={styles.articleImage}
                       style={{
@@ -471,7 +471,7 @@ export const News: React.FC = () => {
 
               <div className={styles.modalImageWrapper}>
                 <img
-                  src={selectedArticle.image}
+                  src={language === 'en' ? (selectedArticle.imageEn || selectedArticle.image) : selectedArticle.image}
                   alt={language === 'en' ? (selectedArticle.titleEn || selectedArticle.title) : selectedArticle.title}
                   style={{
                     objectFit: selectedArticle.imageFit || 'cover',

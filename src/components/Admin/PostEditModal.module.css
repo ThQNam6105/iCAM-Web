@@ -99,6 +99,50 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+.langTabGroup {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.35rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.langTab {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.langTab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.langTabActive {
+  background: #F58220 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(245, 130, 32, 0.4);
+}
+
+.requiredStar {
+  color: #ef4444;
+  margin-left: 3px;
+  font-weight: 800;
+}
+
 .formGrid {
   display: flex;
   flex-direction: column;

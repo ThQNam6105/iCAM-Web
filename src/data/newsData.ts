@@ -16,6 +16,7 @@ export interface Article {
   content: string;
   contentEn?: string;
   image: string;
+  imageEn?: string;
   imagePosition?: 'center' | 'top' | 'bottom' | 'left' | 'right';
   imageFit?: 'cover' | 'contain';
   imageZoom?: number;
