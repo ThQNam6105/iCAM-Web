@@ -14,7 +14,7 @@ import {
   Check,
 } from 'lucide-react';
 import styles from './News.module.css';
-import { articlesData, type Article } from '../../data/newsData';
+import { type Article } from '../../data/newsData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SectionTransition } from '../../components/SectionTransition/SectionTransition';
 import { getPublicNewsPosts, fetchPostsFromSupabase, generateSlug, type DynamicNewsItem } from '../../services/newsService';
@@ -34,8 +34,7 @@ export const News: React.FC = () => {
     const urlSlug = params.slug || new URLSearchParams(window.location.search).get('slug');
     if (urlSlug) {
       const dynamic = getPublicNewsPosts();
-      const allArts = dynamic.length > 0 ? dynamic : articlesData;
-      return allArts.find((a) => ('slug' in a && a.slug === urlSlug) || String(a.id) === urlSlug) || null;
+      return dynamic.find((a) => ('slug' in a && a.slug === urlSlug) || String(a.id) === urlSlug) || null;
     }
     return null;
   });

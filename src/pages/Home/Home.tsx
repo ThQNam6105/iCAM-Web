@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
-import { articlesData, type Article } from '../../data/newsData';
+import { type Article } from '../../data/newsData';
 import { getPublicNewsPosts, fetchPostsFromSupabase, type DynamicNewsItem } from '../../services/newsService';
-import { teachersData, type Teacher } from '../../data/teacherData';
-import { studentsData, type Student } from '../../data/studentData';
-import { parentsData, type ParentTestimonial } from '../../data/parentData';
+import { type Teacher } from '../../data/teacherData';
+import { type Student } from '../../data/studentData';
+import { type ParentTestimonial } from '../../data/parentData';
 import { fetchTeachersFromSupabase } from '../../services/teacherService';
 import { fetchStudentsFromSupabase } from '../../services/studentService';
 import { fetchParentsFromSupabase } from '../../services/parentService';
@@ -108,9 +108,9 @@ export const Home: React.FC = () => {
   const [liveArticles, setLiveArticles] = useState<(Article | DynamicNewsItem)[]>(() => {
     return getPublicNewsPosts();
   });
-  const [liveTeachers, setLiveTeachers] = useState<Teacher[]>(teachersData);
-  const [liveStudents, setLiveStudents] = useState<Student[]>(studentsData);
-  const [liveParents, setLiveParents] = useState<ParentTestimonial[]>(parentsData);
+  const [liveTeachers, setLiveTeachers] = useState<Teacher[]>([]);
+  const [liveStudents, setLiveStudents] = useState<Student[]>([]);
+  const [liveParents, setLiveParents] = useState<ParentTestimonial[]>([]);
 
   useEffect(() => {
     fetchPostsFromSupabase().then((postsFromDb) => {
@@ -120,13 +120,13 @@ export const Home: React.FC = () => {
       }
     });
     fetchTeachersFromSupabase().then((data) => {
-      if (data && data.length > 0) setLiveTeachers(data);
+      if (data) setLiveTeachers(data);
     });
     fetchStudentsFromSupabase().then((data) => {
-      if (data && data.length > 0) setLiveStudents(data);
+      if (data) setLiveStudents(data);
     });
     fetchParentsFromSupabase().then((data) => {
-      if (data && data.length > 0) setLiveParents(data);
+      if (data) setLiveParents(data);
     });
   }, []);
 
@@ -304,15 +304,15 @@ export const Home: React.FC = () => {
   const handleTransitionEnd = () => {
     if (currentIndex === -1) {
       setDisableTransition(true);
-      setCurrentIndex(articlesData.length - 1);
-    } else if (currentIndex === articlesData.length) {
+      setCurrentIndex(liveArticles.length - 1);
+    } else if (currentIndex === liveArticles.length) {
       setDisableTransition(true);
       setCurrentIndex(0);
     }
   };
 
   useEffect(() => {
-    if (currentIndex >= articlesData.length + 1) {
+    if (currentIndex >= liveArticles.length + 1) {
       const timer = setTimeout(() => {
         setDisableTransition(true);
         setCurrentIndex(0);
@@ -321,11 +321,11 @@ export const Home: React.FC = () => {
     } else if (currentIndex <= -2) {
       const timer = setTimeout(() => {
         setDisableTransition(true);
-        setCurrentIndex(articlesData.length - 1);
+        setCurrentIndex(liveArticles.length - 1);
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [currentIndex]);
+  }, [currentIndex, liveArticles.length]);
 
   useEffect(() => {
     if (disableTransition) {
