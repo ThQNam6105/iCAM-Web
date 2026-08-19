@@ -198,7 +198,7 @@ export const AdminParents: React.FC = () => {
                 <div className={styles.cardInfo}>
                   <h3 className={styles.childName}>{parent.childName}</h3>
                   <span className={styles.yearsBadge}>
-                    Học viên {parent.years || 10} tuổi
+                    +{parent.years || 1} năm đồng hành
                   </span>
                 </div>
               </div>
@@ -268,7 +268,7 @@ export const AdminParents: React.FC = () => {
                     />
                   </div>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Độ Tuổi / Lớp (*)</label>
+                    <label className={styles.label}>Số Năm Đồng Hành (*)</label>
                     <input
                       type="number"
                       value={years}
