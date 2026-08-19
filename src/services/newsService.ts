@@ -86,9 +86,27 @@ export const fetchPostsFromSupabase = async (): Promise<DynamicNewsItem[]> => {
         updatedAt: item.updated_at,
       }));
 
-      // Cache exact Supabase posts into localStorage so incognito / new sessions stay 100% in sync
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(postsFromDb));
-      return postsFromDb;
+      // Smart merge: Keep local custom posts if not in Supabase yet
+      const localPosts = getAllNewsPosts();
+      const mergedPostsMap = new Map<string, DynamicNewsItem>();
+      postsFromDb.forEach((dbPost) => {
+        mergedPostsMap.set(String(dbPost.id), dbPost);
+      });
+
+      localPosts.forEach((localPost: DynamicNewsItem) => {
+        if (localPost.isCustom) {
+          const key = String(localPost.id).replace('default_', '').replace('post_', '');
+          if (!mergedPostsMap.has(key) && !mergedPostsMap.has(String(localPost.id))) {
+            mergedPostsMap.set(String(localPost.id), localPost);
+            // Re-trigger sync in case previous sync failed
+            syncPostToSupabase(localPost);
+          }
+        }
+      });
+
+      const finalPosts = Array.from(mergedPostsMap.values());
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(finalPosts));
+      return finalPosts;
     }
   } catch (err) {
     console.warn('Supabase table not created yet or offline, using local storage cache:', err);
@@ -180,8 +198,8 @@ export const getFilteredNewsPosts = (options: PostFilterOptions): DynamicNewsIte
 // Helper to sync single post to Supabase
 const syncPostToSupabase = async (post: DynamicNewsItem) => {
   try {
-    const rawId = String(post.id).replace('default_', '');
-    const dbId = !isNaN(Number(rawId)) ? Number(rawId) : rawId;
+    const rawIdStr = String(post.id).replace('default_', '').replace('post_', '');
+    const dbId = !isNaN(Number(rawIdStr)) && Number(rawIdStr) > 0 ? Number(rawIdStr) : Date.now();
 
     const { error } = await supabase.from('news_posts').upsert({
       id: dbId,
@@ -204,7 +222,7 @@ const syncPostToSupabase = async (post: DynamicNewsItem) => {
       og_description: post.ogDescription || post.excerpt,
       canonical_url_override: post.canonicalUrlOverride,
       url: post.url,
-      date: post.date,
+      date: post.date || post.publishedAt || new Date().toLocaleDateString('vi-VN'),
       published_at: post.publishedAt,
       reading_time: post.readingTime,
       featured: post.featured,
@@ -228,9 +246,10 @@ export const createNewsPost = (
   const posts = getAllNewsPosts();
 
   const now = new Date().toISOString();
+  const numericId = Date.now();
   const createdPost: DynamicNewsItem = {
     ...data,
-    id: `post_${Date.now()}`,
+    id: numericId,
     slug: data.slug || generateSlug(data.title),
     createdAt: now,
     updatedAt: now,
