@@ -1,7 +1,7 @@
 import { articlesData, type Article } from '../data/newsData';
 import { supabase } from './supabaseClient';
 
-const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v3';
+const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v4';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
 
 export type PostStatus = 'draft' | 'published' | 'archived';
