@@ -268,9 +268,10 @@
   border-radius: 20px;
   width: 100%;
   max-width: 680px;
-  max-height: 90vh;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   animation: modalIn 0.25s ease-out;
   color: #ffffff;
@@ -287,12 +288,21 @@
   }
 }
 
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .modalHeader {
   padding: 1.25rem 1.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .modalTitle {
@@ -323,9 +333,11 @@
 .modalBody {
   padding: 1.5rem 1.75rem;
   overflow-y: auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  min-height: 0;
 }
 
 .langTabGroup {
@@ -395,10 +407,12 @@
   color: #ffffff;
   outline: none;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .textarea {
-  min-height: 110px;
+  min-height: 100px;
+  max-height: 220px;
   resize: vertical;
   line-height: 1.55;
 }

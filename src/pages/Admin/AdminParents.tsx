@@ -235,7 +235,7 @@ export const AdminParents: React.FC = () => {
                 <X size={20} />
               </button>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className={styles.modalForm}>
               <div className={styles.modalBody}>
                 {/* Language Tabs */}
                 <div className={styles.langTabGroup}>
