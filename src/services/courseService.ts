@@ -52,7 +52,6 @@ export interface CourseItem {
 }
 
 const LOCAL_STORAGE_KEY = 'icancam_courses_v1';
-const DELETED_COURSES_KEY = 'icancam_deleted_course_ids_v1';
 
 export const INITIAL_COURSES: CourseItem[] = [
   {
@@ -277,114 +276,64 @@ export const INITIAL_COURSES: CourseItem[] = [
   },
 ];
 
-export const getDeletedCourseIds = (): string[] => {
+// COURSES CRUD - SUPABASE AS SINGLE SOURCE OF TRUTH
+export const getAllCourses = (): CourseItem[] => {
   try {
-    const raw = localStorage.getItem(DELETED_COURSES_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+    return [];
   } catch {
     return [];
   }
 };
 
-export const markCourseAsDeleted = (id: string) => {
-  const ids = new Set(getDeletedCourseIds());
-  ids.add(id);
-  localStorage.setItem(DELETED_COURSES_KEY, JSON.stringify(Array.from(ids)));
-};
-
-export const saveDeletedCourseIds = (idsList: string[]) => {
-  localStorage.setItem(DELETED_COURSES_KEY, JSON.stringify(Array.from(new Set(idsList))));
-};
-
-export const getAllCourses = (): CourseItem[] => {
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    let list: CourseItem[] = [];
-    if (raw) {
-      list = JSON.parse(raw);
-    } else {
-      list = INITIAL_COURSES;
-    }
-
-    const deletedSet = new Set(getDeletedCourseIds());
-    const cleanList = list.filter((c) => !deletedSet.has(c.id));
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
-    return cleanList;
-  } catch {
-    const deletedSet = new Set(getDeletedCourseIds());
-    return INITIAL_COURSES.filter((c) => !deletedSet.has(c.id));
-  }
-};
-
 export const saveCourses = (list: CourseItem[]) => {
-  const deletedSet = new Set(getDeletedCourseIds());
-  const cleanList = list.filter((c) => !deletedSet.has(c.id));
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
 };
 
 export const fetchCoursesFromSupabase = async (): Promise<CourseItem[]> => {
-  let globalDeletedIds = getDeletedCourseIds();
-  try {
-    const { data: settingsData } = await supabase
-      .from('system_settings')
-      .select('value')
-      .eq('key', 'icancam_deleted_course_ids')
-      .maybeSingle();
-    if (settingsData && settingsData.value) {
-      const parsed = JSON.parse(settingsData.value);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        globalDeletedIds = Array.from(new Set([...globalDeletedIds, ...parsed]));
-        saveDeletedCourseIds(globalDeletedIds);
-      }
-    }
-  } catch (err) {
-    // Ignore settings fetch error
-  }
-
-  const deletedSet = new Set(globalDeletedIds);
-
   try {
     const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
-    if (!error && data && data.length > 0) {
-      const coursesFromDb: CourseItem[] = data
-        .filter((item) => !deletedSet.has(item.id))
-        .map((item) => {
-          const seed = INITIAL_COURSES.find((init) => init.id === item.id);
-          return {
-            id: item.id,
-            courseCode: item.course_code || seed?.courseCode || `ICAM-CRS-${item.id}`,
-            category: item.category as CourseCategory,
-            titleVi: item.title_vi || item.title || seed?.titleVi || '',
-            titleEn: item.title_en || seed?.titleEn || item.title_vi || '',
-            badgeVi: item.badge_vi || seed?.badgeVi || '',
-            badgeEn: item.badge_en || seed?.badgeEn || '',
-            targetAgeVi: item.target_age_vi || item.target_age || seed?.targetAgeVi || '',
-            targetAgeEn: item.target_age_en || seed?.targetAgeEn || '',
-            descriptionVi: item.description_vi || item.description || seed?.descriptionVi || '',
-            descriptionEn: item.description_en || seed?.descriptionEn || '',
-            durationVi: item.duration_vi || item.duration || seed?.durationVi || '',
-            durationEn: item.duration_en || seed?.durationEn || '',
-            levelVi: item.level_vi || item.level || seed?.levelVi || '',
-            levelEn: item.level_en || seed?.levelEn || '',
-            targetOutputVi: item.target_output_vi || item.target_output || seed?.targetOutputVi || '',
-            targetOutputEn: item.target_output_en || seed?.targetOutputEn || '',
-            thumbnailUrl: item.thumbnail_url || seed?.thumbnailUrl,
-            bannerUrl: item.banner_url || seed?.bannerUrl,
-            featuresVi: Array.isArray(item.features_vi) ? item.features_vi : seed?.featuresVi || [],
-            featuresEn: Array.isArray(item.features_en) ? item.features_en : seed?.featuresEn || [],
-            syllabusVi: Array.isArray(item.syllabus_vi) ? item.syllabus_vi : seed?.syllabusVi || [],
-            syllabusEn: Array.isArray(item.syllabus_en) ? item.syllabus_en : seed?.syllabusEn || [],
-            status: (item.status as CourseStatus) || 'active',
-            createdAt: item.created_at || new Date().toISOString(),
-            updatedAt: item.updated_at || new Date().toISOString(),
-          };
-        });
+    if (!error && data) {
+      const coursesFromDb: CourseItem[] = data.map((item) => {
+        const seed = INITIAL_COURSES.find((init) => init.id === item.id);
+        return {
+          id: item.id,
+          courseCode: item.course_code || seed?.courseCode || `ICAM-CRS-${item.id}`,
+          category: item.category as CourseCategory,
+          titleVi: item.title_vi || item.title || seed?.titleVi || '',
+          titleEn: item.title_en || seed?.titleEn || item.title_vi || '',
+          badgeVi: item.badge_vi || seed?.badgeVi || '',
+          badgeEn: item.badge_en || seed?.badgeEn || '',
+          targetAgeVi: item.target_age_vi || item.target_age || seed?.targetAgeVi || '',
+          targetAgeEn: item.target_age_en || seed?.targetAgeEn || '',
+          descriptionVi: item.description_vi || item.description || seed?.descriptionVi || '',
+          descriptionEn: item.description_en || seed?.descriptionEn || '',
+          durationVi: item.duration_vi || item.duration || seed?.durationVi || '',
+          durationEn: item.duration_en || seed?.durationEn || '',
+          levelVi: item.level_vi || item.level || seed?.levelVi || '',
+          levelEn: item.level_en || seed?.levelEn || '',
+          targetOutputVi: item.target_output_vi || item.target_output || seed?.targetOutputVi || '',
+          targetOutputEn: item.target_output_en || seed?.targetOutputEn || '',
+          thumbnailUrl: item.thumbnail_url || seed?.thumbnailUrl,
+          bannerUrl: item.banner_url || seed?.bannerUrl,
+          featuresVi: Array.isArray(item.features_vi) ? item.features_vi : seed?.featuresVi || [],
+          featuresEn: Array.isArray(item.features_en) ? item.features_en : seed?.featuresEn || [],
+          syllabusVi: Array.isArray(item.syllabus_vi) ? item.syllabus_vi : seed?.syllabusVi || [],
+          syllabusEn: Array.isArray(item.syllabus_en) ? item.syllabus_en : seed?.syllabusEn || [],
+          status: (item.status as CourseStatus) || 'active',
+          createdAt: item.created_at || new Date().toISOString(),
+          updatedAt: item.updated_at || new Date().toISOString(),
+        };
+      });
 
       saveCourses(coursesFromDb);
       return coursesFromDb;
     }
   } catch (err) {
-    console.warn('Supabase courses table offline or not synced yet:', err);
+    console.warn('Supabase courses table offline:', err);
   }
   return getAllCourses();
 };
@@ -472,30 +421,22 @@ export const updateCourse = async (
 };
 
 export const deleteCourse = async (id: string): Promise<{ success: boolean; error?: string }> => {
-  markCourseAsDeleted(id);
-
-  const list = getAllCourses();
-  const filtered = list.filter((c) => c.id !== id);
-  saveCourses(filtered);
-
   try {
-    await supabase.from('courses').delete().eq('id', id);
-  } catch (err) {
-    console.warn('Supabase delete course notice:', err);
-  }
+    const { error } = await supabase.from('courses').delete().eq('id', id);
+    if (error) {
+      console.error('Supabase delete course error:', error.message);
+      return { success: false, error: error.message };
+    }
 
-  try {
-    const deletedList = getDeletedCourseIds();
-    await supabase.from('system_settings').upsert({
-      key: 'icancam_deleted_course_ids',
-      value: JSON.stringify(deletedList),
-      updated_at: new Date().toISOString(),
-    });
-  } catch (err) {
-    console.warn('Supabase system_settings sync notice:', err);
-  }
+    const list = getAllCourses();
+    const filtered = list.filter((c) => c.id !== id);
+    saveCourses(filtered);
 
-  return { success: true };
+    return { success: true };
+  } catch (err: any) {
+    console.error('Supabase delete course exception:', err);
+    return { success: false, error: err?.message || 'Network error' };
+  }
 };
 
 // ==========================================

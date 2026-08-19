@@ -203,34 +203,16 @@ export const deleteFaqCategory = (id: string): { success: boolean; message?: str
   return { success: true };
 };
 
-// FAQ ITEMS CRUD
+// FAQ ITEMS CRUD - SUPABASE AS SINGLE SOURCE OF TRUTH
 export const getAllFaqs = (): FaqItem[] => {
   try {
     const raw = localStorage.getItem(FAQ_STORAGE_KEY);
-    let list: FaqItem[] = [];
     if (raw) {
-      list = JSON.parse(raw);
-    } else {
-      list = INITIAL_FAQS;
+      return JSON.parse(raw);
     }
-
-    const categories = getAllFaqCategories();
-    const updated = list.map((item) => {
-      const cat = categories.find((c) => c.id === item.categoryId);
-      const seed = INITIAL_FAQS.find((s) => s.id === item.id);
-      return {
-        ...item,
-        categoryNameVi: cat?.nameVi || 'Khác',
-        categoryNameEn: cat?.nameEn || 'Other',
-        questionEn: item.questionEn || seed?.questionEn || item.questionVi,
-        answerEn: item.answerEn || seed?.answerEn || item.answerVi,
-      };
-    });
-
-    localStorage.setItem(FAQ_STORAGE_KEY, JSON.stringify(updated));
-    return updated;
+    return [];
   } catch {
-    return INITIAL_FAQS;
+    return [];
   }
 };
 
@@ -270,7 +252,7 @@ export const fetchFaqsFromSupabase = async (): Promise<FaqItem[]> => {
       return faqsFromDb;
     }
   } catch (err) {
-    console.warn('Supabase faq_items table offline or not created yet:', err);
+    console.warn('Supabase faq_items table offline:', err);
   }
   return getAllFaqs();
 };
@@ -344,23 +326,18 @@ export const archiveFaq = async (id: string): Promise<FaqItem | null> => {
 
 export const deleteFaq = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
-    const { data, error } = await supabase.from('faq_items').delete().eq('id', id).select('id');
-    if (!error && data && data.length > 0) {
-      const list = getAllFaqs();
-      const filtered = list.filter((f) => f.id !== id);
-      saveFaqs(filtered);
-      return { success: true };
+    const { error } = await supabase.from('faq_items').delete().eq('id', id);
+    if (error) {
+      console.error('Supabase delete faq error:', error.message);
+      return { success: false, error: error.message };
     }
-    const softRes = await updateFaq(id, { status: 'archived' });
-    if (softRes) {
-      const list = getAllFaqs();
-      const filtered = list.filter((f) => f.id !== id);
-      saveFaqs(filtered);
-      return { success: true };
-    }
-    return { success: false, error: error?.message || 'Failed to remove FAQ item' };
+
+    const list = getAllFaqs();
+    const filtered = list.filter((f) => f.id !== id);
+    saveFaqs(filtered);
+    return { success: true };
   } catch (err: any) {
-    return { success: false, error: err?.message || 'Network or connection failure' };
+    return { success: false, error: err?.message || 'Network failure' };
   }
 };
 

@@ -147,23 +147,6 @@ export const getAllDepartments = (): DepartmentItem[] => {
     return INITIAL_DEPARTMENTS;
   }
 };
-const DELETED_CAREERS_KEY = 'icancam_deleted_careers_ids_v1';
-
-export const getDeletedCareerIds = (): string[] => {
-  try {
-    const raw = localStorage.getItem(DELETED_CAREERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-};
-
-export const markCareerAsDeleted = (id: string) => {
-  const ids = new Set(getDeletedCareerIds());
-  ids.add(id);
-  localStorage.setItem(DELETED_CAREERS_KEY, JSON.stringify(Array.from(ids)));
-};
-
 export const saveDepartments = (list: DepartmentItem[]) => {
   localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(list));
 };
@@ -196,91 +179,59 @@ export const deleteDepartment = (id: string): boolean => {
   return true;
 };
 
-// CAREERS CRUD
+// CAREERS CRUD - SUPABASE AS SINGLE SOURCE OF TRUTH
 export const getAllCareers = (): CareersItem[] => {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    let list: CareersItem[] = [];
     if (raw) {
-      list = JSON.parse(raw);
-    } else {
-      list = INITIAL_CAREERS;
+      return JSON.parse(raw);
     }
-
-    const deletedSet = new Set(getDeletedCareerIds());
-
-    const updatedList = list
-      .filter((item) => !deletedSet.has(item.id))
-      .map((item) => {
-        const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
-        if (seed) {
-          return {
-            ...item,
-            titleEn: item.titleEn || seed.titleEn,
-            departmentEn: item.departmentEn || seed.departmentEn,
-            locationEn: item.locationEn || seed.locationEn,
-            salaryEn: item.salaryEn || seed.salaryEn,
-            descriptionEn: item.descriptionEn || seed.descriptionEn,
-            requirementsEn: item.requirementsEn || seed.requirementsEn,
-            benefitsEn: item.benefitsEn || seed.benefitsEn,
-          };
-        }
-        return item;
-      });
-
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedList));
-    return updatedList;
+    return [];
   } catch {
-    const deletedSet = new Set(getDeletedCareerIds());
-    return INITIAL_CAREERS.filter((item) => !deletedSet.has(item.id));
+    return [];
   }
 };
 
 export const saveCareers = (list: CareersItem[]) => {
-  const deletedSet = new Set(getDeletedCareerIds());
-  const cleanList = list.filter((j) => !deletedSet.has(j.id));
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
 };
 
 export const fetchCareersFromSupabase = async (): Promise<CareersItem[]> => {
   try {
     const { data, error } = await supabase.from('careers_posts').select('*').order('created_at', { ascending: false });
     if (!error && data) {
-      const deletedSet = new Set(getDeletedCareerIds());
-      const careersFromDb: CareersItem[] = data
-        .filter((item) => !deletedSet.has(item.id))
-        .map((item) => {
-          const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
-          return {
-            id: item.id,
-            title: item.title,
-            titleEn: item.title_en || seed?.titleEn || item.title,
-            department: item.department,
-            departmentEn: item.department_en || seed?.departmentEn || item.department,
-            location: item.location,
-            locationEn: item.location_en || seed?.locationEn || item.location,
-            type: item.type as JobType,
-            salary: item.salary,
-            salaryEn: item.salary_en || seed?.salaryEn || item.salary,
-            deadline: item.deadline,
-            status: item.status as JobStatus,
-            description: item.description,
-            descriptionEn: item.description_en || seed?.descriptionEn || item.description,
-            requirements: item.requirements,
-            requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
-            benefits: item.benefits,
-            benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
-            applicationsCount: item.applications_count || 0,
-            createdAt: item.created_at || '2026-08-16T02:30:00.000Z',
-            updatedAt: item.updated_at || '2026-08-16T02:30:00.000Z',
-          };
-        });
+      const careersFromDb: CareersItem[] = data.map((item) => {
+        const seed = INITIAL_CAREERS.find((init) => init.id === item.id);
+        return {
+          id: item.id,
+          title: item.title,
+          titleEn: item.title_en || seed?.titleEn || item.title,
+          department: item.department,
+          departmentEn: item.department_en || seed?.departmentEn || item.department,
+          location: item.location,
+          locationEn: item.location_en || seed?.locationEn || item.location,
+          type: item.type as JobType,
+          salary: item.salary,
+          salaryEn: item.salary_en || seed?.salaryEn || item.salary,
+          deadline: item.deadline,
+          status: item.status as JobStatus,
+          description: item.description,
+          descriptionEn: item.description_en || seed?.descriptionEn || item.description,
+          requirements: item.requirements,
+          requirementsEn: item.requirements_en || seed?.requirementsEn || item.requirements,
+          benefits: item.benefits,
+          benefitsEn: item.benefits_en || seed?.benefitsEn || item.benefits,
+          applicationsCount: item.applications_count || 0,
+          createdAt: item.created_at || new Date().toISOString(),
+          updatedAt: item.updated_at || new Date().toISOString(),
+        };
+      });
 
       saveCareers(careersFromDb);
       return careersFromDb;
     }
   } catch (err) {
-    console.warn('Supabase careers_posts table offline or not created yet:', err);
+    console.warn('Supabase careers_posts table offline:', err);
   }
   return getAllCareers();
 };
@@ -387,32 +338,21 @@ export const updateCareer = async (
 };
 
 export const deleteCareer = async (id: string): Promise<{ success: boolean; error?: string }> => {
-  // 1. Permanently blacklist deleted job ID so it never resurrects on reload or seed fallback
-  markCareerAsDeleted(id);
-
-  // 2. Filter out from local storage
-  const list = getAllCareers();
-  const filtered = list.filter((j) => j.id !== id);
-  saveCareers(filtered);
-
   try {
-    // 3. Try Hard Delete on Supabase DB
-    const { data, error } = await supabase
-      .from('careers_posts')
-      .delete()
-      .eq('id', id)
-      .select('id');
-
-    if (!error && data && data.length > 0) {
-      return { success: true };
+    const { error } = await supabase.from('careers_posts').delete().eq('id', id);
+    if (error) {
+      console.error('Supabase delete career error:', error.message);
+      return { success: false, error: error.message };
     }
 
-    // 4. Soft Delete Fallback (close status on Supabase)
-    await supabase.from('careers_posts').update({ status: 'closed' }).eq('id', id);
+    const list = getAllCareers();
+    const filtered = list.filter((j) => j.id !== id);
+    saveCareers(filtered);
+
     return { success: true };
   } catch (err: any) {
-    console.warn('Supabase delete career notice:', err);
-    return { success: true };
+    console.error('Supabase delete career exception:', err);
+    return { success: false, error: err?.message || 'Network error' };
   }
 };
 

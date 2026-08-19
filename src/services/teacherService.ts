@@ -1,65 +1,34 @@
 import { supabase } from './supabaseClient';
-import { teachersData, type Teacher, type TeacherHighlight } from '../data/teacherData';
+import { type Teacher, type TeacherHighlight } from '../data/teacherData';
+import { saveTeachersIDB, compressBase64Image } from './cmsStorage';
 
 export type { Teacher, TeacherHighlight };
 
 const LOCAL_STORAGE_KEY = 'icancam_teachers_v1';
-const DELETED_TEACHERS_KEY = 'icancam_deleted_teacher_ids_v1';
+let inMemoryTeachers: Teacher[] | null = null;
 
-export const getDeletedTeacherIds = (): string[] => {
+// TEACHERS CRUD - SUPABASE AS SINGLE SOURCE OF TRUTH
+export const getAllTeachers = (): Teacher[] => {
+  if (inMemoryTeachers) {
+    return inMemoryTeachers;
+  }
   try {
-    const raw = localStorage.getItem(DELETED_TEACHERS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (raw) {
+      const list = JSON.parse(raw);
+      inMemoryTeachers = list;
+      return list;
+    }
+    return [];
   } catch {
     return [];
   }
 };
 
-export const saveDeletedTeacherIds = (idsList: string[]) => {
-  localStorage.setItem(DELETED_TEACHERS_KEY, JSON.stringify(Array.from(new Set(idsList))));
-};
-
-export const markTeacherAsDeleted = (id: string) => {
-  const ids = new Set(getDeletedTeacherIds());
-  ids.add(id);
-  saveDeletedTeacherIds(Array.from(ids));
-};
-
-import { saveTeachersIDB, getTeachersIDB, compressBase64Image } from './cmsStorage';
-
-let inMemoryTeachers: Teacher[] | null = null;
-
-export const getAllTeachers = (): Teacher[] => {
-  if (inMemoryTeachers) {
-    const deletedSet = new Set(getDeletedTeacherIds());
-    return inMemoryTeachers.filter((t) => !deletedSet.has(t.id));
-  }
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    let list: Teacher[] = [];
-    if (raw) {
-      list = JSON.parse(raw);
-    } else {
-      list = teachersData;
-    }
-    const deletedSet = new Set(getDeletedTeacherIds());
-    const cleanList = list.filter((t) => !deletedSet.has(t.id));
-    inMemoryTeachers = cleanList;
-    return cleanList;
-  } catch {
-    const deletedSet = new Set(getDeletedTeacherIds());
-    const cleanList = teachersData.filter((t) => !deletedSet.has(t.id));
-    inMemoryTeachers = cleanList;
-    return cleanList;
-  }
-};
-
 export const syncTeachersToSystemSettings = async (list: Teacher[]) => {
   try {
-    const deletedSet = new Set(getDeletedTeacherIds());
-    const cleanList = list.filter((t) => !deletedSet.has(t.id));
     const compressedList = await Promise.all(
-      cleanList.map(async (t) => {
+      list.map(async (t) => {
         if (t.image && t.image.startsWith('data:image/') && t.image.length > 20000) {
           const comp = await compressBase64Image(t.image);
           return { ...t, image: comp };
@@ -80,108 +49,41 @@ export const syncTeachersToSystemSettings = async (list: Teacher[]) => {
 };
 
 export const saveTeachers = (list: Teacher[]) => {
-  const deletedSet = new Set(getDeletedTeacherIds());
-  const cleanList = list.filter((t) => !deletedSet.has(t.id));
-  inMemoryTeachers = cleanList;
-  saveTeachersIDB(cleanList);
+  inMemoryTeachers = list;
+  saveTeachersIDB(list);
   try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanList));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
   } catch (err) {
     console.warn('LocalStorage save warning in teacherService:', err);
   }
-  syncTeachersToSystemSettings(cleanList);
+  syncTeachersToSystemSettings(list);
 };
 
 export const fetchTeachersFromSupabase = async (): Promise<Teacher[]> => {
-  const idbTeachers = await getTeachersIDB();
-  const localList = getAllTeachers();
-
-  const localMap = new Map<string, Teacher>();
-  for (const t of localList) localMap.set(t.id, t);
-  for (const t of idbTeachers) localMap.set(t.id, t);
-  const currentLocalTeachers = Array.from(localMap.values());
-
-  let globalDeletedIds = getDeletedTeacherIds();
   try {
-    const { data: settingsData } = await supabase
-      .from('system_settings')
-      .select('value')
-      .eq('key', 'icancam_deleted_teacher_ids')
-      .maybeSingle();
-    if (settingsData && settingsData.value) {
-      const parsed = JSON.parse(settingsData.value);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        globalDeletedIds = Array.from(new Set([...globalDeletedIds, ...parsed]));
-        saveDeletedTeacherIds(globalDeletedIds);
-      }
-    }
-  } catch {
-    // Ignore settings fetch error
-  }
-
-  const deletedSet = new Set(globalDeletedIds);
-
-  // Cross-device & Mobile sync: Try reading global teachers list from Supabase system_settings first!
-  try {
-    const { data: globalSetting } = await supabase
+    const { data: globalSetting, error } = await supabase
       .from('system_settings')
       .select('value')
       .eq('key', 'icancam_all_teachers_v1')
       .maybeSingle();
 
-    if (globalSetting && globalSetting.value) {
+    if (!error && globalSetting && globalSetting.value) {
       const parsed: Teacher[] = JSON.parse(globalSetting.value);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        const cleanGlobal = parsed.filter((t) => !deletedSet.has(t.id));
-        inMemoryTeachers = cleanGlobal;
-        saveTeachersIDB(cleanGlobal);
+      if (Array.isArray(parsed)) {
+        inMemoryTeachers = parsed;
+        saveTeachersIDB(parsed);
         try {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanGlobal));
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(parsed));
         } catch {
           // Ignore
         }
-        return cleanGlobal;
+        return parsed;
       }
     }
   } catch (err) {
     console.warn('System settings global teachers fetch notice:', err);
   }
-
-  try {
-    const { data, error } = await supabase.from('teachers').select('*').order('created_at', { ascending: false });
-    if (!error && data && data.length > 0) {
-      const teachersFromDb: Teacher[] = data
-        .filter((item) => !deletedSet.has(item.id))
-        .map((item) => {
-          const seed = teachersData.find((init) => init.id === item.id);
-          return {
-            id: item.id,
-            name: item.name || seed?.name || '',
-            role: item.role || seed?.role || '',
-            roleEn: item.role_en || item.roleEn || seed?.roleEn || '',
-            image: item.image || seed?.image || '',
-            mainHighlight: item.main_highlight || item.mainHighlight || seed?.mainHighlight || '',
-            highlights: Array.isArray(item.highlights) ? item.highlights : seed?.highlights || [],
-          };
-        });
-
-      const mergedMap = new Map<string, Teacher>();
-      for (const item of currentLocalTeachers) {
-        mergedMap.set(item.id, item);
-      }
-      for (const item of teachersFromDb) {
-        mergedMap.set(item.id, item);
-      }
-
-      const mergedList = Array.from(mergedMap.values()).filter((t) => !deletedSet.has(t.id));
-      saveTeachers(mergedList);
-      return mergedList;
-    }
-  } catch (err) {
-    console.warn('Supabase teachers table offline or not synced yet:', err);
-  }
-
-  return currentLocalTeachers.length > 0 ? currentLocalTeachers : localList;
+  return getAllTeachers();
 };
 
 export const syncTeacherToSupabase = async (teacher: Teacher): Promise<{ success: boolean; error?: string }> => {
@@ -257,28 +159,8 @@ export const updateTeacher = async (
 };
 
 export const deleteTeacher = async (id: string): Promise<{ success: boolean; error?: string }> => {
-  markTeacherAsDeleted(id);
-
   const list = getAllTeachers();
   const filtered = list.filter((t) => t.id !== id);
   saveTeachers(filtered);
-
-  try {
-    await supabase.from('teachers').delete().eq('id', id);
-  } catch (err) {
-    console.warn('Supabase delete teacher notice:', err);
-  }
-
-  try {
-    const deletedList = getDeletedTeacherIds();
-    await supabase.from('system_settings').upsert({
-      key: 'icancam_deleted_teacher_ids',
-      value: JSON.stringify(deletedList),
-      updated_at: new Date().toISOString(),
-    });
-  } catch (err) {
-    console.warn('Supabase system_settings sync notice:', err);
-  }
-
   return { success: true };
 };
