@@ -276,9 +276,45 @@ export const updateNewsPost = (
   data: Partial<Omit<DynamicNewsItem, 'id' | 'createdAt' | 'isCustom'>>
 ): DynamicNewsItem | null => {
   const posts = getAllNewsPosts();
+  const targetIdStr = String(id).replace('default_', '');
 
-  const index = posts.findIndex((p) => String(p.id) === String(id));
-  if (index === -1) return null;
+  let index = posts.findIndex(
+    (p) =>
+      String(p.id) === String(id) ||
+      String(p.id).replace('default_', '') === targetIdStr
+  );
+
+  // If still not found by ID, try matching by slug or title
+  if (index === -1 && data.title) {
+    const searchSlug = data.slug || generateSlug(data.title);
+    index = posts.findIndex((p) => p.slug === searchSlug || generateSlug(p.title) === searchSlug);
+  }
+
+  // Fallback: If post doesn't exist in local array, create it as new post!
+  if (index === -1) {
+    return createNewsPost({
+      title: data.title || 'Bài viết tin tức iCANCAM',
+      titleEn: data.titleEn || data.title || 'iCANCAM News Article',
+      slug: data.slug || (data.title ? generateSlug(data.title) : `post_${Date.now()}`),
+      status: data.status || 'draft',
+      category: data.category || 'news',
+      categoryLabel: data.categoryLabel || 'TIN TỨC',
+      categoryLabelEn: data.categoryLabelEn || 'NEWS',
+      image: data.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
+      imageEn: data.imageEn || data.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop',
+      excerpt: data.excerpt || data.title || '',
+      excerptEn: data.excerptEn || data.excerpt || data.title || '',
+      content: data.content || `<p>${data.title || ''}</p>`,
+      contentEn: data.contentEn || data.content || `<p>${data.title || ''}</p>`,
+      url: '/news',
+      author: 'iCANCAM Admin',
+      tags: ['Anh ngữ', 'Giáo dục'],
+      featured: true,
+      readingTime: '3 phút đọc',
+      date: data.date || new Date().toLocaleDateString('vi-VN'),
+      ...data,
+    });
+  }
 
   const now = new Date().toISOString();
   const updatedPost: DynamicNewsItem = {

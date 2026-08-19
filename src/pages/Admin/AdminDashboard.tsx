@@ -115,14 +115,29 @@ export const AdminDashboard: React.FC = () => {
 
   // Create or Update handler
   const handleSavePost = (postData: Partial<DynamicNewsItem>) => {
-    if (editingPost) {
-      updateNewsPost(editingPost.id, postData);
-      showToast('Đã lưu thay đổi bài viết thành công! ✓', 'success');
-    } else {
-      createNewsPost(postData as Omit<DynamicNewsItem, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>);
-      showToast('Đã đăng bài viết mới thành công! ✓', 'success');
+    try {
+      const statusLabel =
+        postData.status === 'published'
+          ? 'Đã xuất bản'
+          : postData.status === 'draft'
+          ? 'Bản nháp'
+          : 'Lưu trữ';
+
+      if (editingPost) {
+        updateNewsPost(editingPost.id, postData);
+        showToast(`Đã lưu thay đổi bài viết thành công (${statusLabel})! ✓`, 'success');
+      } else {
+        createNewsPost(postData as Omit<DynamicNewsItem, 'id' | 'createdAt' | 'updatedAt' | 'isCustom'>);
+        showToast(`Đã lưu & tạo bài viết mới thành công (${statusLabel})! ✓`, 'success');
+      }
+
+      // Reset filter so the newly saved post is visible in the list regardless of previous filter
+      setSelectedStatus('all');
+      loadPosts();
+    } catch (err) {
+      console.error('Error in handleSavePost:', err);
+      showToast('Có lỗi xảy ra khi lưu bài viết!', 'error');
     }
-    loadPosts();
   };
 
   // Delete handler
