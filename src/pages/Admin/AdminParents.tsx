@@ -152,34 +152,36 @@ export const AdminParents: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.header}>
+      {/* Page Header */}
+      <div className={styles.pageHeader}>
         <div>
-          <h1 className={styles.title}>Ý Kiến Phụ Huynh</h1>
-          <p className={styles.subtitle}>
+          <h1 className={styles.pageTitle}>Ý Kiến Phụ Huynh</h1>
+          <p className={styles.pageSubtitle}>
             Quản lý và cập nhật các đánh giá, cảm nhận từ phụ huynh học viên tại iCANCAM
           </p>
         </div>
-        <div className={styles.actions}>
-          <div className={styles.searchBox}>
-            <Search className={styles.searchIcon} size={18} />
-            <input
-              type="text"
-              placeholder="Tìm kiếm phụ huynh / tên bé..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={styles.searchInput}
-            />
-          </div>
-          <button onClick={loadParents} className={styles.refreshBtn} title="Làm mới">
-            <RefreshCw size={18} />
-            <span>Làm mới</span>
-          </button>
-          <button onClick={openCreateModal} className={styles.addBtn}>
-            <Plus size={18} />
-            <span>Thêm Ý Kiến Phụ Huynh</span>
-          </button>
+        <button onClick={openCreateModal} className={styles.createBtn}>
+          <Plus size={18} />
+          <span>Thêm Ý Kiến Phụ Huynh</span>
+        </button>
+      </div>
+
+      {/* Filter Card */}
+      <div className={styles.filterCard}>
+        <div className={styles.searchBox}>
+          <Search className={styles.searchIcon} size={18} />
+          <input
+            type="text"
+            placeholder="Tìm kiếm phụ huynh / tên bé..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+          />
         </div>
+        <button onClick={loadParents} className={styles.refreshBtn} title="Làm mới">
+          <RefreshCw size={18} />
+          <span>Làm mới</span>
+        </button>
       </div>
 
       {/* Grid */}
@@ -236,7 +238,7 @@ export const AdminParents: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className={styles.modalBody}>
                 {/* Language Tabs */}
-                <div className={styles.langTabs}>
+                <div className={styles.langTabGroup}>
                   <button
                     type="button"
                     className={`${styles.langTab} ${activeLangTab === 'vi' ? styles.langTabActive : ''}`}
@@ -282,7 +284,7 @@ export const AdminParents: React.FC = () => {
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Ảnh Đại Diện Phụ Huynh / Học Viên (*)</label>
                   <div className={styles.imagePreviewRow}>
-                    <img src={image || 'https://via.placeholder.com/70'} alt="Avatar Preview" className={styles.imagePreview} />
+                    <img src={image || 'https://via.placeholder.com/65'} alt="Avatar Preview" className={styles.imagePreview} />
                     <button
                       type="button"
                       onClick={() => setIsMediaModalOpen(true)}
