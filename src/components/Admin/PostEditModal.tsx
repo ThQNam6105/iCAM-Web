@@ -246,7 +246,7 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.formGrid}>
+          <form onSubmit={handleSubmit} noValidate className={styles.formGrid}>
             {/* Top Common Fields: Status & Category */}
             <div className={styles.rowTwo}>
               <div className={styles.inputGroup}>
@@ -319,7 +319,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     className={styles.input}
-                    required
                   />
                   {errors.title && <span className={styles.errorText}>{errors.title}</span>}
                 </div>
@@ -335,7 +334,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       value={image}
                       onChange={(e) => setImage(e.target.value)}
                       className={styles.input}
-                      required
                     />
                     <button
                       type="button"
@@ -381,7 +379,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                     value={excerpt}
                     onChange={(e) => setExcerpt(e.target.value)}
                     className={styles.textarea}
-                    required
                   />
                   {errors.excerpt && <span className={styles.errorText}>{errors.excerpt}</span>}
                 </div>
@@ -413,7 +410,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                     value={titleEn}
                     onChange={(e) => setTitleEn(e.target.value)}
                     className={styles.input}
-                    required
                   />
                   {errors.titleEn && <span className={styles.errorText}>{errors.titleEn}</span>}
                 </div>
@@ -429,7 +425,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                       value={imageEn}
                       onChange={(e) => setImageEn(e.target.value)}
                       className={styles.input}
-                      required
                     />
                     <button
                       type="button"
@@ -474,7 +469,6 @@ export const PostEditModal: React.FC<PostEditModalProps> = ({
                     value={excerptEn}
                     onChange={(e) => setExcerptEn(e.target.value)}
                     className={styles.textarea}
-                    required
                   />
                 </div>
 

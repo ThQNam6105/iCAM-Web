@@ -348,20 +348,17 @@ export interface ValidationError {
 
 export const validatePostForm = (data: Partial<DynamicNewsItem>): ValidationError => {
   const errors: ValidationError = {};
-  if (!data.title || data.title.trim().length < 5) {
-    errors.title = 'Tiêu đề tiếng Việt phải dài ít nhất 5 ký tự.';
+  if (!data.title || data.title.trim().length < 2) {
+    errors.title = 'Tiêu đề bài viết phải dài ít nhất 2 ký tự.';
   }
-  if (!data.titleEn || data.titleEn.trim().length < 5) {
-    errors.titleEn = 'Tiêu đề tiếng Anh phải dài ít nhất 5 ký tự.';
+  if (!data.excerpt || data.excerpt.trim().length < 5) {
+    errors.excerpt = 'Tóm tắt bài viết phải dài ít nhất 5 ký tự.';
   }
-  if (!data.excerpt || data.excerpt.trim().length < 10) {
-    errors.excerpt = 'Tóm tắt bài viết phải dài ít nhất 10 ký tự.';
+  if (!data.content || data.content.trim().length < 10) {
+    errors.content = 'Nội dung chi tiết phải dài ít nhất 10 ký tự.';
   }
-  if (!data.content || data.content.trim().length < 20) {
-    errors.content = 'Nội dung chi tiết phải dài ít nhất 20 ký tự.';
-  }
-  if (!data.image || (!data.image.startsWith('http') && !data.image.startsWith('data:image/'))) {
-    errors.image = 'Vui lòng nhập đường dẫn URL hình ảnh hoặc tải ảnh từ máy tính lên.';
+  if (!data.image || data.image.trim().length === 0) {
+    errors.image = 'Vui lòng chọn hoặc nhập đường dẫn hình ảnh bìa bài viết.';
   }
   return errors;
 };
