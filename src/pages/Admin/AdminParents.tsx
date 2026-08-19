@@ -257,7 +257,9 @@ export const AdminParents: React.FC = () => {
 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Tên Bé / Học Viên (*)</label>
+                    <label className={styles.label}>
+                      Tên Bé / Học Viên <span className={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="text"
                       value={childName}
@@ -268,7 +270,9 @@ export const AdminParents: React.FC = () => {
                     />
                   </div>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Số Năm Đồng Hành (*)</label>
+                    <label className={styles.label}>
+                      Số Năm Đồng Hành <span className={styles.requiredStar}>*</span>
+                    </label>
                     <input
                       type="number"
                       value={years}
@@ -282,7 +286,9 @@ export const AdminParents: React.FC = () => {
 
                 {/* Avatar Image Selection */}
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Ảnh Đại Diện Phụ Huynh / Học Viên (*)</label>
+                  <label className={styles.label}>
+                    Ảnh Đại Diện Phụ Huynh / Học Viên <span className={styles.requiredStar}>*</span>
+                  </label>
                   <div className={styles.imagePreviewRow}>
                     <img src={image || 'https://via.placeholder.com/65'} alt="Avatar Preview" className={styles.imagePreview} />
                     <button
@@ -307,7 +313,9 @@ export const AdminParents: React.FC = () => {
                 {/* Feedback text according to selected tab */}
                 {activeLangTab === 'vi' ? (
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Cảm Nhận Của Phụ Huynh (Tiếng Việt) (*)</label>
+                    <label className={styles.label}>
+                      Cảm Nhận Của Phụ Huynh (Tiếng Việt) <span className={styles.requiredStar}>*</span>
+                    </label>
                     <textarea
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
