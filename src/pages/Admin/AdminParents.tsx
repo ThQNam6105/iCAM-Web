@@ -90,7 +90,13 @@ export const AdminParents: React.FC = () => {
       return;
     }
     if (!feedback.trim()) {
-      showToast('Vui lòng nhập nội dung cảm nhận phụ huynh', 'error');
+      showToast('Vui lòng nhập nội dung cảm nhận phụ huynh (Tiếng Việt)', 'error');
+      setActiveLangTab('vi');
+      return;
+    }
+    if (!feedbackEn.trim()) {
+      showToast('Vui lòng nhập nội dung cảm nhận phụ huynh (Tiếng Anh)', 'error');
+      setActiveLangTab('en');
       return;
     }
 
@@ -326,11 +332,14 @@ export const AdminParents: React.FC = () => {
                   </div>
                 ) : (
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Cảm Nhận Của Phụ Huynh (Tiếng Anh)</label>
+                    <label className={styles.label}>
+                      Cảm Nhận Của Phụ Huynh (Tiếng Anh) <span className={styles.requiredStar}>*</span>
+                    </label>
                     <textarea
                       value={feedbackEn}
                       onChange={(e) => setFeedbackEn(e.target.value)}
                       placeholder="Enter parent feedback in English..."
+                      required
                       className={styles.textarea}
                     />
                   </div>
