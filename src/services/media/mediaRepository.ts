@@ -191,6 +191,38 @@ export const getAllDynamicUsagesForMedia = (mediaItem: MediaItem): MediaUsage[] 
     // Ignore
   }
 
+  // 7. Scan Homepage Static Sections (Key Achievements, Banners, Hero)
+  const homepageStaticAssets: { filename: string; title: string; type: EntityType }[] = [
+    { filename: 'achievement_teacher.png', title: '[TRANG CHỦ] Key Achievements - Đội ngũ giảng viên', type: 'homepage' },
+    { filename: 'achievement_smartboard.png', title: '[TRANG CHỦ] Key Achievements - Công nghệ Smartboard', type: 'homepage' },
+    { filename: 'achievement_school.png', title: '[TRANG CHỦ] Key Achievements - Cơ sở vật chất trung tâm', type: 'homepage' },
+    { filename: 'banner-bg.jpg', title: '[TRANG CHỦ] Banner chính (Desktop)', type: 'homepage' },
+    { filename: 'banner-bg-mobile.jpg', title: '[TRANG CHỦ] Banner chính (Mobile)', type: 'homepage' },
+    { filename: 'en_banner-bg.jpg', title: '[TRANG CHỦ] Banner Tiếng Anh (Desktop)', type: 'homepage' },
+    { filename: 'en_banner-bg-mobile.jpg', title: '[TRANG CHỦ] Banner Tiếng Anh (Mobile)', type: 'homepage' },
+    { filename: 'hero.png', title: '[TRANG CHỦ] Hình ảnh Hero', type: 'homepage' },
+    { filename: 'ican.png', title: '[TRANG CHỦ] Logo iCANCAM', type: 'homepage' },
+    { filename: 'footer-logo.jpg', title: '[TRANG CHỦ] Logo chân trang', type: 'homepage' },
+  ];
+
+  for (const staticAsset of homepageStaticAssets) {
+    if (isImageMatch(mediaItem, staticAsset.filename)) {
+      const uId = `dyn_homepage_${staticAsset.filename}`;
+      if (!registeredIds.has(uId)) {
+        registeredIds.add(uId);
+        dynamicUsages.push({
+          id: uId,
+          media_id: mediaItem.id,
+          entity_type: staticAsset.type,
+          entity_id: `static_${staticAsset.filename}`,
+          entity_title: staticAsset.title,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+    }
+  }
+
   return dynamicUsages;
 };
 
