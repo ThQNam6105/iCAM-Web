@@ -1,6 +1,198 @@
 import { supabase } from '../supabaseClient';
 import type { MediaItem, MediaUsage, MediaFolder, MediaFilter, EntityType } from '../../types/media';
 import { getAllNewsPosts } from '../newsService';
+import { getAllTeachers } from '../teacherService';
+import { getAllStudents } from '../studentService';
+import { getAllParents } from '../parentService';
+import { getAllCareers } from '../careersService';
+import { getAllCourses } from '../courseService';
+
+// Helper to extract clean base image name for accurate URL matching (strips Vite build hashes, query params, etc.)
+export const extractBaseImageName = (urlOrPath?: string): string => {
+  if (!urlOrPath) return '';
+  const clean = urlOrPath.split('?')[0].split('#')[0];
+  const filename = clean.substring(clean.lastIndexOf('/') + 1);
+  // Remove Vite build hashes (e.g. teacher_khoa-B5GIR_KI.png -> teacher_khoa.png)
+  return filename.replace(/-[A-Za-z0-9_-]{8,}\./, '.').toLowerCase();
+};
+
+export const isImageMatch = (mediaItem: MediaItem, entityImageUrl?: string): boolean => {
+  if (!entityImageUrl) return false;
+  if (mediaItem.public_url === entityImageUrl || mediaItem.id === entityImageUrl) return true;
+
+  const itemBase = extractBaseImageName(mediaItem.public_url) || extractBaseImageName(mediaItem.original_filename);
+  const entityBase = extractBaseImageName(entityImageUrl);
+
+  if (itemBase && entityBase && itemBase === entityBase) return true;
+  return false;
+};
+
+export const getAllDynamicUsagesForMedia = (mediaItem: MediaItem): MediaUsage[] => {
+  const dynamicUsages: MediaUsage[] = [];
+  const registeredIds = new Set<string>();
+
+  // 1. Scan News Posts
+  try {
+    const posts = getAllNewsPosts() || [];
+    for (const post of posts) {
+      let matched = isImageMatch(mediaItem, post.image) || isImageMatch(mediaItem, post.imageEn);
+
+      // Also check content HTML for <img src="...">
+      if (!matched && post.content) {
+        const matches = post.content.match(/<img[^>]+src=["']([^"']+)["']/g);
+        if (matches) {
+          for (const m of matches) {
+            const srcMatch = m.match(/src=["']([^"']+)["']/);
+            if (srcMatch && isImageMatch(mediaItem, srcMatch[1])) {
+              matched = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (matched) {
+        const uId = `dyn_news_${post.id}`;
+        if (!registeredIds.has(uId)) {
+          registeredIds.add(uId);
+          dynamicUsages.push({
+            id: uId,
+            media_id: mediaItem.id,
+            entity_type: 'news',
+            entity_id: String(post.id),
+            entity_title: `[TIN TỨC] ${post.title}`,
+            created_at: post.createdAt || new Date().toISOString(),
+            updated_at: post.updatedAt || new Date().toISOString(),
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  // 2. Scan Teachers
+  try {
+    const teachers = getAllTeachers() || [];
+    for (const t of teachers) {
+      if (isImageMatch(mediaItem, t.image)) {
+        const uId = `dyn_teacher_${t.id}`;
+        if (!registeredIds.has(uId)) {
+          registeredIds.add(uId);
+          dynamicUsages.push({
+            id: uId,
+            media_id: mediaItem.id,
+            entity_type: 'teachers',
+            entity_id: String(t.id),
+            entity_title: `[GIÁO VIÊN] ${t.name}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  // 3. Scan Students
+  try {
+    const students = getAllStudents() || [];
+    for (const s of students) {
+      if (isImageMatch(mediaItem, s.image)) {
+        const uId = `dyn_student_${s.id}`;
+        if (!registeredIds.has(uId)) {
+          registeredIds.add(uId);
+          dynamicUsages.push({
+            id: uId,
+            media_id: mediaItem.id,
+            entity_type: 'homepage',
+            entity_id: String(s.id),
+            entity_title: `[HỌC VIÊN] ${s.name}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  // 4. Scan Parents
+  try {
+    const parents = getAllParents() || [];
+    for (const p of parents) {
+      if (isImageMatch(mediaItem, p.image)) {
+        const uId = `dyn_parent_${p.id}`;
+        if (!registeredIds.has(uId)) {
+          registeredIds.add(uId);
+          dynamicUsages.push({
+            id: uId,
+            media_id: mediaItem.id,
+            entity_type: 'homepage',
+            entity_id: String(p.id),
+            entity_title: `[PHỤ HUYNH] ${p.childName || p.id}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  // 5. Scan Careers
+  try {
+    const careers = getAllCareers() || [];
+    for (const c of careers) {
+      if (isImageMatch(mediaItem, (c as any).image)) {
+        const uId = `dyn_career_${c.id}`;
+        if (!registeredIds.has(uId)) {
+          registeredIds.add(uId);
+          dynamicUsages.push({
+            id: uId,
+            media_id: mediaItem.id,
+            entity_type: 'careers',
+            entity_id: String(c.id),
+            entity_title: `[TUYỂN DỤNG] ${c.title}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  // 6. Scan Courses
+  try {
+    const courses = getAllCourses() || [];
+    for (const c of courses) {
+      if (isImageMatch(mediaItem, c.thumbnailUrl)) {
+        const uId = `dyn_course_${c.id}`;
+        if (!registeredIds.has(uId)) {
+          registeredIds.add(uId);
+          dynamicUsages.push({
+            id: uId,
+            media_id: mediaItem.id,
+            entity_type: 'courses',
+            entity_id: String(c.id),
+            entity_title: `[KHÓA HỌC] ${c.titleVi}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  return dynamicUsages;
+};
 
 // Import asset images directly to guarantee clean resolution in Dev & Production builds
 import bannerBg from '../../assets/banner-bg.jpg';
@@ -578,10 +770,16 @@ export class MediaRepository {
 
     const usages = getStoredUsages();
 
-    // Attach current usage count
+    // Attach current 100% accurate real-time usage count across all CMS modules
     items = items.map((item) => {
-      const count = usages.filter((u) => u.media_id === item.id).length;
-      return { ...item, usage_count: count };
+      const dynamicUsages = getAllDynamicUsagesForMedia(item);
+      const manualUsages = usages.filter((u) => u.media_id === item.id);
+      const combinedCount = new Set([
+        ...dynamicUsages.map((u) => `${u.entity_type}_${u.entity_id}`),
+        ...manualUsages.map((u) => `${u.entity_type}_${u.entity_id}`),
+      ]).size;
+
+      return { ...item, usage_count: combinedCount };
     });
 
     // Apply Filter & Search
@@ -740,40 +938,30 @@ export class MediaRepository {
   }
 
   /**
-   * Get usages history for a specific media item (with auto-pruning orphaned usages)
+   * Get usages history for a specific media item (combining dynamic & manual usages)
    */
   async getMediaUsages(mediaId: string): Promise<MediaUsage[]> {
-    const usages = getStoredUsages();
-    const mediaUsages = usages.filter((u) => u.media_id === mediaId);
+    const items = getStoredItems();
+    const targetItem = items.find((i) => i.id === mediaId);
 
-    if (mediaUsages.length === 0) return [];
+    const manualUsages = getStoredUsages().filter((u) => u.media_id === mediaId);
+    let dynamicUsages: MediaUsage[] = [];
 
-    let activeNewsPosts: any[] = [];
-    try {
-      activeNewsPosts = getAllNewsPosts() || [];
-    } catch {
-      // Ignore
+    if (targetItem) {
+      dynamicUsages = getAllDynamicUsagesForMedia(targetItem);
     }
 
-    const validUsages = mediaUsages.filter((u) => {
-      const typeStr = String(u.entity_type).toLowerCase();
-      if (typeStr === 'news') {
-        const cleanEntityId = String(u.entity_id).replace('post_', '').replace('default_', '');
-        const exists = activeNewsPosts.some(
-          (p: any) => String(p.id) === String(u.entity_id) || String(p.id).replace('post_', '').replace('default_', '') === cleanEntityId
-        );
-        return exists;
+    const usageMap = new Map<string, MediaUsage>();
+    for (const u of dynamicUsages) {
+      usageMap.set(`${u.entity_type}_${u.entity_id}`, u);
+    }
+    for (const u of manualUsages) {
+      if (!usageMap.has(`${u.entity_type}_${u.entity_id}`)) {
+        usageMap.set(`${u.entity_type}_${u.entity_id}`, u);
       }
-      return true;
-    });
-
-    if (validUsages.length !== mediaUsages.length) {
-      const validIds = new Set(validUsages.map((v) => v.id));
-      const remainingAll = usages.filter((u) => u.media_id !== mediaId || validIds.has(u.id));
-      saveStoredUsages(remainingAll);
     }
 
-    return validUsages;
+    return Array.from(usageMap.values());
   }
 
   /**
