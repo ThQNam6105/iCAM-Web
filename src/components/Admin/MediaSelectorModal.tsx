@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { MediaItem, MediaFolder } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
+import { mediaUsageService } from '../../services/mediaUsageService';
 import { Button, Select } from './UI';
 import styles from './MediaSelectorModal.module.css';
 
@@ -105,9 +106,13 @@ export const MediaSelectorModal: React.FC<MediaSelectorModalProps> = ({
 
   const handleDeleteAsset = async (item: MediaItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    const usages = await mediaService.getMediaUsages(item.id);
-    if (usages.length > 0) {
-      alert(`Không thể xóa! Tệp "${item.original_filename}" đang được sử dụng ở ${usages.length} vị trí trên website.`);
+    const verification = await mediaUsageService.getMediaUsage(item.id);
+    if (verification.state === 'IN_USE') {
+      alert(`Không thể xóa! Tệp "${item.original_filename}" đang được sử dụng ở ${verification.usageCount} vị trí trên website.`);
+      return;
+    }
+    if (verification.state === 'UNKNOWN') {
+      alert(`Không thể xác minh việc sử dụng tệp "${item.original_filename}" do lỗi kết nối/CSDL. Thao tác xóa đã bị ngăn chặn để bảo vệ dữ liệu.`);
       return;
     }
     if (window.confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn tệp "${item.original_filename}"?`)) {

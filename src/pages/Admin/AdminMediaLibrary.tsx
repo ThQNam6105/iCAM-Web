@@ -25,8 +25,9 @@ import {
   Video,
   FolderInput,
 } from 'lucide-react';
-import type { MediaItem, MediaUsage, MediaFolder, MediaFilter } from '../../types/media';
+import type { MediaItem, MediaFolder, MediaFilter } from '../../types/media';
 import { mediaService } from '../../services/media/mediaService';
+import { mediaUsageService, type MediaUsageResult } from '../../services/mediaUsageService';
 import { ImageCropperModal } from '../../components/Admin/ImageCropperModal';
 import { ConfirmModal } from '../../components/ConfirmModal/ConfirmModal';
 import { useToast } from '../../components/Toast/Toast';
@@ -64,7 +65,7 @@ export const AdminMediaLibrary: React.FC = () => {
 
   // Asset Details Side Drawer
   const [activeDrawerAsset, setActiveDrawerAsset] = useState<MediaItem | null>(null);
-  const [activeAssetUsages, setActiveAssetUsages] = useState<MediaUsage[]>([]);
+  const [activeDrawerUsageResult, setActiveDrawerUsageResult] = useState<MediaUsageResult | null>(null);
 
   // Editing Metadata state inside drawer
   const [editAltVi, setEditAltVi] = useState('');
@@ -244,8 +245,8 @@ export const AdminMediaLibrary: React.FC = () => {
     setEditTagsStr((item.tags || []).join(', '));
     setEditFolderId(item.folder_id || null);
 
-    const usages = await mediaService.getMediaUsages(item.id);
-    setActiveAssetUsages(usages);
+    const usageResult = await mediaUsageService.getMediaUsage(item.id);
+    setActiveDrawerUsageResult(usageResult);
   };
 
   const handleSaveMetadata = async () => {
@@ -284,9 +285,20 @@ export const AdminMediaLibrary: React.FC = () => {
   };
 
   const handleRequestDelete = async (item: MediaItem) => {
-    const usages = await mediaService.getMediaUsages(item.id);
-    if (usages.length > 0) {
-      showToast(`Không thể xóa! Tệp này đang được sử dụng ở ${usages.length} vị trí trên website.`, 'error');
+    const verification = await mediaUsageService.getMediaUsage(item.id);
+    if (verification.state === 'IN_USE') {
+      showToast(
+        `Không thể xóa! Tệp "${item.original_filename}" đang được sử dụng ở ${verification.usageCount} vị trí trên website.`,
+        'error'
+      );
+      handleOpenDrawer(item);
+      return;
+    }
+    if (verification.state === 'UNKNOWN') {
+      showToast(
+        `Không thể xác minh việc sử dụng tệp "${item.original_filename}" do lỗi kết nối/CSDL. Thao tác xóa đã bị ngăn chặn để bảo vệ dữ liệu.`,
+        'error'
+      );
       return;
     }
     setDeleteCandidate(item);
@@ -294,20 +306,21 @@ export const AdminMediaLibrary: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (!deleteCandidate) return;
-    const targetId = deleteCandidate.id;
-    const res = await mediaService.deleteMediaItem(targetId);
+    const target = deleteCandidate;
+    setDeleteCandidate(null);
+
+    const res = await mediaService.deleteMediaItem(target.id);
     if (res.success) {
-      showToast('Đã xóa vĩnh viễn tệp media khỏi hệ thống!', 'info');
-      if (activeDrawerAsset?.id === targetId) {
+      showToast(`Đã xóa vĩnh viễn tệp "${target.original_filename}" thành công!`, 'success');
+      if (activeDrawerAsset?.id === target.id) {
         setActiveDrawerAsset(null);
       }
-      setSelectedIds((prev) => prev.filter((id) => id !== targetId));
-      setItems((prev) => prev.filter((item) => item.id !== targetId));
+      setSelectedIds((prev) => prev.filter((id) => id !== target.id));
+      setItems((prev) => prev.filter((item) => item.id !== target.id));
       await refreshMediaList();
     } else {
       showToast(res.error || 'Không thể xóa tệp.', 'error');
     }
-    setDeleteCandidate(null);
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1083,20 +1096,49 @@ export const AdminMediaLibrary: React.FC = () => {
 
               <div className={styles.usageBox}>
                 <div className={styles.usageHeader}>
-                  <Eye size={16} /> Lịch sử sử dụng ({activeAssetUsages.length} vị trí)
+                  <Eye size={16} /> Lịch sử sử dụng ({activeDrawerUsageResult?.usageCount || 0} vị trí)
+                  {activeDrawerUsageResult?.state === 'UNKNOWN' && (
+                    <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: 600, marginLeft: 'auto' }}>
+                      ⚠️ Lỗi xác minh CSDL
+                    </span>
+                  )}
                 </div>
-                {activeAssetUsages.length === 0 ? (
-                  <div style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
+                {activeDrawerUsageResult?.state === 'UNKNOWN' ? (
+                  <div style={{ fontSize: '0.82rem', color: '#ef4444', padding: '0.5rem 0' }}>
+                    Không thể xác minh tình trạng sử dụng của tệp do lỗi kết nối/CSDL. Để bảo vệ an toàn website, thao tác xóa bị tạm khóa.
+                  </div>
+                ) : !activeDrawerUsageResult || activeDrawerUsageResult.locations.length === 0 ? (
+                  <div style={{ fontSize: '0.82rem', color: '#94a3b8', padding: '0.5rem 0' }}>
                     Tệp này chưa được liên kết sử dụng ở mô-đun nào. Có thể xóa an toàn.
                   </div>
                 ) : (
                   <div className={styles.usageList}>
-                    {activeAssetUsages.map((u) => (
-                      <div key={u.id} className={styles.usageItem}>
-                        <Tag size={13} color="#F58220" />
-                        <span>
-                          [{u.entity_type.toUpperCase()}] <strong>{u.entity_title}</strong>
-                        </span>
+                    {activeDrawerUsageResult.locations.map((loc, idx) => (
+                      <div
+                        key={`${loc.module}_${loc.recordId}_${loc.field}_${idx}`}
+                        className={styles.usageItem}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '8px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', marginBottom: '6px' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <Tag size={13} color="#F58220" />
+                          <span>[{loc.moduleLabel}] {loc.recordTitle}</span>
+                          <span style={{ marginLeft: 'auto', fontSize: '0.72rem', background: 'rgba(245,130,32,0.15)', color: '#F58220', padding: '2px 6px', borderRadius: '4px' }}>
+                            {loc.matchType}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: '#cbd5e1', paddingLeft: '20px' }}>
+                          Trường dữ liệu: <strong>{loc.label}</strong>
+                        </div>
+                        {loc.route && (
+                          <a
+                            href={loc.route}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ fontSize: '0.75rem', color: '#3b82f6', textDecoration: 'underline', paddingLeft: '20px' }}
+                          >
+                            Đến trang chỉnh sửa →
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>

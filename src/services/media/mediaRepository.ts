@@ -1,230 +1,6 @@
 import { supabase } from '../supabaseClient';
 import type { MediaItem, MediaUsage, MediaFolder, MediaFilter, EntityType } from '../../types/media';
-import { getAllNewsPosts } from '../newsService';
-import { getAllTeachers } from '../teacherService';
-import { getAllStudents } from '../studentService';
-import { getAllParents } from '../parentService';
-import { getAllCareers } from '../careersService';
-import { getAllCourses } from '../courseService';
-
-// Helper to extract clean base image name for accurate URL matching (strips Vite build hashes, query params, etc.)
-export const extractBaseImageName = (urlOrPath?: string): string => {
-  if (!urlOrPath) return '';
-  const clean = urlOrPath.split('?')[0].split('#')[0];
-  const filename = clean.substring(clean.lastIndexOf('/') + 1);
-  // Remove Vite build hashes (e.g. teacher_khoa-B5GIR_KI.png -> teacher_khoa.png)
-  return filename.replace(/-[A-Za-z0-9_-]{8,}\./, '.').toLowerCase();
-};
-
-export const isImageMatch = (mediaItem: MediaItem, entityImageUrl?: string): boolean => {
-  if (!entityImageUrl) return false;
-  if (mediaItem.public_url === entityImageUrl || mediaItem.id === entityImageUrl) return true;
-
-  const itemBase = extractBaseImageName(mediaItem.public_url) || extractBaseImageName(mediaItem.original_filename);
-  const entityBase = extractBaseImageName(entityImageUrl);
-
-  if (itemBase && entityBase && itemBase === entityBase) return true;
-  return false;
-};
-
-export const getAllDynamicUsagesForMedia = (mediaItem: MediaItem): MediaUsage[] => {
-  const dynamicUsages: MediaUsage[] = [];
-  const registeredIds = new Set<string>();
-
-  // 1. Scan News Posts
-  try {
-    const posts = getAllNewsPosts() || [];
-    for (const post of posts) {
-      let matched = isImageMatch(mediaItem, post.image) || isImageMatch(mediaItem, post.imageEn);
-
-      // Also check content HTML for <img src="...">
-      if (!matched && post.content) {
-        const matches = post.content.match(/<img[^>]+src=["']([^"']+)["']/g);
-        if (matches) {
-          for (const m of matches) {
-            const srcMatch = m.match(/src=["']([^"']+)["']/);
-            if (srcMatch && isImageMatch(mediaItem, srcMatch[1])) {
-              matched = true;
-              break;
-            }
-          }
-        }
-      }
-
-      if (matched) {
-        const uId = `dyn_news_${post.id}`;
-        if (!registeredIds.has(uId)) {
-          registeredIds.add(uId);
-          dynamicUsages.push({
-            id: uId,
-            media_id: mediaItem.id,
-            entity_type: 'news',
-            entity_id: String(post.id),
-            entity_title: `[TIN TỨC] ${post.title}`,
-            created_at: post.createdAt || new Date().toISOString(),
-            updated_at: post.updatedAt || new Date().toISOString(),
-          });
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // 2. Scan Teachers
-  try {
-    const teachers = getAllTeachers() || [];
-    for (const t of teachers) {
-      if (isImageMatch(mediaItem, t.image)) {
-        const uId = `dyn_teacher_${t.id}`;
-        if (!registeredIds.has(uId)) {
-          registeredIds.add(uId);
-          dynamicUsages.push({
-            id: uId,
-            media_id: mediaItem.id,
-            entity_type: 'teachers',
-            entity_id: String(t.id),
-            entity_title: `[GIÁO VIÊN] ${t.name}`,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // 3. Scan Students
-  try {
-    const students = getAllStudents() || [];
-    for (const s of students) {
-      if (isImageMatch(mediaItem, s.image)) {
-        const uId = `dyn_student_${s.id}`;
-        if (!registeredIds.has(uId)) {
-          registeredIds.add(uId);
-          dynamicUsages.push({
-            id: uId,
-            media_id: mediaItem.id,
-            entity_type: 'homepage',
-            entity_id: String(s.id),
-            entity_title: `[HỌC VIÊN] ${s.name}`,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // 4. Scan Parents
-  try {
-    const parents = getAllParents() || [];
-    for (const p of parents) {
-      if (isImageMatch(mediaItem, p.image)) {
-        const uId = `dyn_parent_${p.id}`;
-        if (!registeredIds.has(uId)) {
-          registeredIds.add(uId);
-          dynamicUsages.push({
-            id: uId,
-            media_id: mediaItem.id,
-            entity_type: 'homepage',
-            entity_id: String(p.id),
-            entity_title: `[PHỤ HUYNH] ${p.childName || p.id}`,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // 5. Scan Careers
-  try {
-    const careers = getAllCareers() || [];
-    for (const c of careers) {
-      if (isImageMatch(mediaItem, (c as any).image)) {
-        const uId = `dyn_career_${c.id}`;
-        if (!registeredIds.has(uId)) {
-          registeredIds.add(uId);
-          dynamicUsages.push({
-            id: uId,
-            media_id: mediaItem.id,
-            entity_type: 'careers',
-            entity_id: String(c.id),
-            entity_title: `[TUYỂN DỤNG] ${c.title}`,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // 6. Scan Courses
-  try {
-    const courses = getAllCourses() || [];
-    for (const c of courses) {
-      if (isImageMatch(mediaItem, c.thumbnailUrl)) {
-        const uId = `dyn_course_${c.id}`;
-        if (!registeredIds.has(uId)) {
-          registeredIds.add(uId);
-          dynamicUsages.push({
-            id: uId,
-            media_id: mediaItem.id,
-            entity_type: 'courses',
-            entity_id: String(c.id),
-            entity_title: `[KHÓA HỌC] ${c.titleVi}`,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-        }
-      }
-    }
-  } catch {
-    // Ignore
-  }
-
-  // 7. Scan Homepage Static Sections (Key Achievements, Banners, Hero)
-  const homepageStaticAssets: { filename: string; title: string; type: EntityType }[] = [
-    { filename: 'achievement_teacher.png', title: '[TRANG CHỦ] Key Achievements - Đội ngũ giảng viên', type: 'homepage' },
-    { filename: 'achievement_smartboard.png', title: '[TRANG CHỦ] Key Achievements - Công nghệ Smartboard', type: 'homepage' },
-    { filename: 'achievement_school.png', title: '[TRANG CHỦ] Key Achievements - Cơ sở vật chất trung tâm', type: 'homepage' },
-    { filename: 'banner-bg.jpg', title: '[TRANG CHỦ] Banner chính (Desktop)', type: 'homepage' },
-    { filename: 'banner-bg-mobile.jpg', title: '[TRANG CHỦ] Banner chính (Mobile)', type: 'homepage' },
-    { filename: 'en_banner-bg.jpg', title: '[TRANG CHỦ] Banner Tiếng Anh (Desktop)', type: 'homepage' },
-    { filename: 'en_banner-bg-mobile.jpg', title: '[TRANG CHỦ] Banner Tiếng Anh (Mobile)', type: 'homepage' },
-    { filename: 'hero.png', title: '[TRANG CHỦ] Hình ảnh Hero', type: 'homepage' },
-    { filename: 'ican.png', title: '[TRANG CHỦ] Logo iCANCAM', type: 'homepage' },
-    { filename: 'footer-logo.jpg', title: '[TRANG CHỦ] Logo chân trang', type: 'homepage' },
-  ];
-
-  for (const staticAsset of homepageStaticAssets) {
-    if (isImageMatch(mediaItem, staticAsset.filename)) {
-      const uId = `dyn_homepage_${staticAsset.filename}`;
-      if (!registeredIds.has(uId)) {
-        registeredIds.add(uId);
-        dynamicUsages.push({
-          id: uId,
-          media_id: mediaItem.id,
-          entity_type: staticAsset.type,
-          entity_id: `static_${staticAsset.filename}`,
-          entity_title: staticAsset.title,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      }
-    }
-  }
-
-  return dynamicUsages;
-};
+import { mediaUsageService, type UsageVerificationState, type MediaUsageLocation } from '../mediaUsageService';
 
 // Import asset images directly to guarantee clean resolution in Dev & Production builds
 import bannerBg from '../../assets/banner-bg.jpg';
@@ -383,7 +159,7 @@ const getItemsFromIDB = async (): Promise<MediaItem[]> => {
 };
 
 // Persistence fallback & Cache Auto-Sync
-const getStoredItems = (): MediaItem[] => {
+export const getStoredItems = (): MediaItem[] => {
   const deletedSet = getDeletedIds();
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -800,18 +576,11 @@ export class MediaRepository {
       // Fallback to local cache
     }
 
-    const usages = getStoredUsages();
-
-    // Attach current 100% accurate real-time usage count across all CMS modules
+    // Attach authoritative usage count from mediaUsageService
+    const usageIndex = await mediaUsageService.getAllMediaUsages();
     items = items.map((item) => {
-      const dynamicUsages = getAllDynamicUsagesForMedia(item);
-      const manualUsages = usages.filter((u) => u.media_id === item.id);
-      const combinedCount = new Set([
-        ...dynamicUsages.map((u) => `${u.entity_type}_${u.entity_id}`),
-        ...manualUsages.map((u) => `${u.entity_type}_${u.entity_id}`),
-      ]).size;
-
-      return { ...item, usage_count: combinedCount };
+      const usageResult = usageIndex.get(item.id);
+      return { ...item, usage_count: usageResult ? usageResult.usageCount : 0 };
     });
 
     // Apply Filter & Search
@@ -936,18 +705,60 @@ export class MediaRepository {
   }
 
   /**
-   * Hard Delete with Usage Protection (supports force delete)
+   * Authoritative Delete Safety Shield
+   * NO CLIENT FORCE DELETE BYPASS ALLOWED.
    */
-  async hardDeleteMediaItem(id: string, force: boolean = true): Promise<{ success: boolean; error?: string }> {
-    const usages = await this.getMediaUsages(id);
-    if (usages.length > 0 && !force) {
+  async hardDeleteMediaItem(id: string): Promise<{
+    success: boolean;
+    state?: UsageVerificationState;
+    locations?: MediaUsageLocation[];
+    error?: string;
+  }> {
+    // 1. Authoritative Usage Verification (Race Condition Re-check)
+    const verification = await mediaUsageService.getMediaUsage(id);
+
+    if (verification.state === 'IN_USE') {
       return {
         success: false,
-        error: `Tệp này đang được sử dụng ở ${usages.length} vị trí! Không thể xóa vĩnh viễn cho đến khi gỡ liên kết.`,
+        state: 'IN_USE',
+        locations: verification.locations,
+        error: `Tệp này đang được sử dụng tại ${verification.usageCount} vị trí! Không thể xóa vĩnh viễn cho đến khi gỡ liên kết.`,
       };
     }
+
+    if (verification.state === 'UNKNOWN') {
+      return {
+        success: false,
+        state: 'UNKNOWN',
+        locations: [],
+        error: `Không thể xác minh việc sử dụng tệp do lỗi kết nối/CSDL. Vui lòng thử lại sau. (${verification.error || 'Verification Error'})`,
+      };
+    }
+
+    // 2. Storage Object Delete (S3 Bucket) First
+    const items = getStoredItems();
+    const item = items.find((i) => i.id === id);
+    if (item && item.storage_path) {
+      try {
+        const { error: storageErr } = await supabase.storage.from(PRIVATE_BUCKET).remove([item.storage_path]);
+        if (storageErr && !storageErr.message?.includes('not found')) {
+          return {
+            success: false,
+            error: `Không thể xóa tệp vật lý trên Storage. Bản ghi CSDL được giữ nguyên an toàn. (${storageErr.message})`,
+          };
+        }
+      } catch (err: any) {
+        console.warn('Storage object removal notice:', err);
+      }
+    }
+
+    // 3. Database Record Delete
     await this.deleteMediaItem(id);
-    return { success: true };
+
+    // 4. Invalidate Usage Service Cache
+    mediaUsageService.invalidateCache();
+
+    return { success: true, state: 'NOT_IN_USE', locations: [] };
   }
 
   /**
@@ -970,30 +781,19 @@ export class MediaRepository {
   }
 
   /**
-   * Get usages history for a specific media item (combining dynamic & manual usages)
+   * Get usages history for a specific media item (delegates to mediaUsageService)
    */
   async getMediaUsages(mediaId: string): Promise<MediaUsage[]> {
-    const items = getStoredItems();
-    const targetItem = items.find((i) => i.id === mediaId);
-
-    const manualUsages = getStoredUsages().filter((u) => u.media_id === mediaId);
-    let dynamicUsages: MediaUsage[] = [];
-
-    if (targetItem) {
-      dynamicUsages = getAllDynamicUsagesForMedia(targetItem);
-    }
-
-    const usageMap = new Map<string, MediaUsage>();
-    for (const u of dynamicUsages) {
-      usageMap.set(`${u.entity_type}_${u.entity_id}`, u);
-    }
-    for (const u of manualUsages) {
-      if (!usageMap.has(`${u.entity_type}_${u.entity_id}`)) {
-        usageMap.set(`${u.entity_type}_${u.entity_id}`, u);
-      }
-    }
-
-    return Array.from(usageMap.values());
+    const usageResult = await mediaUsageService.getMediaUsage(mediaId);
+    return usageResult.locations.map((loc, idx) => ({
+      id: `loc_${loc.module}_${loc.recordId}_${idx}`,
+      media_id: mediaId,
+      entity_type: loc.module as any,
+      entity_id: loc.recordId,
+      entity_title: `${loc.recordTitle} (${loc.label})`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
   }
 
   /**
