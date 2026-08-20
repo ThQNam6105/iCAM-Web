@@ -1,5 +1,6 @@
 import { type Article } from '../data/newsData';
 import { supabase } from './supabaseClient';
+import { mediaRepository } from './media/mediaRepository';
 
 const LOCAL_STORAGE_KEY = 'icancam_dynamic_news_posts_v4';
 const AUTOSAVE_DRAFT_KEY = 'icancam_news_draft_autosave';
@@ -370,6 +371,13 @@ export const deleteNewsPost = async (id: string | number): Promise<boolean> => {
     const { error } = await supabase.from('news_posts').delete().eq('id', dbIdVal);
     if (error) {
       console.warn('Supabase delete error:', error.message);
+    }
+
+    // Auto-clean media usages for this deleted post
+    try {
+      await mediaRepository.unregisterUsageByEntity('news', String(id));
+    } catch {
+      // Ignore
     }
 
     return true;

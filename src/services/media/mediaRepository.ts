@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 import type { MediaItem, MediaUsage, MediaFolder, MediaFilter, EntityType } from '../../types/media';
+import { getAllNewsPosts } from '../newsService';
 
 // Import asset images directly to guarantee clean resolution in Dev & Production builds
 import bannerBg from '../../assets/banner-bg.jpg';
@@ -671,11 +672,11 @@ export class MediaRepository {
   }
 
   /**
-   * Hard Delete with Usage Protection
+   * Hard Delete with Usage Protection (supports force delete)
    */
-  async hardDeleteMediaItem(id: string): Promise<{ success: boolean; error?: string }> {
+  async hardDeleteMediaItem(id: string, force: boolean = true): Promise<{ success: boolean; error?: string }> {
     const usages = await this.getMediaUsages(id);
-    if (usages.length > 0) {
+    if (usages.length > 0 && !force) {
       return {
         success: false,
         error: `Tệp này đang được sử dụng ở ${usages.length} vị trí! Không thể xóa vĩnh viễn cho đến khi gỡ liên kết.`,
@@ -705,11 +706,40 @@ export class MediaRepository {
   }
 
   /**
-   * Get usages history for a specific media item
+   * Get usages history for a specific media item (with auto-pruning orphaned usages)
    */
   async getMediaUsages(mediaId: string): Promise<MediaUsage[]> {
     const usages = getStoredUsages();
-    return usages.filter((u) => u.media_id === mediaId);
+    const mediaUsages = usages.filter((u) => u.media_id === mediaId);
+
+    if (mediaUsages.length === 0) return [];
+
+    let activeNewsPosts: any[] = [];
+    try {
+      activeNewsPosts = getAllNewsPosts() || [];
+    } catch {
+      // Ignore
+    }
+
+    const validUsages = mediaUsages.filter((u) => {
+      const typeStr = String(u.entity_type).toLowerCase();
+      if (typeStr === 'news') {
+        const cleanEntityId = String(u.entity_id).replace('post_', '').replace('default_', '');
+        const exists = activeNewsPosts.some(
+          (p: any) => String(p.id) === String(u.entity_id) || String(p.id).replace('post_', '').replace('default_', '') === cleanEntityId
+        );
+        return exists;
+      }
+      return true;
+    });
+
+    if (validUsages.length !== mediaUsages.length) {
+      const validIds = new Set(validUsages.map((v) => v.id));
+      const remainingAll = usages.filter((u) => u.media_id !== mediaId || validIds.has(u.id));
+      saveStoredUsages(remainingAll);
+    }
+
+    return validUsages;
   }
 
   /**
@@ -768,6 +798,26 @@ export class MediaRepository {
 
     try {
       await supabase.from('media_usages').delete().eq('media_id', mediaId).eq('entity_type', entityType).eq('entity_id', entityId);
+    } catch {
+      // Ignore
+    }
+  }
+
+  /**
+   * Unregister all usages for a deleted entity
+   */
+  async unregisterUsageByEntity(entityType: string, entityId: string): Promise<void> {
+    const usages = getStoredUsages();
+    const cleanEntityId = String(entityId).replace('post_', '').replace('default_', '');
+    const filtered = usages.filter((u) => {
+      if (String(u.entity_type).toLowerCase() !== String(entityType).toLowerCase()) return true;
+      const cleanUId = String(u.entity_id).replace('post_', '').replace('default_', '');
+      return String(u.entity_id) !== String(entityId) && cleanUId !== cleanEntityId;
+    });
+    saveStoredUsages(filtered);
+
+    try {
+      await supabase.from('media_usages').delete().eq('entity_type', entityType).eq('entity_id', entityId);
     } catch {
       // Ignore
     }
