@@ -52,6 +52,25 @@ const LOCAL_STORAGE_KEY = 'ican_cms_media_items_v3';
 const LOCAL_USAGE_KEY = 'ican_cms_media_usages_v3';
 const LOCAL_FOLDER_KEY = 'ican_cms_media_folders_v3';
 const LOCAL_DELETED_KEY = 'ican_cms_media_deleted_ids_v3';
+const LOCAL_DELETED_FOLDERS_KEY = 'ican_cms_media_deleted_folders_v3';
+
+const getDeletedFolderIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(LOCAL_DELETED_FOLDERS_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch {
+    // Ignore
+  }
+  return new Set();
+};
+
+const saveDeletedFolderIds = (set: Set<string>) => {
+  try {
+    localStorage.setItem(LOCAL_DELETED_FOLDERS_KEY, JSON.stringify(Array.from(set)));
+  } catch {
+    // Ignore
+  }
+};
 
 // In-Memory & IndexedDB Storage
 const inMemoryItemsMap = new Map<string, MediaItem>();
@@ -212,22 +231,24 @@ const saveStoredUsages = (usages: MediaUsage[]) => {
 };
 
 const getStoredFolders = (): MediaFolder[] => {
+  const deletedSet = getDeletedFolderIds();
   try {
     const raw = localStorage.getItem(LOCAL_FOLDER_KEY);
     if (raw) {
       const parsed: MediaFolder[] = JSON.parse(raw);
-      const missing = DEFAULT_INITIAL_FOLDERS.filter((df) => !parsed.some((pf) => pf.id === df.id));
+      const filtered = parsed.filter((f) => !deletedSet.has(f.id));
+      const missing = DEFAULT_INITIAL_FOLDERS.filter((df) => !deletedSet.has(df.id) && !filtered.some((pf) => pf.id === df.id));
       if (missing.length > 0) {
-        const merged = [...parsed, ...missing];
+        const merged = [...filtered, ...missing];
         saveStoredFolders(merged);
         return merged;
       }
-      return parsed;
+      return filtered;
     }
   } catch {
     // Ignore
   }
-  return DEFAULT_INITIAL_FOLDERS;
+  return DEFAULT_INITIAL_FOLDERS.filter((df) => !deletedSet.has(df.id));
 };
 
 const saveStoredFolders = (folders: MediaFolder[]) => {
@@ -243,12 +264,13 @@ export class MediaRepository {
    * Fetch all folders with item count
    */
   async getFolders(): Promise<MediaFolder[]> {
+    const deletedSet = getDeletedFolderIds();
     const localFolders = getStoredFolders();
     let folders = [...localFolders];
     try {
       const { data, error } = await supabase.from('media_folders').select('*').order('created_at', { ascending: true });
       if (!error && data && data.length > 0) {
-        const supabaseFolders = data as MediaFolder[];
+        const supabaseFolders = (data as MediaFolder[]).filter((f) => !deletedSet.has(f.id));
         const folderMap = new Map<string, MediaFolder>();
         for (const f of supabaseFolders) {
           folderMap.set(f.id, f);
@@ -261,15 +283,17 @@ export class MediaRepository {
         folders = Array.from(folderMap.values());
         saveStoredFolders(folders);
       } else {
-        // Sync default initial folders to Supabase if database table is empty
-        await supabase.from('media_folders').upsert(DEFAULT_INITIAL_FOLDERS);
+        const validInitial = DEFAULT_INITIAL_FOLDERS.filter((f) => !deletedSet.has(f.id));
+        if (validInitial.length > 0) {
+          await supabase.from('media_folders').upsert(validInitial);
+        }
       }
     } catch {
       // Fallback
     }
 
     const items = getStoredItems();
-    return folders.map((f) => {
+    return folders.filter((f) => !deletedSet.has(f.id)).map((f) => {
       const count = items.filter((i) => i.folder_id === f.id && i.status !== 'archived').length;
       return { ...f, item_count: count };
     });
@@ -292,6 +316,12 @@ export class MediaRepository {
       updated_at: now,
       item_count: 0,
     };
+
+    const deletedSet = getDeletedFolderIds();
+    if (deletedSet.has(newFolder.id)) {
+      deletedSet.delete(newFolder.id);
+      saveDeletedFolderIds(deletedSet);
+    }
 
     folders.push(newFolder);
     saveStoredFolders(folders);
@@ -335,6 +365,10 @@ export class MediaRepository {
    * Delete a media folder (unassigns contained items back to root)
    */
   async deleteFolder(id: string): Promise<void> {
+    const deletedSet = getDeletedFolderIds();
+    deletedSet.add(id);
+    saveDeletedFolderIds(deletedSet);
+
     const folders = getStoredFolders();
     const filteredFolders = folders.filter((f) => f.id !== id);
     saveStoredFolders(filteredFolders);
